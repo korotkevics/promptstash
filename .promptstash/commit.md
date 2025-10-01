@@ -15,8 +15,8 @@ Present options:
 
 Loop until option 1 is selected.
 
-Finally, propose terminal actions. 
+Finally, propose terminal actions.
 
 Present options:
-1. Push - proceed with `git push`.
-2. No further actions - end here.
+1. Push - proceed with `git push`. If push fails, explain the issue and ask how to proceed.
+2. Done - return to caller if invoked from another prompt, otherwise end here.

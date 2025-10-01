@@ -1,6 +1,12 @@
 # promptstash
 
+<div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+  <img src="static/logo.png" alt="Promptstash Logo" style="width:35%;height:35%;object-fit:contain;" />
+</div>
+
+
 ![Version](https://img.shields.io/github/v/release/korotkevics/promptstash)
+![Tests](https://github.com/korotkevics/promptstash/actions/workflows/test.yml/badge.svg)
 
 A free, open-source collection of generic, reusable developer prompts for various workflows.
 
@@ -55,8 +61,11 @@ We welcome contributions! To add or improve prompts:
 
 ### Contribution Guidelines
 
-- Ensure prompts are generic and reusable. Avoid specific names, places, or scenarios.
+- Ensure prompts are generic and reusable. Avoid overly specific names, places, or scenarios.
 - If enhancing an existing prompt, explain your motivation in the PR description.
+- Test prompts to ensure they work as intended.
+- Follow existing formatting and style conventions.
+- Whenever possible, leverage the ecosystem of existing prompts via referencing.
 
 ---
 
