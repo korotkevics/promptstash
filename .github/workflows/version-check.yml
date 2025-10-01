@@ -1,0 +1,62 @@
+name: Version Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR version
+        id: pr_version
+        run: echo "version=$(cat .version)" >> $GITHUB_OUTPUT
+
+      - name: Check if version exists on main
+        id: check_main_version
+        run: |
+          if git cat-file -e origin/main:.version 2>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get main version
+        if: steps.check_main_version.outputs.exists == 'true'
+        id: main_version
+        run: |
+          git checkout origin/main -- .version
+          echo "version=$(cat .version)" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        run: |
+          PR_VERSION="${{ steps.pr_version.outputs.version }}"
+          MAIN_VERSION="${{ steps.main_version.outputs.version }}"
+
+          echo "PR version: $PR_VERSION"
+
+          if [ "$MAIN_VERSION" = "" ]; then
+            echo "✅ First version: $PR_VERSION"
+            exit 0
+          fi
+
+          echo "Main version: $MAIN_VERSION"
+
+          if [ "$PR_VERSION" = "$MAIN_VERSION" ]; then
+            echo "❌ Version not incremented. Please update .version file."
+            exit 1
+          fi
+
+          # Proper semver comparison using sort -V
+          if [ "$(printf '%s\n' "$PR_VERSION" "$MAIN_VERSION" | sort -V | head -n1)" = "$PR_VERSION" ] && [ "$PR_VERSION" != "$MAIN_VERSION" ]; then
+            echo "❌ Version decreased. PR version ($PR_VERSION) is less than main version ($MAIN_VERSION)."
+            exit 1
+          fi
+
+          echo "✅ Version incremented from $MAIN_VERSION to $PR_VERSION"
