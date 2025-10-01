@@ -18,12 +18,21 @@ jobs:
         id: pr_version
         run: echo "version=$(cat .version)" >> $GITHUB_OUTPUT
 
-      - name: Checkout main branch
-        run: git checkout origin/main -- .version
+      - name: Check if version exists on main
+        id: check_main_version
+        run: |
+          if git cat-file -e origin/main:.version 2>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Get main version
+        if: steps.check_main_version.outputs.exists == 'true'
         id: main_version
-        run: echo "version=$(cat .version)" >> $GITHUB_OUTPUT
+        run: |
+          git checkout origin/main -- .version
+          echo "version=$(cat .version)" >> $GITHUB_OUTPUT
 
       - name: Compare versions
         run: |
@@ -31,6 +40,12 @@ jobs:
           MAIN_VERSION="${{ steps.main_version.outputs.version }}"
 
           echo "PR version: $PR_VERSION"
+
+          if [ "$MAIN_VERSION" = "" ]; then
+            echo "✅ First version: $PR_VERSION"
+            exit 0
+          fi
+
           echo "Main version: $MAIN_VERSION"
 
           if [ "$PR_VERSION" = "$MAIN_VERSION" ]; then
