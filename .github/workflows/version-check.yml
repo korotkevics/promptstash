@@ -38,8 +38,8 @@ jobs:
             exit 1
           fi
 
-          # Simple semver comparison (lexicographic for basic cases)
-          if [ "$PR_VERSION" \< "$MAIN_VERSION" ]; then
+          # Proper semver comparison using sort -V
+          if [ "$(printf '%s\n' "$PR_VERSION" "$MAIN_VERSION" | sort -V | head -n1)" = "$PR_VERSION" ] && [ "$PR_VERSION" != "$MAIN_VERSION" ]; then
             echo "❌ Version decreased. PR version ($PR_VERSION) is less than main version ($MAIN_VERSION)."
             exit 1
           fi
