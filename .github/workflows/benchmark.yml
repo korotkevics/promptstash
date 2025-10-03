@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   benchmark:
@@ -29,10 +30,46 @@ jobs:
         run: |
           python scripts/benchmark.py
 
-      - name: Commit benchmark updates
+      - name: Create benchmark PR
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .benchmark/data.json README.md
-          git diff --staged --quiet || git commit -m "Update benchmarks for $(cat .version) [skip ci]"
-          git push
+
+          if git diff --staged --quiet; then
+            echo "No benchmark changes"
+            exit 0
+          fi
+
+          VERSION=$(cat .version)
+          BRANCH="benchmarks/v${VERSION}"
+
+          # Delete local branch if exists
+          git branch -D "$BRANCH" 2>/dev/null || true
+
+          # Delete remote branch if exists
+          git push origin --delete "$BRANCH" 2>/dev/null || true
+
+          # Create new branch
+          git checkout -b "$BRANCH"
+          git commit -m "Update benchmarks for ${VERSION}"
+          git push -u origin "$BRANCH"
+
+          # Create PR or update if exists
+          if gh pr list --head "$BRANCH" --json number --jq '.[0].number' | grep -q .; then
+            echo "PR already exists for $BRANCH, skipping creation"
+          else
+            gh pr create \
+              --title "Update benchmarks for ${VERSION}" \
+              --body "Automated benchmark update for version ${VERSION}" \
+              --base main \
+              --head "$BRANCH"
+          fi
+
+          # Clean up merged benchmark branches
+          gh pr list --state merged --json headRefName --jq '.[] | select(.headRefName | startswith("benchmarks/")) | .headRefName' | while read branch; do
+            echo "Deleting merged branch: $branch"
+            git push origin --delete "$branch" 2>/dev/null || true
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
