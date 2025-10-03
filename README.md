@@ -44,17 +44,17 @@ Follow the instructions in the prompt at $PROMPTSTASH_DIR/debug.md to investigat
 
 Token counts by version (latest 5):
 
-| Prompt | **0.5.1** | **0.4.0** | **0.3.0** | **0.2.0** | **0.1.0** |
+| Prompt | **0.5.2** | **0.5.1** | **0.4.0** | **0.3.0** | **0.2.0** |
 |---|---|---|---|---|---|
-| **commit** | 137 | 137 | 137 | 137 <sub>🔴 +20</sub> | 117 |
-| **create-pr** | 291 | 291 | - | - | - |
-| **create-simple-source-map** | 124 | 124 | 124 | 124 | - |
+| **commit** | 137 | 137 | 137 | 137 | 137 |
+| **create-pr** | 291 | 291 | 291 | - | - |
+| **create-simple-source-map** | 124 | 124 | 124 | 124 | 124 |
 | **debug** | 98 | 98 | 98 | 98 | 98 |
-| **read-source-map** | 71 | 71 | 71 | 71 | - |
-| **review-pr** | 267 | 267 <sub>🟢 -89</sub> | 356 | - | - |
+| **read-source-map** | 71 | 71 | 71 | 71 | 71 |
+| **review-pr** | 267 | 267 | 267 <sub>🟢 -89</sub> | 356 | - |
 | **ship** | 104 | 104 | 104 | 104 | 104 |
-| **squash** | 531 | 531 | 531 | 531 | - |
-| **TOTAL** | **1623** | **1623** <sub>🔴 +202</sub> | **1421** <sub>🔴 +356</sub> | **1065** <sub>🔴 +746</sub> | **319** |
+| **squash** | 531 | 531 | 531 | 531 | 531 |
+| **TOTAL** | **1623** | **1623** | **1623** <sub>🔴 +202</sub> | **1421** <sub>🔴 +356</sub> | **1065** |
 
 
 ## Contributing
