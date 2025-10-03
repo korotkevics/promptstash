@@ -4,11 +4,17 @@
 import json
 import os
 import subprocess
+import sys
 from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List
 
-import tiktoken
+try:
+    import tiktoken
+except ImportError:
+    print("Error: tiktoken is not installed.", file=sys.stderr)
+    print("Please install it with: pip install tiktoken", file=sys.stderr)
+    sys.exit(1)
 
 # Use cl100k_base tokenizer (GPT-4, Claude)
 TOKENIZER = tiktoken.get_encoding("cl100k_base")
@@ -155,7 +161,16 @@ Token counts by version (latest 5):
 def update_readme(table: str):
     """Update README.md with new benchmark table."""
     readme_file = Path("README.md")
-    content = readme_file.read_text()
+
+    # Read README with error handling
+    try:
+        content = readme_file.read_text()
+    except FileNotFoundError:
+        print(f"Error: {readme_file} not found", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error reading {readme_file}: {e}", file=sys.stderr)
+        sys.exit(1)
 
     # Find benchmark section
     benchmark_marker = "## 📊 Benchmarks"
@@ -182,11 +197,20 @@ def update_readme(table: str):
                 new_lines = lines[:start_idx] + table.split("\n")
 
             content = "\n".join(new_lines)
+        else:
+            # Benchmark marker found but start_idx is None (shouldn't happen)
+            print(f"Warning: Could not locate benchmark section properly", file=sys.stderr)
+            content = content.rstrip() + "\n\n" + table + "\n"
     else:
         # Append to end
         content = content.rstrip() + "\n\n" + table + "\n"
 
-    readme_file.write_text(content)
+    # Write README with error handling
+    try:
+        readme_file.write_text(content)
+    except Exception as e:
+        print(f"Error writing {readme_file}: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def main():

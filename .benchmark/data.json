@@ -3,7 +3,7 @@
     {
       "commit": "4412fef",
       "version": "0.1.0",
-      "timestamp": "2025-10-01T00:00:00+00:00",
+      "timestamp": "2025-10-01T03:27:30+02:00",
       "prompts": {
         "commit.md": 117,
         "debug.md": 98,
@@ -13,7 +13,7 @@
     {
       "commit": "ea9b69b",
       "version": "0.2.0",
-      "timestamp": "2025-10-02T00:00:00+00:00",
+      "timestamp": "2025-10-01T15:33:20+02:00",
       "prompts": {
         "commit.md": 137,
         "create-simple-source-map.md": 124,
@@ -26,7 +26,7 @@
     {
       "commit": "3ab4c0e",
       "version": "0.3.0",
-      "timestamp": "2025-10-03T00:00:00+00:00",
+      "timestamp": "2025-10-03T22:11:27+02:00",
       "prompts": {
         "commit.md": 137,
         "create-simple-source-map.md": 124,

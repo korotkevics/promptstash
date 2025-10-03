@@ -56,6 +56,7 @@ Token counts by version (latest 5):
 | **squash** | 531 | 531 | 531 | - |
 | **TOTAL** | **1623** <sub>🔴 +202</sub> | **1421** <sub>🔴 +356</sub> | **1065** <sub>🔴 +746</sub> | **319** |
 
+*Token counts are measured using the `cl100k_base` tokenizer (compatible with GPT-4 and Claude).*
 
 ## Contributing
 
