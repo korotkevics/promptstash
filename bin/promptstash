@@ -81,6 +81,7 @@ check_for_updates() {
 
         if [ "$higher_version" = "$latest_version" ]; then
             echo -e "${YELLOW}⚡ A new version of promptstash is available (v$latest_version). Run 'promptstash self-update' to upgrade.${NC}"
+            echo -e "${YELLOW}   Release notes: https://github.com/korotkevics/promptstash/releases/tag/v$latest_version${NC}"
             echo ""
         fi
     fi
@@ -109,9 +110,16 @@ self_update() {
     # Fetch and pull latest changes
     echo "Fetching latest changes..."
     git fetch --tags origin
-    
+
     local before_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
-    
+
+    # Check current branch and switch to main if needed
+    local current_branch=$(git branch --show-current)
+    if [ "$current_branch" != "main" ]; then
+        echo "Switching from branch '$current_branch' to 'main'..."
+        git checkout main
+    fi
+
     git pull origin main
     
     local after_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")

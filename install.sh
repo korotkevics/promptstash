@@ -4,6 +4,7 @@ set -e
 # PromptStash Installation Script
 # Usage: curl -fsSL https://raw.githubusercontent.com/korotkevics/promptstash/main/install.sh | bash
 # or: wget -qO- https://raw.githubusercontent.com/korotkevics/promptstash/main/install.sh | bash
+# Dry run: curl -fsSL https://raw.githubusercontent.com/korotkevics/promptstash/main/install.sh | bash -s -- --dry-run
 
 # Colors for output
 RED='\033[0;31m'
@@ -11,6 +12,16 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# Parse command line arguments
+DRY_RUN=false
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run)
+            DRY_RUN=true
+            ;;
+    esac
+done
 
 # Installation directory (customizable via environment variable)
 INSTALL_DIR="${PROMPTSTASH_INSTALL_DIR:-${HOME}/.promptstash}"
@@ -20,6 +31,11 @@ echo -e "${BLUE}═════════════════════�
 echo -e "${BLUE}   PromptStash Installation Script${NC}"
 echo -e "${BLUE}════════════════════════════════════════════════${NC}"
 echo ""
+
+if [ "$DRY_RUN" = true ]; then
+    echo -e "${YELLOW}🔍 DRY RUN MODE - No changes will be made${NC}"
+    echo ""
+fi
 
 # Check if git is installed
 if ! command -v git &> /dev/null; then
@@ -31,20 +47,49 @@ fi
 # Clone or update repository
 if [ -d "$INSTALL_DIR/.git" ]; then
     echo -e "${YELLOW}⚠ PromptStash is already installed at $INSTALL_DIR${NC}"
-    echo "Updating to the latest version..."
-    cd "$INSTALL_DIR"
-    git fetch --tags
-    git pull origin main
-    echo -e "${GREEN}✓ Updated successfully!${NC}"
+
+    if [ "$DRY_RUN" = true ]; then
+        echo "[DRY RUN] Would update to the latest version:"
+        echo "[DRY RUN]   cd $INSTALL_DIR"
+        echo "[DRY RUN]   git fetch --tags"
+        current_branch=$(cd "$INSTALL_DIR" && git branch --show-current)
+        if [ "$current_branch" != "main" ]; then
+            echo "[DRY RUN]   git checkout main (from branch '$current_branch')"
+        fi
+        echo "[DRY RUN]   git pull origin main"
+    else
+        echo "Updating to the latest version..."
+        cd "$INSTALL_DIR"
+        git fetch --tags
+
+        # Check current branch and switch to main if needed
+        local current_branch=$(git branch --show-current)
+        if [ "$current_branch" != "main" ]; then
+            echo "Switching from branch '$current_branch' to 'main'..."
+            git checkout main
+        fi
+
+        git pull origin main
+        echo -e "${GREEN}✓ Updated successfully!${NC}"
+    fi
 else
-    echo "Installing PromptStash to $INSTALL_DIR..."
-    git clone "$REPO_URL" "$INSTALL_DIR"
-    echo -e "${GREEN}✓ Cloned repository successfully!${NC}"
+    if [ "$DRY_RUN" = true ]; then
+        echo "[DRY RUN] Would install PromptStash to $INSTALL_DIR:"
+        echo "[DRY RUN]   git clone $REPO_URL $INSTALL_DIR"
+    else
+        echo "Installing PromptStash to $INSTALL_DIR..."
+        git clone "$REPO_URL" "$INSTALL_DIR"
+        echo -e "${GREEN}✓ Cloned repository successfully!${NC}"
+    fi
 fi
 
 # Make the CLI executable
 if [ -f "$INSTALL_DIR/bin/promptstash" ]; then
-    chmod +x "$INSTALL_DIR/bin/promptstash"
+    if [ "$DRY_RUN" = true ]; then
+        echo "[DRY RUN] Would make CLI executable: chmod +x $INSTALL_DIR/bin/promptstash"
+    else
+        chmod +x "$INSTALL_DIR/bin/promptstash"
+    fi
 fi
 
 # Detect shell and rc file
@@ -95,7 +140,11 @@ add_to_rc() {
 
     # Create rc file if it doesn't exist
     if [ ! -f "$rc_file" ]; then
-        touch "$rc_file"
+        if [ "$DRY_RUN" = true ]; then
+            echo "[DRY RUN] Would create $rc_file"
+        else
+            touch "$rc_file"
+        fi
     fi
 
     # Determine the correct syntax based on shell
@@ -111,21 +160,31 @@ add_to_rc() {
     fi
 
     # Check if already added (idempotent)
-    if grep -q "PROMPTSTASH_DIR.*\.promptstash" "$rc_file"; then
+    if grep -q "PROMPTSTASH_DIR=" "$rc_file" 2>/dev/null; then
         echo -e "${YELLOW}⚠ PROMPTSTASH_DIR is already configured in $rc_file${NC}"
     else
-        echo "" >> "$rc_file"
-        echo "# PromptStash" >> "$rc_file"
-        echo "$export_line" >> "$rc_file"
-        echo -e "${GREEN}✓ Added PROMPTSTASH_DIR to $rc_file${NC}"
+        if [ "$DRY_RUN" = true ]; then
+            echo "[DRY RUN] Would add to $rc_file:"
+            echo "[DRY RUN]   # PromptStash"
+            echo "[DRY RUN]   $export_line"
+        else
+            echo "" >> "$rc_file"
+            echo "# PromptStash" >> "$rc_file"
+            echo "$export_line" >> "$rc_file"
+            echo -e "${GREEN}✓ Added PROMPTSTASH_DIR to $rc_file${NC}"
+        fi
     fi
 
     # Check if PATH is already added
-    if grep -q "PATH.*promptstash/bin" "$rc_file"; then
+    if grep -q "PATH.*promptstash/bin" "$rc_file" 2>/dev/null; then
         echo -e "${YELLOW}⚠ PromptStash bin is already in PATH in $rc_file${NC}"
     else
-        echo "$path_line" >> "$rc_file"
-        echo -e "${GREEN}✓ Added PromptStash bin to PATH in $rc_file${NC}"
+        if [ "$DRY_RUN" = true ]; then
+            echo "[DRY RUN]   $path_line"
+        else
+            echo "$path_line" >> "$rc_file"
+            echo -e "${GREEN}✓ Added PromptStash bin to PATH in $rc_file${NC}"
+        fi
     fi
 }
 
@@ -137,15 +196,21 @@ rc_file=$(detect_shell)
 if [ $? -eq 0 ] && [ -n "$rc_file" ]; then
     add_to_rc "$rc_file" "$shell_name"
     echo ""
-    echo -e "${GREEN}✓ Installation complete!${NC}"
-    echo ""
-    echo "To start using PromptStash:"
-    echo "  1. Reload your shell: source $rc_file"
-    echo "  2. Or start a new terminal session"
-    echo ""
-    echo "Then you can use:"
-    echo "  • promptstash self-update    - Update to the latest version"
-    echo "  • \$PROMPTSTASH_DIR/commit.md - Access prompts directly"
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${YELLOW}✓ Dry run complete!${NC}"
+        echo ""
+        echo "To actually install, run without --dry-run flag"
+    else
+        echo -e "${GREEN}✓ Installation complete!${NC}"
+        echo ""
+        echo "To start using PromptStash:"
+        echo "  1. Reload your shell: source $rc_file"
+        echo "  2. Or start a new terminal session"
+        echo ""
+        echo "Then you can use:"
+        echo "  • promptstash self-update    - Update to the latest version"
+        echo "  • \$PROMPTSTASH_DIR/commit.md - Access prompts directly"
+    fi
     echo ""
 else
     echo ""
