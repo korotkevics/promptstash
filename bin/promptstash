@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # PromptStash CLI
 # A simple CLI for managing your PromptStash installation

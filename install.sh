@@ -51,6 +51,12 @@ if [ -d "$INSTALL_DIR/.git" ]; then
     if [ "$DRY_RUN" = true ]; then
         echo "[DRY RUN] Would update to the latest version:"
         echo "[DRY RUN]   cd $INSTALL_DIR"
+
+        # Check for uncommitted changes
+        if ! (cd "$INSTALL_DIR" && git diff-index --quiet HEAD -- 2>/dev/null); then
+            echo "[DRY RUN]   ⚠ Warning: Uncommitted changes detected - update would fail"
+        fi
+
         echo "[DRY RUN]   git fetch --tags"
         current_branch=$(cd "$INSTALL_DIR" && git branch --show-current)
         if [ "$current_branch" != "main" ]; then

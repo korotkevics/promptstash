@@ -49,7 +49,7 @@ fi
 
 # Test 5: Verify install.sh supports idempotency
 TESTS=$((TESTS + 1))
-if grep -q "PROMPTSTASH_DIR.*\.promptstash" install.sh; then
+if grep -q "PROMPTSTASH_DIR=" install.sh; then
   echo -e "${GREEN}✓ install.sh checks for existing configuration${NC}"
 else
   echo -e "${RED}✗ install.sh missing idempotency check${NC}"

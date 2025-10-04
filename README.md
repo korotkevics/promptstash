@@ -41,6 +41,12 @@ After installation, reload your shell or start a new terminal session:
 source ~/.bashrc  # or ~/.zshrc for zsh users
 ```
 
+To preview what the installer would do without making any changes, use the `--dry-run` flag:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/korotkevics/promptstash/main/install.sh | bash -s -- --dry-run
+```
+
 ### Updating
 
 Keep PromptStash up to date with:
