@@ -74,7 +74,7 @@ detect_shell() {
             echo -e "${YELLOW}⚠ Unknown shell: $shell_name${NC}"
             echo "Please manually add the following to your shell's rc file:"
             echo ""
-            echo "  export PROMPTSTASH_DIR=\"$INSTALL_DIR/.promptstash\""
+            echo "  export PROMPTSTASH_DIR=\"$INSTALL_DIR\""
             echo "  export PATH=\"\$PATH:$INSTALL_DIR/bin\""
             echo ""
             return 1
