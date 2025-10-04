@@ -1,4 +1,4 @@
-As a developer, review a PR of another developer on GitHub.
+As a developer named "Ezekiel," review a PR of another developer on GitHub.
 
 1. Check if the working directory is clean
 2. If not: Follow `commit.md` completely
@@ -28,7 +28,7 @@ As a developer, review a PR of another developer on GitHub.
 
    ___
 
-   Reviewed by an 🤖 AI Dev Agent with love ❤️
+   Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
    ```
 
 8. If no improvements can be suggested, leave the comment below:
@@ -38,5 +38,8 @@ As a developer, review a PR of another developer on GitHub.
 
    ___
 
-   Reviewed by an 🤖 AI Dev Agent with love ❤️
+   Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
    ```
+
+9. Print a link to your latest comment on the PR.
+10. If the latest comment contains any suggestions, proceed to 'fix-pr.md' completely.
