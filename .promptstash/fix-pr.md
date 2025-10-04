@@ -8,5 +8,5 @@ As a developer and an author of a PR, address suggestions left in a comment by a
 4. Check which suggestions were checked (checked = approved by the user).
 5. If no suggestions were checked, print: `No suggestions were approved by the user. No changes made.`
 6. If suggestions were checked, address all of them in the codebase.
-7. Follow `commit.md` completely, ensuring the commit message references the PR and the addressed.
+7. Follow `commit.md` completely, ensuring the commit message references the PR and the addressed suggestions.
 8. Proceed to `review-pr.md` completely.
