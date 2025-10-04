@@ -48,6 +48,30 @@ while IFS= read -r md_file; do
     ERRORS=$((ERRORS + 1))
   fi
 
+  # Check for newline at end of file
+  if [ -s "$md_file" ] && [ -z "$(tail -c 1 "$md_file")" ]; then
+    : # File ends with newline, good
+  else
+    echo -e "${RED}✗ $filename: Missing newline at end of file${NC}"
+    ERRORS=$((ERRORS + 1))
+  fi
+
+  # Validate review-pr.md and fix-pr.md specific requirements
+  if [[ "$filename" == "review-pr.md" ]] || [[ "$filename" == "fix-pr.md" ]]; then
+    if ! grep -q "Ezekiel" "$md_file"; then
+      echo -e "${RED}✗ $filename: Missing 'Ezekiel' agent identity${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+  fi
+
+  # Validate review-pr.md has checkbox template
+  if [[ "$filename" == "review-pr.md" ]]; then
+    if ! grep -q '\- \[ \]' "$md_file"; then
+      echo -e "${YELLOW}⚠ $filename: Missing checkbox template for suggestions${NC}"
+      WARNINGS=$((WARNINGS + 1))
+    fi
+  fi
+
 done < <(find .promptstash -name "*.md")
 
 echo ""

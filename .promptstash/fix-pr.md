@@ -5,6 +5,8 @@ As a developer and an author of a PR, address suggestions left in a comment by a
    - If no PR is found for the current branch: "No PR found. Run `create-pr.md` first."
 3. Find the latest comment made by you (the AI Dev Agent) on the PR.
    - If no AI (by "Ezekiel") comment is found: "No AI review comment found. Nothing to fix."
+   - If the comment is "LGTM!" (no suggestions): "PR approved with LGTM! No suggestions to address."
+   - Validate the comment contains checkbox format (- [ ] or - [x]). If not: "Comment format invalid. Expected checkbox structure."
 4. Check which suggestions were checked (checked = approved by the user).
 5. If no suggestions were checked, print: `No suggestions were approved by the user. No changes made.`
 6. If suggestions were checked, address all of them in the codebase.

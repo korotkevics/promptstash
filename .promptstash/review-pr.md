@@ -30,7 +30,7 @@ As a developer named "Ezekiel," review a PR of another developer on GitHub.
 
    Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
    ```
-   
+
 8. If no improvements can be suggested, leave the comment below:
 
    ```text
@@ -40,6 +40,6 @@ As a developer named "Ezekiel," review a PR of another developer on GitHub.
 
    Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
    ```
-   
+
 9. Print a link to your latest comment on the PR.
 10. If the latest comment contains any suggestions, proceed to 'fix-pr.md' completely.
