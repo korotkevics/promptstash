@@ -61,7 +61,7 @@ If you prefer to install manually:
 
 ```bash
 git clone https://github.com/korotkevics/promptstash.git ~/.promptstash
-export PROMPTSTASH_DIR="$HOME/.promptstash/.promptstash"
+export PROMPTSTASH_DIR="$HOME/.promptstash"
 export PATH="$PATH:$HOME/.promptstash/bin"
 ```
 
@@ -79,7 +79,7 @@ To uninstall PromptStash:
 2. Remove the environment variables from your shell's rc file (`~/.bashrc`, `~/.zshrc`, or `~/.config/fish/config.fish`):
    ```bash
    # Remove these lines:
-   export PROMPTSTASH_DIR="$HOME/.promptstash/.promptstash"
+   export PROMPTSTASH_DIR="$HOME/.promptstash"
    export PATH="$PATH:$HOME/.promptstash/bin"
    ```
 
