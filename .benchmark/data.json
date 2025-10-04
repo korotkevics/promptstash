@@ -112,6 +112,22 @@
         "ship.md": 104,
         "squash.md": 532
       }
+    },
+    {
+      "commit": "e2826c3",
+      "version": "0.7.0",
+      "timestamp": "2025-10-04T14:12:08.872904+00:00",
+      "prompts": {
+        "commit.md": 137,
+        "create-pr.md": 291,
+        "create-simple-source-map.md": 124,
+        "debug.md": 98,
+        "fix-pr.md": 294,
+        "read-source-map.md": 71,
+        "review-pr.md": 317,
+        "ship.md": 104,
+        "squash.md": 532
+      }
     }
   ]
 }
