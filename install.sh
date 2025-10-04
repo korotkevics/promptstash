@@ -103,10 +103,10 @@ add_to_rc() {
     local path_line=""
 
     if [ "$shell_name" = "fish" ]; then
-        export_line="set -gx PROMPTSTASH_DIR \"$INSTALL_DIR/.promptstash\""
+        export_line="set -gx PROMPTSTASH_DIR \"$INSTALL_DIR\""
         path_line="set -gx PATH \$PATH \"$INSTALL_DIR/bin\""
     else
-        export_line="export PROMPTSTASH_DIR=\"$INSTALL_DIR/.promptstash\""
+        export_line="export PROMPTSTASH_DIR=\"$INSTALL_DIR\""
         path_line="export PATH=\"\$PATH:$INSTALL_DIR/bin\""
     fi
 
