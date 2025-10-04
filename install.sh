@@ -152,7 +152,7 @@ else
     echo -e "${YELLOW}⚠ Could not automatically configure shell${NC}"
     echo "Please manually add to your shell's rc file:"
     echo ""
-    echo "  export PROMPTSTASH_DIR=\"$INSTALL_DIR/.promptstash\""
+    echo "  export PROMPTSTASH_DIR=\"$INSTALL_DIR\""
     echo "  export PATH=\"\$PATH:$INSTALL_DIR/bin\""
     echo ""
 fi
