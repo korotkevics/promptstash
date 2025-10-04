@@ -55,6 +55,13 @@ if [ -d "$INSTALL_DIR/.git" ]; then
         # Check for uncommitted changes
         if ! (cd "$INSTALL_DIR" && git diff-index --quiet HEAD -- 2>/dev/null); then
             echo "[DRY RUN]   ⚠ Warning: Uncommitted changes detected - update would fail"
+            uncommitted_files=$(cd "$INSTALL_DIR" && git status --short 2>/dev/null)
+            if [ -n "$uncommitted_files" ]; then
+                echo "[DRY RUN]   Uncommitted files:"
+                echo "$uncommitted_files" | while read -r line; do
+                    echo "[DRY RUN]     $line"
+                done
+            fi
         fi
 
         echo "[DRY RUN]   git fetch --tags"
@@ -69,7 +76,7 @@ if [ -d "$INSTALL_DIR/.git" ]; then
         git fetch --tags
 
         # Check current branch and switch to main if needed
-        local current_branch=$(git branch --show-current)
+        current_branch=$(git branch --show-current)
         if [ "$current_branch" != "main" ]; then
             echo "Switching from branch '$current_branch' to 'main'..."
             git checkout main

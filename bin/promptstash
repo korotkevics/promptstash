@@ -56,9 +56,9 @@ check_for_updates() {
     local api_response=""
 
     if command -v curl &> /dev/null; then
-        api_response=$(curl -sf "$GITHUB_API_URL" 2>/dev/null)
+        api_response=$(curl -sf --max-time 5 "$GITHUB_API_URL" 2>/dev/null)
     elif command -v wget &> /dev/null; then
-        api_response=$(wget -qO- "$GITHUB_API_URL" 2>/dev/null)
+        api_response=$(wget -qO- --timeout=5 "$GITHUB_API_URL" 2>/dev/null)
     fi
 
     # Only proceed if we got a valid response
@@ -77,8 +77,18 @@ check_for_updates() {
 
     # Compare versions using semantic versioning
     if [ -n "$latest_version" ] && [ "$latest_version" != "$local_version" ]; then
-        # Use sort -V for proper semantic version comparison
-        local higher_version=$(printf "%s\n%s" "$local_version" "$latest_version" | sort -V | tail -1)
+        # Use sort -V for proper semantic version comparison (with fallback for older systems)
+        local higher_version=""
+        if printf "%s\n%s" "1.0.0" "1.0.1" | sort -V &>/dev/null; then
+            higher_version=$(printf "%s\n%s" "$local_version" "$latest_version" | sort -V | tail -1)
+        else
+            # Fallback: simple string comparison (works for most semantic versions)
+            if [ "$latest_version" \> "$local_version" ]; then
+                higher_version="$latest_version"
+            else
+                higher_version="$local_version"
+            fi
+        fi
 
         if [ "$higher_version" = "$latest_version" ]; then
             echo -e "${YELLOW}⚡ A new version of promptstash is available (v$latest_version). Run 'promptstash self-update' to upgrade.${NC}"
@@ -178,11 +188,6 @@ EOF
 
 # Main command handler
 main() {
-    # Check for updates on every run (skip for self-update, version, and help)
-    if [ "$1" != "self-update" ] && [ "$1" != "version" ] && [ "$1" != "help" ] && [ "$1" != "--help" ] && [ "$1" != "-h" ]; then
-        check_for_updates
-    fi
-    
     case "$1" in
         self-update)
             self_update
@@ -194,12 +199,16 @@ main() {
             show_help
             ;;
         *)
+            # Unknown command - show error without update check
             echo -e "${RED}Unknown command: $1${NC}"
             echo ""
             show_help
             exit 1
             ;;
     esac
+
+    # Check for updates after successful command (helps keep terminal clean)
+    check_for_updates
 }
 
 main "$@"

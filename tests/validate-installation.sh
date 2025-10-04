@@ -147,6 +147,16 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
+# Test 16: Verify install.sh dry-run flag works
+TESTS=$((TESTS + 1))
+DRY_RUN_OUTPUT=$(bash install.sh --dry-run 2>&1)
+if echo "$DRY_RUN_OUTPUT" | grep -q "DRY RUN MODE" && echo "$DRY_RUN_OUTPUT" | grep -q "\[DRY RUN\]"; then
+  echo -e "${GREEN}✓ install.sh dry-run flag works${NC}"
+else
+  echo -e "${RED}✗ install.sh dry-run flag not working${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
 echo ""
 echo "Ran $TESTS tests"
 
