@@ -23,3 +23,6 @@ jobs:
 
       - name: Validate prompt structure
         run: ./tests/validate-prompt-structure.sh
+
+      - name: Validate installation features
+        run: ./tests/validate-installation.sh

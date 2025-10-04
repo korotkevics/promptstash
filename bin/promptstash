@@ -1,0 +1,196 @@
+#!/bin/bash
+
+# PromptStash CLI
+# A simple CLI for managing your PromptStash installation
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Determine the installation directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_DIR="$(dirname "$SCRIPT_DIR")"
+VERSION_FILE="$INSTALL_DIR/.version"
+REPO_URL="https://github.com/korotkevics/promptstash.git"
+GITHUB_API_URL="https://api.github.com/repos/korotkevics/promptstash/releases/latest"
+
+# Check for updates (unless disabled)
+check_for_updates() {
+    # Skip if update check is disabled
+    if [ "${PROMPTSTASH_NO_UPDATE_CHECK}" = "1" ]; then
+        return 0
+    fi
+    
+    # Skip if we checked recently (within last 24 hours)
+    local cache_file="$HOME/.promptstash_update_check"
+    if [ -f "$cache_file" ]; then
+        local last_check=$(cat "$cache_file" 2>/dev/null)
+
+        # Validate that last_check is a number
+        if [[ "$last_check" =~ ^[0-9]+$ ]]; then
+            local current_time=$(date +%s)
+            local time_diff=$((current_time - last_check))
+
+            # 86400 seconds = 24 hours
+            if [ $time_diff -lt 86400 ]; then
+                return 0
+            fi
+        else
+            # Corrupted cache file, remove it
+            rm -f "$cache_file"
+        fi
+    fi
+    
+    # Get local version
+    if [ ! -f "$VERSION_FILE" ]; then
+        return 0
+    fi
+    local local_version=$(cat "$VERSION_FILE")
+    
+    # Get latest release version from GitHub API
+    local latest_version=""
+    local api_response=""
+
+    if command -v curl &> /dev/null; then
+        api_response=$(curl -sf "$GITHUB_API_URL" 2>/dev/null)
+    elif command -v wget &> /dev/null; then
+        api_response=$(wget -qO- "$GITHUB_API_URL" 2>/dev/null)
+    fi
+
+    # Only proceed if we got a valid response
+    if [ -n "$api_response" ] && echo "$api_response" | grep -q '"tag_name"'; then
+        if command -v jq &> /dev/null; then
+            # Use jq for robust JSON parsing
+            latest_version=$(echo "$api_response" | jq -r '.tag_name // empty' 2>/dev/null | sed 's/^v//')
+        else
+            # Fallback to grep/sed if jq is not available
+            latest_version=$(echo "$api_response" | grep -o '"tag_name": *"[^"]*"' | sed 's/"tag_name": *"v*\([^"]*\)"/\1/')
+        fi
+    fi
+    
+    # Update cache file
+    date +%s > "$cache_file"
+
+    # Compare versions using semantic versioning
+    if [ -n "$latest_version" ] && [ "$latest_version" != "$local_version" ]; then
+        # Use sort -V for proper semantic version comparison
+        local higher_version=$(printf "%s\n%s" "$local_version" "$latest_version" | sort -V | tail -1)
+
+        if [ "$higher_version" = "$latest_version" ]; then
+            echo -e "${YELLOW}⚡ A new version of promptstash is available (v$latest_version). Run 'promptstash self-update' to upgrade.${NC}"
+            echo ""
+        fi
+    fi
+}
+
+# Self-update command
+self_update() {
+    echo -e "${BLUE}Updating PromptStash...${NC}"
+    
+    if [ ! -d "$INSTALL_DIR/.git" ]; then
+        echo -e "${RED}✗ Error: Not a git repository${NC}"
+        echo "Please reinstall PromptStash using the install script."
+        exit 1
+    fi
+    
+    cd "$INSTALL_DIR"
+    
+    # Check if there are uncommitted changes
+    if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+        echo -e "${RED}✗ Error: You have uncommitted changes${NC}"
+        echo "Please commit or discard your changes before updating."
+        echo "Run 'git status' in $INSTALL_DIR to see your changes."
+        exit 1
+    fi
+    
+    # Fetch and pull latest changes
+    echo "Fetching latest changes..."
+    git fetch --tags origin
+    
+    local before_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
+    
+    git pull origin main
+    
+    local after_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
+    
+    # Make sure the CLI is executable
+    if [ -f "$INSTALL_DIR/bin/promptstash" ]; then
+        chmod +x "$INSTALL_DIR/bin/promptstash"
+    fi
+    
+    # Clear update check cache
+    rm -f "$HOME/.promptstash_update_check"
+    
+    echo ""
+    if [ "$before_version" = "$after_version" ]; then
+        echo -e "${GREEN}✓ You are already on the latest version ($after_version)${NC}"
+    else
+        echo -e "${GREEN}✓ Successfully updated from v$before_version to v$after_version${NC}"
+    fi
+}
+
+# Show version
+show_version() {
+    if [ -f "$VERSION_FILE" ]; then
+        local version=$(cat "$VERSION_FILE")
+        echo "PromptStash v$version"
+    else
+        echo "PromptStash (version unknown)"
+    fi
+}
+
+# Show help
+show_help() {
+    cat << EOF
+PromptStash CLI - A collection of generic, reusable developer prompts
+
+Usage: promptstash [command]
+
+Commands:
+  self-update    Update PromptStash to the latest version
+  version        Show the current version
+  help           Show this help message
+
+Environment Variables:
+  PROMPTSTASH_DIR              Path to the prompts directory
+  PROMPTSTASH_NO_UPDATE_CHECK  Set to '1' to disable update checks
+
+Examples:
+  promptstash self-update      # Update to the latest version
+  promptstash version          # Show current version
+
+Prompts are located in: \$PROMPTSTASH_DIR
+Learn more: https://github.com/korotkevics/promptstash
+EOF
+}
+
+# Main command handler
+main() {
+    # Check for updates on every run (skip for self-update, version, and help)
+    if [ "$1" != "self-update" ] && [ "$1" != "version" ] && [ "$1" != "help" ] && [ "$1" != "--help" ] && [ "$1" != "-h" ]; then
+        check_for_updates
+    fi
+    
+    case "$1" in
+        self-update)
+            self_update
+            ;;
+        version)
+            show_version
+            ;;
+        help|--help|-h|"")
+            show_help
+            ;;
+        *)
+            echo -e "${RED}Unknown command: $1${NC}"
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
