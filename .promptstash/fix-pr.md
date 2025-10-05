@@ -4,12 +4,13 @@ Follow this workflow:
 
 1. Ask the user to review and approve suggestions:
 
-```text
-Please review the latest AI suggestions on your PR and check (☑) the ones I should address.
-Waiting for your confirmation...
-```
+    ```text
+    Please review the latest AI suggestions on your PR and check (☑) the ones I should address.
+    Waiting for your confirmation...
+    ```
 
 2. Find the PR for the current branch:
+
    ```bash
    BRANCH=$(git rev-parse --abbrev-ref HEAD)
    gh pr list --head $BRANCH
@@ -30,9 +31,9 @@ Waiting for your confirmation...
 
 5. If no suggestions were checked:
 
-```text
-No suggestions were approved. No changes made.
-```
+    ```text
+    No suggestions were approved. No changes made.
+    ```
 
 6. If suggestions were checked, implement all approved changes:
    - Address each suggestion systematically
@@ -41,14 +42,14 @@ No suggestions were approved. No changes made.
 
 7. Follow `.promptstash/commit.md` with a commit message referencing the PR and suggestions:
 
-```text
-Address PR feedback
-
-Implemented approved suggestions:
-- [List checked suggestions]
-
-Ref: PR #<number>
-```
+    ```text
+    Address PR feedback
+    
+    Implemented approved suggestions:
+    - [List checked suggestions]
+    
+    Ref: PR #<number>
+    ```
 
 8. Follow `.promptstash/review-pr.md` to request another review.
 
@@ -63,13 +64,13 @@ Ref: PR #<number>
 ```
 
 **Summary presented to user:**
-```text
-Found 2 approved suggestions to address:
-1. Add error handling to API client
-2. Update unit tests for new edge cases
-
-Proceeding with implementation...
-```
+    ```text
+    Found 2 approved suggestions to address:
+    1. Add error handling to API client
+    2. Update unit tests for new edge cases
+    
+    Proceeding with implementation...
+    ```
 
 ## Constraints
 - Only address suggestions that are explicitly checked by the user

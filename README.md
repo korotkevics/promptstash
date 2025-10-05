@@ -161,6 +161,7 @@ We welcome contributions! To add or improve prompts:
 - Test prompts to ensure they work as intended.
 - Follow existing formatting and style conventions.
 - Whenever possible, leverage the ecosystem of existing prompts via referencing.
+- When creating new prompts: use `.promptstash/improve-prompt.md` to refine your human-written draft, then use `.promptstash/optimize-prompt.md` to slim it down (improve first, optimize after).
 
 ---
 
