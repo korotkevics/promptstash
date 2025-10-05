@@ -9,7 +9,7 @@ Follow this workflow to improve prompts:
    - **Structured instructions**: Provides detailed context and step-by-step instructions
    - **Concrete examples**: Includes examples demonstrating desired behavior or output
    - **Output format**: Specifies the format of desired output using ```text ... ``` blocks
-   - **References**: Links to related prompts via `.promptstash/existing-prompt.md` when applicable
+   - **References**: Links to related prompts via, for example, `.promptstash/commit.md` when applicable
    - **Constraints**: States important limitations or requirements
 
 4. Present your analysis and suggestions in this format:
