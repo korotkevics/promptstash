@@ -34,18 +34,18 @@ Follow this workflow:
 
     ```text
     <Concise 1-2 sentence summary of overall assessment>
-    
+
     **HIGH priority suggestions**
     - [ ] <Critical issues that should be addressed before merge>
-    
+
     **MEDIUM priority suggestions**
     - [ ] <Important improvements that enhance quality>
-    
+
     **LOW priority suggestions**
     - [ ] <Nice-to-have refinements and optimizations>
-    
+
     ___
-    
+
     Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
     ```
 
@@ -53,9 +53,9 @@ Follow this workflow:
 
     ```text
     LGTM!
-    
+
     ___
-    
+
     Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
     ```
 
@@ -69,7 +69,7 @@ Follow this workflow:
 
     ```text
     ✓ Review posted successfully
-    
+
     **PR:** #<number> - <title>
     **Comment URL:** <url>
     **Suggestions:** <count> (<HIGH>/<MEDIUM>/<LOW>)
@@ -82,29 +82,29 @@ Follow this workflow:
 **Review with suggestions:**
     ```text
     Overall solid implementation, but found a few areas for improvement around error handling and test coverage.
-    
+
     **HIGH priority suggestions**
     - [ ] Add null check for `user.email` before calling `toLowerCase()` (line 42)
     - [ ] Handle API timeout errors in the fetch call (line 78)
-    
+
     **MEDIUM priority suggestions**
     - [ ] Extract magic number `5000` to a named constant `MAX_RETRIES`
     - [ ] Add unit tests for the new `validateInput()` function
-    
+
     **LOW priority suggestions**
     - [ ] Consider using async/await instead of `.then()` chains for better readability
-    
+
     ___
-    
+
     Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
     ```
 
 **Review with approval:**
     ```text
     LGTM!
-    
+
     ___
-    
+
     Reviewed by an 🤖 AI Dev Agent named "Ezekiel" with love ❤️
     ```
 

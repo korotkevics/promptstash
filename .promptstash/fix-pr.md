@@ -75,5 +75,5 @@ Proceeding with implementation...
 - Only address suggestions that are explicitly checked by the user
 - Never modify code without user approval of specific suggestions
 - If AI comment format is invalid, ask user to manually specify suggestions
-- Handle multiple AI comments by using the most recent one
+- Handle multiple AI comments by using the most recent one (look for "Ezekiel" signature)
 - Ensure commit message clearly references which suggestions were addressed

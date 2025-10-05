@@ -17,15 +17,15 @@ Follow this workflow to improve prompts:
     ```text
     ## Analysis
     [Identify specific issues with clarity, specificity, or ambiguities]
-    
+
     ## Suggested Improvements
     [Provide the improved prompt with explanations for key changes]
-    
+
     ## Key Changes
     - [Bullet point 1]
     - [Bullet point 2]
     ```
-   
+
 5. Present user with options:
    1. Accept improvements and save to the original file, then proceed to `.promptstash/commit.md`"
    2. Request further refinements
