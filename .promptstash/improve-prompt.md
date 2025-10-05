@@ -9,7 +9,7 @@ Follow this workflow to improve prompts:
    - **Structured instructions**: Provides detailed context and step-by-step instructions
    - **Concrete examples**: Includes examples demonstrating desired behavior or output
    - **Output format**: Specifies the format of desired output using ```text ... ``` blocks
-   - **References**: Links to related prompts via `existing-prompt.md` when applicable
+   - **References**: Links to related prompts via `.promptstash/existing-prompt.md` when applicable
    - **Constraints**: States important limitations or requirements
 
 4. Present your analysis and suggestions in this format:
@@ -33,6 +33,18 @@ If analyzing a vague prompt like "Help me write code," suggest improvements such
 - Add context about what kind of code, language, and requirements
 - Specify output format (e.g., "Provide code in ```language blocks with inline comments")
 - Include constraints (e.g., "Follow language-specific best practices")
+- Add references to related prompts (e.g., "For debugging assistance, see `.promptstash/debug.md`")
+
+## Output Validation Checklist
+
+Before finalizing your improved prompt, verify:
+- [ ] Role is clearly defined in first 1-2 sentences
+- [ ] Instructions are numbered or structured step-by-step
+- [ ] At least one concrete example is provided
+- [ ] Output format is specified (if applicable)
+- [ ] Related prompts are referenced (if applicable)
+- [ ] Constraints and limitations are stated
+- [ ] Language is clear, concise, and actionable
 
 ## Important Constraints
 - Always suggest complete, actionable rewrites, not just abstract advice
