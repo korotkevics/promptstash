@@ -34,31 +34,31 @@ Follow this workflow:
 
 6. Output the result in this format:
 
-```text
-✓ PR created successfully
-
-**Title:** <PR title>
-**URL:** <PR URL>
-```
+    ```text
+    ✓ PR created successfully
+    
+    **Title:** <PR title>
+    **URL:** <PR URL>
+    ```
 
 ## Example
 
 **Good PR title and body:**
-```
-Add user authentication middleware
-
-Implement JWT-based authentication for API routes.
-Includes token validation and refresh logic.
-Closes #123
-```
+    ```
+    Add user authentication middleware
+    
+    Implement JWT-based authentication for API routes.
+    Includes token validation and refresh logic.
+    Closes #123
+    ```
 
 **Output format:**
-```
-✓ PR created successfully
-
-**Title:** Add user authentication middleware
-**URL:** https://github.com/owner/repo/pull/456
-```
+    ```
+    ✓ PR created successfully
+    
+    **Title:** Add user authentication middleware
+    **URL:** https://github.com/owner/repo/pull/456
+    ```
 
 ## Constraints
 - Never force push to protected branches

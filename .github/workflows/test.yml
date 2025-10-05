@@ -40,3 +40,6 @@ jobs:
 
       - name: Validate token count ranges
         run: ./tests/validate-token-counts.sh
+
+      - name: Validate word counts
+        run: ./tests/validate-word-count.sh
