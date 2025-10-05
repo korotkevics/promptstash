@@ -27,19 +27,19 @@ Workflow:
     ```text
     ## Version Bump Analysis
     **Current:** X.Y.Z | **File:** <path> | **Base:** <branch> | **Commits:** N
-    
+
     ## Changes
     [Key changes list]
-    
+
     ## Options
     **1 (Recommended): <TYPE> → A.B.C**
     Why: [Rationale]
-    
+
     **2: <TYPE> → A.B.C**
     Why: [Alternative]
-    
+
     **3: Custom**
-    
+
     Select (1/2/3):
     ```
 
@@ -53,7 +53,7 @@ Workflow:
 11. `.promptstash/commit.md`:
     ```text
     Bump version to A.B.C
-    
+
     <TYPE> bump for:
     - [change 1]
     - [change 2]
@@ -63,21 +63,21 @@ Workflow:
     ```text
     ## Version Bump Analysis
     **Current:** 0.8.5 | **File:** .version | **Base:** main | **Commits:** 7
-    
+
     ## Changes
     - 3 new REST endpoints (user mgmt)
     - Auth token validation fix
     - Docs + tests
-    
+
     ## Options
     **1 (Recommended): MINOR → 0.9.0**
     Why: New endpoints = backwards-compatible features
-    
+
     **2: PATCH → 0.8.6**
     Why: If endpoints internal/experimental
-    
+
     **3: Custom**
-    
+
     Select (1/2/3):
     ```
 
