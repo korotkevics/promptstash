@@ -66,7 +66,7 @@ while IFS= read -r md_file; do
 
   # Validate review-pr.md has checkbox template
   if [[ "$filename" == "review-pr.md" ]]; then
-    if ! grep -q '- \[ \]' "$md_file"; then
+    if ! grep -q '\- \[ \]' "$md_file"; then
       echo -e "${YELLOW}⚠ $filename: Missing checkbox template for suggestions${NC}"
       WARNINGS=$((WARNINGS + 1))
     fi

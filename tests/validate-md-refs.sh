@@ -45,6 +45,10 @@ while IFS= read -r md_file; do
       fi
 
       if [ -z "$resolved_path" ]; then
+        # Skip .map_decisions.md as it's optional (can be referenced with any path)
+        if [[ "$ref" == *".map_decisions.md" ]]; then
+          continue
+        fi
         echo -e "${RED}✗ Broken reference in $md_file: $ref${NC}"
         ERRORS=$((ERRORS + 1))
       fi
