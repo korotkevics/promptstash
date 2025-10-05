@@ -17,8 +17,8 @@ while IFS= read -r md_file; do
   # Excludes variable references like $VAR/file.md
   while IFS= read -r ref; do
     if [ -n "$ref" ]; then
-      # Skip if it contains $ (variable reference)
-      if echo "$ref" | grep -q '\$'; then
+      # Skip if it contains $ (variable reference) or < > (template placeholder)
+      if echo "$ref" | grep -q '\$\|<\|>'; then
         continue
       fi
 
