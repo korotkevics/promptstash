@@ -6,6 +6,7 @@ digraph PromptReferences {
     bgcolor=transparent;
 
     // Nodes
+    "bump-semver-version" [label="bump-\nsemver-\nversion"];
     "commit" [label="commit"];
     "create-pr" [label="create-\npr"];
     "create-simple-source-map" [label="create-\nsimple-\nsource-\nmap"];
@@ -19,6 +20,9 @@ digraph PromptReferences {
     "squash" [label="squash"];
 
     // Edges
+    "bump-semver-version" -> "commit";
+    "bump-semver-version" -> "create-simple-source-map";
+    "bump-semver-version" -> "read-source-map";
     "create-pr" -> "squash";
     "create-simple-source-map" -> "commit";
     "debug" -> "commit";
