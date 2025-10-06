@@ -63,23 +63,23 @@ Load $PROMPTSTASH_DIR/.promptstash/debug.md and help me investigate this error:
 
 Token counts by version (latest 5):
 
-| Prompt | **0.16.0** | **0.16.0** | **0.15.1** | **0.15.0** | **0.14.0** |
+| Prompt | **0.16.0** | **0.16.0** | **0.16.0** | **0.15.1** | **0.15.0** |
 |---|---|---|---|---|---|
-| **bump-semver-version** $$$ | 442 | 442 | 442 <sub>🟢 -422</sub> | 864 | 864 |
+| **bump-semver-version** $$$ | 442 | 442 | 442 | 442 <sub>🟢 -422</sub> | 864 |
 | **commit** $$ | 286 | 286 | 286 | 286 | 286 |
-| **create-mr** $$ | 272 | 272 | 272 <sub>🟢 -318</sub> | 590 | - |
+| **create-mr** $$ | 272 | 272 | 272 | 272 <sub>🟢 -318</sub> | 590 |
 | **create-pr** $$$ | 490 | 490 | 490 | 490 | 490 |
-| **create-simple-source-map** $$ | 332 | 332 | 332 <sub>🟢 -173</sub> | 505 | 505 |
+| **create-simple-source-map** $$ | 332 | 332 | 332 | 332 <sub>🟢 -173</sub> | 505 |
 | **debug** $$ | 317 | 317 | 317 | 317 | 317 |
-| **fix-pr** $$ | 275 | 275 | 275 <sub>🟢 -305</sub> | 580 | 580 |
+| **fix-pr** $$ | 275 | 275 | 275 | 275 <sub>🟢 -305</sub> | 580 |
 | **improve-prompt** $$$ | 416 | 416 | 416 | 416 | 416 |
 | **optimize-prompt** $$$$$$ | 1186 | 1186 | 1186 | 1186 | 1186 |
 | **read-source-map** $$ | 308 | 308 | 308 | 308 | 308 |
-| **review-pr** $$ | 282 | 282 | 282 <sub>🟢 -343</sub> | 625 | 625 |
+| **review-pr** $$ | 282 | 282 | 282 | 282 <sub>🟢 -343</sub> | 625 |
 | **ship** $$ | 202 | 202 | 202 | 202 | 202 |
 | **squash** $ | 180 | 180 | 180 | 180 | 180 |
-| **suggest-better-function-names** $$ | 303 | 303 | 303 <sub>🟢 -317</sub> | 620 | 620 |
-| **TOTAL** | **5291** | **5291** | **5291** <sub>🟢 -1878</sub> | **7169** <sub>🔴 +590</sub> | **6579** |
+| **suggest-better-function-names** $$ | 303 | 303 | 303 | 303 <sub>🟢 -317</sub> | 620 |
+| **TOTAL** | **5291** | **5291** | **5291** | **5291** <sub>🟢 -1878</sub> | **7169** |
 
 
 ## Prompt Reference Graph
