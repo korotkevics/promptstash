@@ -34,19 +34,27 @@ For detailed installation options, updating, manual installation, and uninstalli
 
 ### Using Prompts
 
-Prompts can be used directly in your chat tool or programmatically:
+PromptStash prompts are stored in `$PROMPTSTASH_DIR/.promptstash/`. When working with your AI assistant, reference these prompts by their full path so the assistant can load and follow the instructions.
 
-**Example 1: Basic Usage**
+Here are practical examples:
+
+**Example 1: Creating a well-formatted commit**
 
 ```text
-Follow the instructions in the prompt at $PROMPTSTASH_DIR/commit.md.
+Load the prompt at $PROMPTSTASH_DIR/.promptstash/commit.md and follow its instructions to create a commit message.
 ```
 
-**Example 2: With Additional Context**
+**Example 2: Getting a PR reviewed**
 
 ```text
-Follow the instructions in the prompt at $PROMPTSTASH_DIR/debug.md to investigate the stacktrace below:
-...
+Follow the instructions in $PROMPTSTASH_DIR/.promptstash/review-pr.md to analyze my current PR and provide feedback.
+```
+
+**Example 3: Debugging an issue with context**
+
+```text
+Load $PROMPTSTASH_DIR/.promptstash/debug.md and help me investigate this error:
+[paste your error message or stack trace here]
 ```
 
 ## 📊 Benchmarks
