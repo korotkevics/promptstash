@@ -53,9 +53,9 @@ Follow the instructions in the prompt at $PROMPTSTASH_DIR/debug.md to investigat
 
 Token counts by version (latest 5):
 
-| Prompt | **0.11.0** | **0.9.3** | **0.9.2** | **0.9.1** | **0.9.0** |
+| Prompt | **0.11.0** | **0.11.0** | **0.9.3** | **0.9.2** | **0.9.1** |
 |---|---|---|---|---|---|
-| **bump-semver-version** | 864 | - | - | - | - |
+| **bump-semver-version** | 864 | 864 | - | - | - |
 | **commit** | 286 | 286 | 286 | 286 | 286 |
 | **create-pr** | 490 | 490 | 490 | 490 | 490 |
 | **create-simple-source-map** | 634 | 634 | 634 | 634 | 634 |
@@ -67,7 +67,7 @@ Token counts by version (latest 5):
 | **review-pr** | 625 | 625 | 625 | 625 | 625 |
 | **ship** | 202 | 202 | 202 | 202 | 202 |
 | **squash** | 180 | 180 | 180 | 180 | 180 |
-| **TOTAL** | **6030** <sub>🔴 +864</sub> | **5166** | **5166** | **5166** | **5166** |
+| **TOTAL** | **6030** | **6030** <sub>🔴 +864</sub> | **5166** | **5166** | **5166** |
 
 
 ## 🔗 Prompt Reference Graph
