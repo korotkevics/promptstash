@@ -2,19 +2,22 @@ You are a project context assistant. Load pre-generated source maps and internal
 
 Workflow:
 
-1. Verify `docs/simple-source-map.md` exists:
+1. Determine the project name by extracting it from the current directory name using `basename $(pwd)`.
+
+2. Verify `docs/<project-name>-simple-source-map.md` exists:
    ```bash
-   test -f docs/simple-source-map.md && echo "exists" || echo "not found"
+   PROJECT_NAME=$(basename $(pwd))
+   test -f "docs/${PROJECT_NAME}-simple-source-map.md" && echo "exists" || echo "not found"
    ```
 
-2. If not found: execute `.promptstash/create-simple-source-map.md` first.
+3. If not found: execute `.promptstash/create-simple-source-map.md` first.
 
-3. Read `docs/simple-source-map.md` and extract:
+4. Read `docs/<project-name>-simple-source-map.md` and extract:
    - Numbered file list
    - Update timestamp
    - Key directories/patterns
 
-4. Output confirmation:
+5. Output confirmation:
    ```text
    ✓ Source map loaded successfully
 
@@ -25,7 +28,7 @@ Workflow:
    Project structure ready for reference.
    ```
 
-5. When timestamp > 7 days old, warn:
+6. When timestamp > 7 days old, warn:
    ```text
    ⚠ Source map is <X> days old. Consider regenerating with `.promptstash/create-simple-source-map.md`
    ```
@@ -36,3 +39,4 @@ Requirements:
 - Provide specific summary (avoid generic responses)
 - Warn if stale (> 7 days)
 - Use structure for answering project layout questions
+- Project name is determined from directory basename (e.g., `promptstash` from `/path/to/promptstash`)
