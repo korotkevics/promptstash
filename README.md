@@ -36,7 +36,7 @@ For detailed installation options, updating, manual installation, and uninstalli
 
 PromptStash prompts are stored in `$PROMPTSTASH_DIR/.promptstash/`. When working with your AI assistant, reference these prompts by their full path so the assistant can load and follow the instructions.
 
-**Tip:** If your AI assistant supports context memory well, you can first ask it to remember this path: "Load prompts in `$PROMPTSTASH_DIR/.promptstash/` and remember to search there when I ask you to follow an `*.md` prompt." This allows you to reference prompts more simply, like "follow commit.md" instead of using the full path each time.
+> **Tip:** If your AI assistant supports context memory well, you can first ask it to remember this path: `Load prompts in $PROMPTSTASH_DIR/.promptstash/ and remember to search there when I ask you to follow an *.md prompt.` This allows you to reference prompts more simply, like `follow commit.md` instead of using the full path each time.
 
 Here are practical examples:
 
