@@ -1,3 +1,11 @@
+---
+name: Issue Report
+about: Report bugs, request features, or suggest improvements
+title: ''
+labels: ''
+assignees: ''
+---
+
 ## What
 
 [Brief description of what needs to be done or fixed]
