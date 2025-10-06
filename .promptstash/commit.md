@@ -12,6 +12,7 @@ Workflow:
 2. Propose commit message:
    - Imperative mood ("Add" not "Added")
    - Subject ≤50 chars
+   - No semantic prefixes (no "feat:", "fix:", "chore:", etc.)
    - Optional detailed body after blank line
 
 3. Present:
@@ -49,6 +50,11 @@ Example good message:
 Example bad message:
     ```
     Updated some files and fixed stuff
+    ```
+
+Example bad message (semantic prefix):
+    ```
+    feat: Add user authentication middleware
     ```
 
 Constraints:
