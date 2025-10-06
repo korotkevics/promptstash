@@ -54,6 +54,29 @@ def test_get_delta():
     print("✓ test_get_delta passed")
 
 
+def test_get_dollar_signs():
+    """Test dollar sign calculation function."""
+    # Test edge cases
+    assert benchmark.get_dollar_signs(1) == " $", "1 token should give 1 dollar sign"
+    assert benchmark.get_dollar_signs(100) == " $", "100 tokens should give 1 dollar sign"
+    assert benchmark.get_dollar_signs(200) == " $", "200 tokens should give 1 dollar sign"
+    
+    # Test boundary
+    assert benchmark.get_dollar_signs(201) == " $$", "201 tokens should give 2 dollar signs"
+    assert benchmark.get_dollar_signs(400) == " $$", "400 tokens should give 2 dollar signs"
+    
+    # Test examples from issue
+    assert benchmark.get_dollar_signs(600) == " $$$", "600 tokens should give 3 dollar signs"
+    assert benchmark.get_dollar_signs(710) == " $$$$", "710 tokens should give 4 dollar signs"
+    
+    # Test more cases
+    assert benchmark.get_dollar_signs(401) == " $$$", "401 tokens should give 3 dollar signs"
+    assert benchmark.get_dollar_signs(800) == " $$$$", "800 tokens should give 4 dollar signs"
+    assert benchmark.get_dollar_signs(1000) == " $$$$$", "1000 tokens should give 5 dollar signs"
+
+    print("✓ test_get_dollar_signs passed")
+
+
 def test_generate_readme_table():
     """Test README table generation."""
     # Create test data
@@ -91,6 +114,9 @@ def test_generate_readme_table():
 
     # Check deltas are shown
     assert "🔴" in table or "🟢" in table, "Should show delta indicators"
+    
+    # Check dollar signs are present (120 tokens -> 1 sign, 50 tokens -> 1 sign)
+    assert "$" in table, "Should include dollar signs based on token count"
 
     print("✓ test_generate_readme_table passed")
 
@@ -141,6 +167,7 @@ def run_all_tests():
 
     test_count_tokens()
     test_get_delta()
+    test_get_dollar_signs()
     test_generate_readme_table()
     test_generate_readme_table_empty()
     test_generate_readme_table_sliding_window()

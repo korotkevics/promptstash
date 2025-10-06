@@ -2,6 +2,7 @@
 """Benchmark prompt token counts and update README."""
 
 import json
+import math
 import os
 import subprocess
 import sys
@@ -89,6 +90,21 @@ def get_delta(current: int, previous: int | None) -> str:
         return f' <sub>🟢 {delta}</sub>'
 
 
+def get_dollar_signs(tokens: int) -> str:
+    """Calculate dollar signs based on token count.
+    
+    Formula: max(ceiling(tokens / 200), 1)
+    Examples:
+    - 100 tokens → $ (1 sign)
+    - 200 tokens → $ (1 sign)
+    - 201 tokens → $$ (2 signs)
+    - 600 tokens → $$$ (3 signs)
+    - 710 tokens → $$$$ (4 signs)
+    """
+    num_signs = max(math.ceil(tokens / 200), 1)
+    return " " + "$" * num_signs
+
+
 def generate_readme_table(data: Dict) -> str:
     """Generate fancy benchmark table for README."""
     commits = data["commits"]
@@ -113,7 +129,11 @@ def generate_readme_table(data: Dict) -> str:
     # Build table rows
     rows = []
     for prompt in all_prompts:
-        prompt_name = f"**{prompt.replace('.md', '')}**"
+        # Get latest token count for this prompt (from most recent commit)
+        latest_token_count = recent_commits[0]["prompts"].get(prompt, 0)
+        dollar_signs = get_dollar_signs(latest_token_count) if latest_token_count > 0 else ""
+        
+        prompt_name = f"**{prompt.replace('.md', '')}**{dollar_signs}"
         cells = [prompt_name]
 
         # Calculate deltas from right to left (oldest to newest)
