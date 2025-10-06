@@ -28,8 +28,8 @@
 27=static
 28=static/logo.png
 29=tests
-29=tests/test_benchmark.py
-30=tests/validate-benchmark-prompts.sh
+30=tests/test_benchmark.py
+31=tests/validate-benchmark-prompts.sh
 31=tests/validate-installation.sh
 32=tests/validate-md-refs.sh
 33=tests/validate-prompt-structure.sh
