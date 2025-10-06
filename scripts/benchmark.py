@@ -213,6 +213,23 @@ def update_readme(table: str):
         sys.exit(1)
 
 
+def generate_prompt_graph():
+    """Generate prompt reference graph."""
+    try:
+        result = subprocess.run(
+            [sys.executable, "scripts/generate_graph.py"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: Failed to generate graph: {e}", file=sys.stderr)
+        print(e.stderr, file=sys.stderr)
+    except FileNotFoundError:
+        print("Warning: generate_graph.py not found, skipping graph generation", file=sys.stderr)
+
+
 def main():
     """Main benchmark workflow."""
     version = get_current_version()
@@ -256,6 +273,10 @@ def main():
     table = generate_readme_table(data)
     update_readme(table)
     print("Updated README.md")
+    
+    # Generate prompt reference graph
+    print("\nGenerating prompt reference graph...")
+    generate_prompt_graph()
 
 
 if __name__ == "__main__":

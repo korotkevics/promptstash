@@ -135,6 +135,15 @@ Token counts by version (latest 5):
 | **squash** | 180 <sub>🟢 -708</sub> | 888 <sub>🔴 +356</sub> | 532 | 532 <sub>🔴 +1</sub> | 531 |
 | **TOTAL** | **5166** <sub>🟢 -732</sub> | **5898** <sub>🔴 +3435</sub> | **2463** <sub>🔴 +495</sub> | **1968** <sub>🔴 +345</sub> | **1623** |
 
+## 🔗 Prompt Reference Graph
+
+Visual representation of how prompts reference each other:
+
+<div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+  <img src="static/prompt-graph.svg" alt="Prompt Reference Graph" style="width:100%;max-width:800px;height:auto;" />
+</div>
+
+Prompts are represented as circles with arrows showing references. Island nodes (like `commit` and `squash`) have no outbound references, while others form a reference network.
 
 ## Contributing
 
