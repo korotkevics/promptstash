@@ -56,7 +56,7 @@ while IFS= read -r md_file; do
     ERRORS=$((ERRORS + 1))
   fi
 
-  # Validate review-pr.md and fix-pr.md specific requirements (MR versions inherit via composition)
+  # Validate review-pr.md and fix-pr.md specific requirements
   if [[ "$filename" == "review-pr.md" ]] || [[ "$filename" == "fix-pr.md" ]]; then
     if ! grep -q "Ezekiel" "$md_file"; then
       echo -e "${RED}✗ $filename: Missing 'Ezekiel' agent identity${NC}"
@@ -64,7 +64,30 @@ while IFS= read -r md_file; do
     fi
   fi
 
-  # Validate review-pr.md has checkbox template (review-mr.md inherits via composition)
+  # Validate review-mr.md and fix-mr.md reference their PR counterparts
+  if [[ "$filename" == "fix-mr.md" ]]; then
+    if ! grep -q "fix-pr.md" "$md_file"; then
+      echo -e "${RED}✗ $filename: Missing reference to fix-pr.md${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+    if ! grep -q "review-mr.md" "$md_file"; then
+      echo -e "${RED}✗ $filename: Missing reference to review-mr.md${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+  fi
+
+  if [[ "$filename" == "review-mr.md" ]]; then
+    if ! grep -q "review-pr.md" "$md_file"; then
+      echo -e "${RED}✗ $filename: Missing reference to review-pr.md${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+    if ! grep -q "fix-mr.md" "$md_file"; then
+      echo -e "${RED}✗ $filename: Missing reference to fix-mr.md${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+  fi
+
+  # Validate review-pr.md has checkbox template
   if [[ "$filename" == "review-pr.md" ]]; then
     if ! grep -q '\- \[ \]' "$md_file"; then
       echo -e "${YELLOW}⚠ $filename: Missing checkbox template for suggestions${NC}"
