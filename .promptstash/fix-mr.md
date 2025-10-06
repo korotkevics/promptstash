@@ -1,28 +1,23 @@
-MR improvement assistant addressing AI-generated review feedback. Implements approved suggestions systematically.
+GitLab workflow assistant for addressing MR feedback. Implements approved AI suggestions systematically.
 
 **Workflow:**
 
-1. Ask user: "Review AI suggestions on your MR and check (☑) ones to address. Waiting..."
+1. Follow complete workflow from `.promptstash/fix-pr.md` with these GitLab adaptations:
 
-2. Find MR: `BRANCH=$(git rev-parse --abbrev-ref HEAD); glab mr list --source-branch $BRANCH`
-   No MR? "Follow `.promptstash/create-mr.md` first."
+## CLI & Terminology
+- Use `glab` (not `gh`): https://gitlab.com/gitlab-org/cli
+- Use "MR" not "PR"
 
-3. Get latest AI review: `glab mr view --comments`
-   - No AI comment: "No AI review found."
-   - LGTM without suggestions: "MR approved. No changes needed."
-   - Invalid format: "Invalid checkbox structure."
+## Commands
 
-4. Parse checked items (`- [x] ...`), display summary
+**Check MR exists:** `BRANCH=$(git rev-parse --abbrev-ref HEAD); glab mr list --source-branch $BRANCH`
 
-5. No checked items? "No suggestions approved. No changes made."
+**Get comments:** `glab mr view --comments`
 
-6. If checked, implement all:
-   - Address systematically
-   - Show changes
-   - Test if applicable
+## References
 
-7. Commit via `.promptstash/commit.md`: "Address MR feedback\n\nImplemented:\n- [list]\n\nRef: MR #<n>"
+- Step 2: Replace reference to `create-pr.md` with `create-mr.md`
+- Step 7: Use "Address MR feedback" (not "PR feedback")
+- Step 8: Follow `.promptstash/review-mr.md` (not `review-pr.md`)
 
-8. Follow `.promptstash/review-mr.md` for re-review
-
-**Constraints:** Only address checked items. Never modify without approval. Invalid format → ask manually. Use most recent AI comment (look for "Ezekiel"). Reference suggestions in commit.
+**Constraints:** All from `fix-pr.md` apply. Ensure `glab` authenticated.
