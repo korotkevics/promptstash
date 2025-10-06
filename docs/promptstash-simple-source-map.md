@@ -23,11 +23,11 @@
 22=docs/promptstash-map-decisions.md
 23=docs/promptstash-simple-source-map.md
 24=install.sh
-24=scripts
-25=scripts/benchmark.py
-26=static
-27=static/logo.png
-28=tests
+25=scripts
+26=scripts/benchmark.py
+27=static
+28=static/logo.png
+29=tests
 29=tests/test_benchmark.py
 30=tests/validate-benchmark-prompts.sh
 31=tests/validate-installation.sh
