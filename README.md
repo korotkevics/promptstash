@@ -53,20 +53,20 @@ Follow the instructions in the prompt at $PROMPTSTASH_DIR/debug.md to investigat
 
 Token counts by version (latest 5):
 
-| Prompt | **0.9.2** | **0.9.1** | **0.9.0** | **0.8.1** | **0.8.0** |
+| Prompt | **0.9.3** | **0.9.2** | **0.9.1** | **0.9.0** | **0.8.1** |
 |---|---|---|---|---|---|
-| **commit** | 286 | 286 | 286 <sub>🟢 -101</sub> | 387 <sub>🔴 +250</sub> | 137 |
-| **create-pr** | 490 | 490 | 490 <sub>🔴 +12</sub> | 478 <sub>🔴 +187</sub> | 291 |
-| **create-simple-source-map** | 634 | 634 | 634 <sub>🔴 +39</sub> | 595 <sub>🔴 +471</sub> | 124 |
-| **debug** | 317 | 317 | 317 <sub>🟢 -178</sub> | 495 <sub>🔴 +397</sub> | 98 |
-| **fix-pr** | 580 | 580 | 580 <sub>🔴 +22</sub> | 558 <sub>🔴 +264</sub> | 294 |
-| **improve-prompt** | 416 | 416 | 416 <sub>🟢 -138</sub> | 554 <sub>🔴 +59</sub> | 495 |
-| **optimize-prompt** | 1186 | 1186 | 1186 | - | - |
-| **read-source-map** | 250 | 250 | 250 <sub>🟢 -256</sub> | 506 <sub>🔴 +435</sub> | 71 |
-| **review-pr** | 625 | 625 | 625 <sub>🟢 -187</sub> | 812 <sub>🔴 +495</sub> | 317 |
-| **ship** | 202 | 202 | 202 <sub>🟢 -423</sub> | 625 <sub>🔴 +521</sub> | 104 |
-| **squash** | 180 | 180 | 180 <sub>🟢 -708</sub> | 888 <sub>🔴 +356</sub> | 532 |
-| **TOTAL** | **5166** | **5166** | **5166** <sub>🟢 -732</sub> | **5898** <sub>🔴 +3435</sub> | **2463** |
+| **commit** | 286 | 286 | 286 | 286 <sub>🟢 -101</sub> | 387 |
+| **create-pr** | 490 | 490 | 490 | 490 <sub>🔴 +12</sub> | 478 |
+| **create-simple-source-map** | 634 | 634 | 634 | 634 <sub>🔴 +39</sub> | 595 |
+| **debug** | 317 | 317 | 317 | 317 <sub>🟢 -178</sub> | 495 |
+| **fix-pr** | 580 | 580 | 580 | 580 <sub>🔴 +22</sub> | 558 |
+| **improve-prompt** | 416 | 416 | 416 | 416 <sub>🟢 -138</sub> | 554 |
+| **optimize-prompt** | 1186 | 1186 | 1186 | 1186 | - |
+| **read-source-map** | 250 | 250 | 250 | 250 <sub>🟢 -256</sub> | 506 |
+| **review-pr** | 625 | 625 | 625 | 625 <sub>🟢 -187</sub> | 812 |
+| **ship** | 202 | 202 | 202 | 202 <sub>🟢 -423</sub> | 625 |
+| **squash** | 180 | 180 | 180 | 180 <sub>🟢 -708</sub> | 888 |
+| **TOTAL** | **5166** | **5166** | **5166** | **5166** <sub>🟢 -732</sub> | **5898** |
 
 
 ## Contributing
