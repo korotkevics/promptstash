@@ -30,74 +30,7 @@ Or if you don't have `curl`:
 wget -qO- https://raw.githubusercontent.com/korotkevics/promptstash/main/install.sh | bash
 ```
 
-The installer will:
-- Clone the repository to `~/.promptstash`
-- Automatically configure your shell environment (`~/.bashrc` or `~/.zshrc`)
-- Add the `promptstash` CLI to your PATH
-
-After installation, reload your shell or start a new terminal session:
-
-```bash
-source ~/.bashrc  # or ~/.zshrc for zsh users
-```
-
-To preview what the installer would do without making any changes, use the `--dry-run` flag:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/korotkevics/promptstash/main/install.sh | bash -s -- --dry-run
-```
-
-### Updating
-
-Keep PromptStash up to date with:
-
-```bash
-promptstash self-update
-```
-
-You'll also receive automatic notifications when a new version is available. To disable update checks, set:
-
-```bash
-export PROMPTSTASH_NO_UPDATE_CHECK=1
-```
-
-### Manual Installation
-
-If you prefer to install manually:
-
-```bash
-git clone https://github.com/korotkevics/promptstash.git ~/.promptstash
-export PROMPTSTASH_DIR="$HOME/.promptstash"
-export PATH="$PATH:$HOME/.promptstash/bin"
-```
-
-Add the export lines to your shell's rc file (`~/.bashrc` or `~/.zshrc`) to make them permanent.
-
-### Uninstalling
-
-To uninstall PromptStash:
-
-1. Remove the installation directory:
-   ```bash
-   rm -rf ~/.promptstash
-   ```
-
-2. Remove the environment variables from your shell's rc file (`~/.bashrc`, `~/.zshrc`, or `~/.config/fish/config.fish`):
-   ```bash
-   # Remove these lines:
-   export PROMPTSTASH_DIR="$HOME/.promptstash"
-   export PATH="$PATH:$HOME/.promptstash/bin"
-   ```
-
-3. Remove the update check cache (optional):
-   ```bash
-   rm -f ~/.promptstash_update_check
-   ```
-
-4. Reload your shell:
-   ```bash
-   source ~/.bashrc  # or ~/.zshrc for zsh users
-   ```
+For detailed installation options, updating, manual installation, and uninstalling instructions, see the [Installation Guide](docs/installation.md).
 
 ### Using Prompts
 
@@ -120,20 +53,20 @@ Follow the instructions in the prompt at $PROMPTSTASH_DIR/debug.md to investigat
 
 Token counts by version (latest 5):
 
-| Prompt | **0.9.0** | **0.8.1** | **0.8.0** | **0.7.0** | **0.6.0** |
+| Prompt | **0.9.3** | **0.9.2** | **0.9.1** | **0.9.0** | **0.8.1** |
 |---|---|---|---|---|---|
-| **commit** | 286 <sub>🟢 -101</sub> | 387 <sub>🔴 +250</sub> | 137 | 137 | 137 |
-| **create-pr** | 490 <sub>🔴 +12</sub> | 478 <sub>🔴 +187</sub> | 291 | 291 | 291 |
-| **create-simple-source-map** | 634 <sub>🔴 +39</sub> | 595 <sub>🔴 +471</sub> | 124 | 124 | 124 |
-| **debug** | 317 <sub>🟢 -178</sub> | 495 <sub>🔴 +397</sub> | 98 | 98 | 98 |
-| **fix-pr** | 580 <sub>🔴 +22</sub> | 558 <sub>🔴 +264</sub> | 294 | 294 | - |
-| **improve-prompt** | 416 <sub>🟢 -138</sub> | 554 <sub>🔴 +59</sub> | 495 | - | - |
-| **optimize-prompt** | 1186 | - | - | - | - |
-| **read-source-map** | 250 <sub>🟢 -256</sub> | 506 <sub>🔴 +435</sub> | 71 | 71 | 71 |
-| **review-pr** | 625 <sub>🟢 -187</sub> | 812 <sub>🔴 +495</sub> | 317 | 317 <sub>🔴 +50</sub> | 267 |
-| **ship** | 202 <sub>🟢 -423</sub> | 625 <sub>🔴 +521</sub> | 104 | 104 | 104 |
-| **squash** | 180 <sub>🟢 -708</sub> | 888 <sub>🔴 +356</sub> | 532 | 532 <sub>🔴 +1</sub> | 531 |
-| **TOTAL** | **5166** <sub>🟢 -732</sub> | **5898** <sub>🔴 +3435</sub> | **2463** <sub>🔴 +495</sub> | **1968** <sub>🔴 +345</sub> | **1623** |
+| **commit** | 286 | 286 | 286 | 286 <sub>🟢 -101</sub> | 387 |
+| **create-pr** | 490 | 490 | 490 | 490 <sub>🔴 +12</sub> | 478 |
+| **create-simple-source-map** | 634 | 634 | 634 | 634 <sub>🔴 +39</sub> | 595 |
+| **debug** | 317 | 317 | 317 | 317 <sub>🟢 -178</sub> | 495 |
+| **fix-pr** | 580 | 580 | 580 | 580 <sub>🔴 +22</sub> | 558 |
+| **improve-prompt** | 416 | 416 | 416 | 416 <sub>🟢 -138</sub> | 554 |
+| **optimize-prompt** | 1186 | 1186 | 1186 | 1186 | - |
+| **read-source-map** | 250 | 250 | 250 | 250 <sub>🟢 -256</sub> | 506 |
+| **review-pr** | 625 | 625 | 625 | 625 <sub>🟢 -187</sub> | 812 |
+| **ship** | 202 | 202 | 202 | 202 <sub>🟢 -423</sub> | 625 |
+| **squash** | 180 | 180 | 180 | 180 <sub>🟢 -708</sub> | 888 |
+| **TOTAL** | **5166** | **5166** | **5166** | **5166** <sub>🟢 -732</sub> | **5898** |
 
 ## 🔗 Prompt Reference Graph
 
@@ -147,32 +80,4 @@ Prompts are represented as circles with arrows showing references. Island nodes 
 
 ## Contributing
 
-We welcome contributions! To add or improve prompts:
-
-1. Fork the repository.
-2. Create a new branch:
-   ```zsh
-   git checkout -b feature-branch
-   ```
-3. Make your changes and commit:
-   ```zsh
-   git commit -am 'Add new prompt'
-   ```
-4. Push your branch:
-   ```zsh
-   git push origin feature-branch
-   ```
-5. Open a Pull Request.
-
-### Contribution Guidelines
-
-- Ensure prompts are generic and reusable. Avoid overly specific names, places, or scenarios.
-- If enhancing an existing prompt, explain your motivation in the PR description.
-- Test prompts to ensure they work as intended.
-- Follow existing formatting and style conventions.
-- Whenever possible, leverage the ecosystem of existing prompts via referencing.
-- When creating new prompts: use `.promptstash/improve-prompt.md` to refine your human-written draft, then use `.promptstash/optimize-prompt.md` to slim it down (improve first, optimize after).
-
----
-
-Enjoy using promptstash! If you have questions or suggestions, feel free to open an issue.
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to add or improve prompts.
