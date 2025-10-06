@@ -91,8 +91,8 @@ Visual representation of how prompts reference each other:
 Prompts are represented as circles with arrows showing references. Island nodes (like `commit` and `squash`) have no outbound references, while others form a reference network.
 
 **Color Legend:**
-- **Green arrows (#228B22)**: Outbound references to non-terminal nodes (nodes that also reference other prompts)
-- **Blue arrows (#1E90FF)**: Inbound references to terminal nodes (utility nodes like 'commit' and 'squash' that don't reference others)
+- <span style="color: #228B22; font-weight: bold;">Green arrows</span>: Outbound references to non-terminal nodes (nodes that also reference other prompts)
+- <span style="color: #1E90FF; font-weight: bold;">Blue arrows</span>: Inbound references to terminal nodes (utility nodes like 'commit' and 'squash' that don't reference others)
 
 ## Contributing
 
