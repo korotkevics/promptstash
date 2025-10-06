@@ -80,7 +80,7 @@ Token counts by version (latest 5):
 | **TOTAL** | **5959** <sub>🟢 -210</sub> | **6169** | **6169** <sub>🔴 +139</sub> | **6030** <sub>🔴 +864</sub> | **5166** |
 
 
-## 🔗 Prompt Reference Graph
+## Prompt Reference Graph
 
 Visual representation of how prompts reference each other:
 
@@ -91,8 +91,8 @@ Visual representation of how prompts reference each other:
 Prompts are represented as circles with arrows showing references. Island nodes (like `commit` and `squash`) have no outbound references, while others form a reference network.
 
 **Color Legend:**
-- 🟢 **Green arrows (#228B22)**: Outbound references to non-terminal nodes (nodes that also reference other prompts)
-- 🔵 **Blue arrows (#1E90FF)**: Inbound references to terminal nodes (utility nodes like 'commit' and 'squash' that don't reference others)
+- **Green arrows (#228B22)**: Outbound references to non-terminal nodes (nodes that also reference other prompts)
+- **Blue arrows (#1E90FF)**: Inbound references to terminal nodes (utility nodes like 'commit' and 'squash' that don't reference others)
 
 ## Contributing
 
