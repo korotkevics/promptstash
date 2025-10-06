@@ -2,7 +2,6 @@ digraph PromptReferences {
     // Graph settings
     rankdir=LR;
     node [shape=circle, style=filled, fillcolor=white, fontname="Arial"];
-    edge [color=black];
     bgcolor=transparent;
 
     // Nodes
@@ -20,25 +19,25 @@ digraph PromptReferences {
     "squash" [label="squash"];
 
     // Edges
-    "bump-semver-version" -> "commit";
-    "bump-semver-version" -> "create-simple-source-map";
-    "bump-semver-version" -> "read-source-map";
-    "create-pr" -> "squash";
-    "create-simple-source-map" -> "commit";
-    "debug" -> "commit";
-    "fix-pr" -> "commit";
-    "fix-pr" -> "create-pr";
-    "fix-pr" -> "review-pr";
-    "improve-prompt" -> "commit";
-    "improve-prompt" -> "debug";
-    "optimize-prompt" -> "commit";
-    "optimize-prompt" -> "improve-prompt";
-    "optimize-prompt" -> "optimize-prompt";
-    "read-source-map" -> "create-simple-source-map";
-    "review-pr" -> "commit";
-    "review-pr" -> "create-pr";
-    "review-pr" -> "fix-pr";
-    "ship" -> "commit";
-    "ship" -> "debug";
-    "ship" -> "read-source-map";
+    "bump-semver-version" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "bump-semver-version" -> "create-simple-source-map" [color="#228B22"];  // Forest green - outbound reference
+    "bump-semver-version" -> "read-source-map" [color="#228B22"];  // Forest green - outbound reference
+    "create-pr" -> "squash" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "create-simple-source-map" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "debug" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "fix-pr" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "fix-pr" -> "create-pr" [color="#228B22"];  // Forest green - outbound reference
+    "fix-pr" -> "review-pr" [color="#228B22"];  // Forest green - outbound reference
+    "improve-prompt" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "improve-prompt" -> "debug" [color="#228B22"];  // Forest green - outbound reference
+    "optimize-prompt" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "optimize-prompt" -> "improve-prompt" [color="#228B22"];  // Forest green - outbound reference
+    "optimize-prompt" -> "optimize-prompt" [color="#228B22"];  // Forest green - outbound reference
+    "read-source-map" -> "create-simple-source-map" [color="#228B22"];  // Forest green - outbound reference
+    "review-pr" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "review-pr" -> "create-pr" [color="#228B22"];  // Forest green - outbound reference
+    "review-pr" -> "fix-pr" [color="#228B22"];  // Forest green - outbound reference
+    "ship" -> "commit" [color="#1E90FF"];  // Dodger blue - inbound to terminal node
+    "ship" -> "debug" [color="#228B22"];  // Forest green - outbound reference
+    "ship" -> "read-source-map" [color="#228B22"];  // Forest green - outbound reference
 }

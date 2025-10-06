@@ -37,7 +37,6 @@ def generate_dot_graph(graph: Dict[str, Set[str]]) -> str:
         '    // Graph settings',
         '    rankdir=LR;',
         '    node [shape=circle, style=filled, fillcolor=white, fontname="Arial"];',
-        '    edge [color=black];',
         '    bgcolor=transparent;',
         '',
         '    // Nodes',
@@ -52,11 +51,20 @@ def generate_dot_graph(graph: Dict[str, Set[str]]) -> str:
     lines.append('')
     lines.append('    // Edges')
     
-    # Add edges
+    # Add edges with colors:
+    # - Green for outbound edges (from nodes with outgoing references)
+    # - Blue for inbound edges (to nodes with no outgoing references - terminal/utility nodes)
     for prompt, references in sorted(graph.items()):
         for ref in sorted(references):
             if ref in graph:  # Only add edge if target exists
-                lines.append(f'    "{prompt}" -> "{ref}";')
+                # If target has no outbound references, it's a terminal node - use blue (inbound focus)
+                # Otherwise, use green (outbound reference)
+                if len(graph[ref]) == 0:
+                    # Terminal node - use blue for inbound arrows
+                    lines.append(f'    "{prompt}" -> "{ref}" [color="#1E90FF"];  // Dodger blue - inbound to terminal node')
+                else:
+                    # Non-terminal node - use green for outbound arrows
+                    lines.append(f'    "{prompt}" -> "{ref}" [color="#228B22"];  // Forest green - outbound reference')
     
     lines.append('}')
     return '\n'.join(lines)
