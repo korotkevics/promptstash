@@ -8,3 +8,6 @@ __pycache__/
 *$py.class
 .venv/
 venv/
+
+# Generated intermediate files
+static/prompt-graph.dot

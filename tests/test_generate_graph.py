@@ -86,11 +86,11 @@ def test_build_reference_graph():
 
 def test_generate_dot_graph():
     """Test DOT format generation."""
-    # Create a simple test graph
+    # Create a test graph with both terminal and non-terminal nodes
     test_graph = {
         "commit": set(),
         "debug": {"commit"},
-        "create-pr": {"squash"},
+        "create-pr": {"squash", "debug"},  # debug is non-terminal, squash is terminal
         "squash": set()
     }
     
@@ -107,9 +107,21 @@ def test_generate_dot_graph():
     assert '"create-pr"' in dot, "Should declare 'create-pr' node"
     assert '"squash"' in dot, "Should declare 'squash' node"
     
-    # Check edges
+    # Check edges exist
     assert '"debug" -> "commit"' in dot, "Should have edge from debug to commit"
     assert '"create-pr" -> "squash"' in dot, "Should have edge from create-pr to squash"
+    assert '"create-pr" -> "debug"' in dot, "Should have edge from create-pr to debug"
+    
+    # Check edge colors (blue for inbound to terminal nodes, green for outbound to non-terminal)
+    assert '#1E90FF' in dot, "Should have blue color for inbound edges"
+    assert '#228B22' in dot, "Should have green color for outbound edges"
+    
+    # Terminal nodes (no outbound edges) should have blue inbound arrows
+    assert '"debug" -> "commit" [color="#1E90FF"]' in dot, "Edge to terminal 'commit' should be blue"
+    assert '"create-pr" -> "squash" [color="#1E90FF"]' in dot, "Edge to terminal 'squash' should be blue"
+    
+    # Non-terminal nodes should have green outbound arrows
+    assert '"create-pr" -> "debug" [color="#228B22"]' in dot, "Edge to non-terminal 'debug' should be green"
     
     # Nodes without references should not have outgoing edges
     assert '"commit" ->' not in dot, "'commit' should not have outgoing edges"
@@ -127,9 +139,13 @@ def test_generate_dot_graph_self_reference():
     
     dot = generate_graph.generate_dot_graph(test_graph)
     
-    # Should handle self-reference
+    # Should handle self-reference (green since optimize-prompt is not terminal)
     assert '"optimize-prompt" -> "optimize-prompt"' in dot, "Should handle self-reference"
+    assert '"optimize-prompt" -> "optimize-prompt" [color="#228B22"]' in dot, "Self-reference should be green"
+    
+    # Edge to terminal node should be blue
     assert '"optimize-prompt" -> "improve-prompt"' in dot, "Should have other references too"
+    assert '"optimize-prompt" -> "improve-prompt" [color="#1E90FF"]' in dot, "Edge to terminal node should be blue"
     
     print("✓ test_generate_dot_graph_self_reference passed")
 

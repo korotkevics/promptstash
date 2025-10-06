@@ -25,8 +25,8 @@
 <!-- bump&#45;semver&#45;version&#45;&gt;commit -->
 <g id="edge1" class="edge">
 <title>bump&#45;semver&#45;version&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M95.92,-534.07C162.81,-551.42 290.56,-572.6 368.98,-509.72 422.44,-466.86 438.89,-385.29 443.81,-332.23"/>
-<polygon fill="black" stroke="black" points="447.32,-332.27 444.65,-322.02 440.34,-331.7 447.32,-332.27"/>
+<path fill="none" stroke="#1e90ff" d="M95.92,-534.07C162.81,-551.42 290.56,-572.6 368.98,-509.72 422.44,-466.86 438.89,-385.29 443.81,-332.23"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="447.32,-332.27 444.65,-322.02 440.34,-331.7 447.32,-332.27"/>
 </g>
 <!-- create&#45;simple&#45;source&#45;map -->
 <g id="node4" class="node">
@@ -40,8 +40,8 @@
 <!-- bump&#45;semver&#45;version&#45;&gt;create&#45;simple&#45;source&#45;map -->
 <g id="edge2" class="edge">
 <title>bump&#45;semver&#45;version&#45;&gt;create&#45;simple&#45;source&#45;map</title>
-<path fill="none" stroke="black" d="M97.88,-521.41C136,-520.71 191.14,-516.74 236.82,-501.72 248.87,-497.76 261.06,-491.85 272.26,-485.5"/>
-<polygon fill="black" stroke="black" points="274.17,-488.43 281,-480.33 270.61,-482.4 274.17,-488.43"/>
+<path fill="none" stroke="#228b22" d="M97.88,-521.41C136,-520.71 191.14,-516.74 236.82,-501.72 248.87,-497.76 261.06,-491.85 272.26,-485.5"/>
+<polygon fill="#228b22" stroke="#228b22" points="274.17,-488.43 281,-480.33 270.61,-482.4 274.17,-488.43"/>
 </g>
 <!-- read&#45;source&#45;map -->
 <g id="node9" class="node">
@@ -54,8 +54,8 @@
 <!-- bump&#45;semver&#45;version&#45;&gt;read&#45;source&#45;map -->
 <g id="edge3" class="edge">
 <title>bump&#45;semver&#45;version&#45;&gt;read&#45;source&#45;map</title>
-<path fill="none" stroke="black" d="M92.6,-498.92C107.19,-491.11 123.77,-482.23 138.88,-474.13"/>
-<polygon fill="black" stroke="black" points="140.9,-477.02 148.07,-469.21 137.6,-470.85 140.9,-477.02"/>
+<path fill="none" stroke="#228b22" d="M92.6,-498.92C107.19,-491.11 123.77,-482.23 138.88,-474.13"/>
+<polygon fill="#228b22" stroke="#228b22" points="140.9,-477.02 148.07,-469.21 137.6,-470.85 140.9,-477.02"/>
 </g>
 <!-- create&#45;pr -->
 <g id="node3" class="node">
@@ -73,14 +73,14 @@
 <!-- create&#45;pr&#45;&gt;squash -->
 <g id="edge4" class="edge">
 <title>create&#45;pr&#45;&gt;squash</title>
-<path fill="none" stroke="black" d="M488.47,-41.72C496.71,-41.72 505.45,-41.72 513.93,-41.72"/>
-<polygon fill="black" stroke="black" points="514.09,-45.22 524.09,-41.72 514.09,-38.22 514.09,-45.22"/>
+<path fill="none" stroke="#1e90ff" d="M488.47,-41.72C496.71,-41.72 505.45,-41.72 513.93,-41.72"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="514.09,-45.22 524.09,-41.72 514.09,-38.22 514.09,-45.22"/>
 </g>
 <!-- create&#45;simple&#45;source&#45;map&#45;&gt;commit -->
 <g id="edge5" class="edge">
 <title>create&#45;simple&#45;source&#45;map&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M351,-414.85C357,-406.92 363.24,-398.57 368.98,-390.72 385.12,-368.65 402.7,-343.74 416.95,-323.31"/>
-<polygon fill="black" stroke="black" points="420,-325.06 422.85,-314.85 414.26,-321.06 420,-325.06"/>
+<path fill="none" stroke="#1e90ff" d="M351,-414.85C357,-406.92 363.24,-398.57 368.98,-390.72 385.12,-368.65 402.7,-343.74 416.95,-323.31"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="420,-325.06 422.85,-314.85 414.26,-321.06 420,-325.06"/>
 </g>
 <!-- debug -->
 <g id="node5" class="node">
@@ -91,8 +91,8 @@
 <!-- debug&#45;&gt;commit -->
 <g id="edge6" class="edge">
 <title>debug&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M355.08,-305.14C368.23,-301.74 383.61,-297.77 397.92,-294.07"/>
-<polygon fill="black" stroke="black" points="398.81,-297.46 407.62,-291.56 397.06,-290.68 398.81,-297.46"/>
+<path fill="none" stroke="#1e90ff" d="M355.08,-305.14C368.23,-301.74 383.61,-297.77 397.92,-294.07"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="398.81,-297.46 407.62,-291.56 397.06,-290.68 398.81,-297.46"/>
 </g>
 <!-- fix&#45;pr -->
 <g id="node6" class="node">
@@ -104,14 +104,14 @@
 <!-- fix&#45;pr&#45;&gt;commit -->
 <g id="edge7" class="edge">
 <title>fix&#45;pr&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M210.48,-91.12C227.28,-101.78 251.1,-116.37 272.82,-127.72 314.31,-149.41 332.97,-140.8 368.98,-170.72 390.84,-188.88 409.21,-214.74 422.49,-236.94"/>
-<polygon fill="black" stroke="black" points="419.63,-238.99 427.68,-245.88 425.68,-235.47 419.63,-238.99"/>
+<path fill="none" stroke="#1e90ff" d="M210.48,-91.12C227.28,-101.78 251.1,-116.37 272.82,-127.72 314.31,-149.41 332.97,-140.8 368.98,-170.72 390.84,-188.88 409.21,-214.74 422.49,-236.94"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="419.63,-238.99 427.68,-245.88 425.68,-235.47 419.63,-238.99"/>
 </g>
 <!-- fix&#45;pr&#45;&gt;create&#45;pr -->
 <g id="edge8" class="edge">
 <title>fix&#45;pr&#45;&gt;create&#45;pr</title>
-<path fill="none" stroke="black" d="M208.7,-60.03C224.95,-47.86 248.88,-32.38 272.82,-25.72 313.52,-14.39 361.48,-20.26 396.55,-27.9"/>
-<polygon fill="black" stroke="black" points="396.01,-31.36 406.54,-30.19 397.57,-24.54 396.01,-31.36"/>
+<path fill="none" stroke="#228b22" d="M208.7,-60.03C224.95,-47.86 248.88,-32.38 272.82,-25.72 313.52,-14.39 361.48,-20.26 396.55,-27.9"/>
+<polygon fill="#228b22" stroke="#228b22" points="396.01,-31.36 406.54,-30.19 397.57,-24.54 396.01,-31.36"/>
 </g>
 <!-- review&#45;pr -->
 <g id="node10" class="node">
@@ -123,8 +123,8 @@
 <!-- fix&#45;pr&#45;&gt;review&#45;pr -->
 <g id="edge9" class="edge">
 <title>fix&#45;pr&#45;&gt;review&#45;pr</title>
-<path fill="none" stroke="black" d="M213.69,-71.26C229.25,-70.11 249.75,-69.73 268.57,-70.12"/>
-<polygon fill="black" stroke="black" points="268.72,-73.62 278.82,-70.41 268.93,-66.63 268.72,-73.62"/>
+<path fill="none" stroke="#228b22" d="M213.69,-71.26C229.25,-70.11 249.75,-69.73 268.57,-70.12"/>
+<polygon fill="#228b22" stroke="#228b22" points="268.72,-73.62 278.82,-70.41 268.93,-66.63 268.72,-73.62"/>
 </g>
 <!-- improve&#45;prompt -->
 <g id="node7" class="node">
@@ -136,14 +136,14 @@
 <!-- improve&#45;prompt&#45;&gt;commit -->
 <g id="edge10" class="edge">
 <title>improve&#45;prompt&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M237.12,-262.42C273.53,-263.29 324.47,-265.27 368.98,-269.72 377.95,-270.62 387.47,-271.86 396.63,-273.22"/>
-<polygon fill="black" stroke="black" points="396.37,-276.72 406.78,-274.77 397.43,-269.8 396.37,-276.72"/>
+<path fill="none" stroke="#1e90ff" d="M237.12,-262.42C273.53,-263.29 324.47,-265.27 368.98,-269.72 377.95,-270.62 387.47,-271.86 396.63,-273.22"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="396.37,-276.72 406.78,-274.77 397.43,-269.8 396.37,-276.72"/>
 </g>
 <!-- improve&#45;prompt&#45;&gt;debug -->
 <g id="edge11" class="edge">
 <title>improve&#45;prompt&#45;&gt;debug</title>
-<path fill="none" stroke="black" d="M233.6,-279.61C248.1,-285.34 264.07,-291.66 278.29,-297.28"/>
-<polygon fill="black" stroke="black" points="277.23,-300.62 287.82,-301.04 279.8,-294.11 277.23,-300.62"/>
+<path fill="none" stroke="#228b22" d="M233.6,-279.61C248.1,-285.34 264.07,-291.66 278.29,-297.28"/>
+<polygon fill="#228b22" stroke="#228b22" points="277.23,-300.62 287.82,-301.04 279.8,-294.11 277.23,-300.62"/>
 </g>
 <!-- optimize&#45;prompt -->
 <g id="node8" class="node">
@@ -155,44 +155,44 @@
 <!-- optimize&#45;prompt&#45;&gt;commit -->
 <g id="edge12" class="edge">
 <title>optimize&#45;prompt&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M100.19,-210.44C112.37,-207.66 125.5,-205.13 137.82,-203.72 181.53,-198.7 193.52,-195.9 236.82,-203.72 295.66,-214.35 359.55,-240.55 400.96,-259.66"/>
-<polygon fill="black" stroke="black" points="399.68,-262.92 410.22,-263.99 402.64,-256.58 399.68,-262.92"/>
+<path fill="none" stroke="#1e90ff" d="M100.19,-210.44C112.37,-207.66 125.5,-205.13 137.82,-203.72 181.53,-198.7 193.52,-195.9 236.82,-203.72 295.66,-214.35 359.55,-240.55 400.96,-259.66"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="399.68,-262.92 410.22,-263.99 402.64,-256.58 399.68,-262.92"/>
 </g>
 <!-- optimize&#45;prompt&#45;&gt;improve&#45;prompt -->
 <g id="edge13" class="edge">
 <title>optimize&#45;prompt&#45;&gt;improve&#45;prompt</title>
-<path fill="none" stroke="black" d="M100.06,-237.33C109.66,-240.05 119.83,-242.92 129.69,-245.71"/>
-<polygon fill="black" stroke="black" points="128.84,-249.1 139.41,-248.46 130.74,-242.37 128.84,-249.1"/>
+<path fill="none" stroke="#228b22" d="M100.06,-237.33C109.66,-240.05 119.83,-242.92 129.69,-245.71"/>
+<polygon fill="#228b22" stroke="#228b22" points="128.84,-249.1 139.41,-248.46 130.74,-242.37 128.84,-249.1"/>
 </g>
 <!-- optimize&#45;prompt&#45;&gt;optimize&#45;prompt -->
 <g id="edge14" class="edge">
 <title>optimize&#45;prompt&#45;&gt;optimize&#45;prompt</title>
-<path fill="none" stroke="black" d="M25.43,-267.79C25.81,-281.68 34.31,-292.63 50.91,-292.63 63.23,-292.63 71.09,-286.6 74.48,-277.81"/>
-<polygon fill="black" stroke="black" points="77.96,-278.27 76.4,-267.79 71.08,-276.96 77.96,-278.27"/>
+<path fill="none" stroke="#228b22" d="M25.43,-267.79C25.81,-281.68 34.31,-292.63 50.91,-292.63 63.23,-292.63 71.09,-286.6 74.48,-277.81"/>
+<polygon fill="#228b22" stroke="#228b22" points="77.96,-278.27 76.4,-267.79 71.08,-276.96 77.96,-278.27"/>
 </g>
 <!-- read&#45;source&#45;map&#45;&gt;create&#45;simple&#45;source&#45;map -->
 <g id="edge15" class="edge">
 <title>read&#45;source&#45;map&#45;&gt;create&#45;simple&#45;source&#45;map</title>
-<path fill="none" stroke="black" d="M231.41,-450.03C241.3,-450.33 251.97,-450.65 262.37,-450.97"/>
-<polygon fill="black" stroke="black" points="262.53,-454.48 272.63,-451.28 262.74,-447.48 262.53,-454.48"/>
+<path fill="none" stroke="#228b22" d="M231.41,-450.03C241.3,-450.33 251.97,-450.65 262.37,-450.97"/>
+<polygon fill="#228b22" stroke="#228b22" points="262.53,-454.48 272.63,-451.28 262.74,-447.48 262.53,-454.48"/>
 </g>
 <!-- review&#45;pr&#45;&gt;commit -->
 <g id="edge16" class="edge">
 <title>review&#45;pr&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M350.08,-107.74C356.64,-115.62 363.35,-124.26 368.98,-132.72 390.81,-165.5 411,-205.27 425.19,-235.47"/>
-<polygon fill="black" stroke="black" points="422.19,-237.33 429.58,-244.92 428.54,-234.38 422.19,-237.33"/>
+<path fill="none" stroke="#1e90ff" d="M350.08,-107.74C356.64,-115.62 363.35,-124.26 368.98,-132.72 390.81,-165.5 411,-205.27 425.19,-235.47"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="422.19,-237.33 429.58,-244.92 428.54,-234.38 422.19,-237.33"/>
 </g>
 <!-- review&#45;pr&#45;&gt;create&#45;pr -->
 <g id="edge17" class="edge">
 <title>review&#45;pr&#45;&gt;create&#45;pr</title>
-<path fill="none" stroke="black" d="M362.1,-65.36C373.02,-62.27 384.97,-58.89 396.34,-55.68"/>
-<polygon fill="black" stroke="black" points="397.46,-58.99 406.13,-52.91 395.56,-52.26 397.46,-58.99"/>
+<path fill="none" stroke="#228b22" d="M362.1,-65.36C373.02,-62.27 384.97,-58.89 396.34,-55.68"/>
+<polygon fill="#228b22" stroke="#228b22" points="397.46,-58.99 406.13,-52.91 395.56,-52.26 397.46,-58.99"/>
 </g>
 <!-- review&#45;pr&#45;&gt;fix&#45;pr -->
 <g id="edge18" class="edge">
 <title>review&#45;pr&#45;&gt;fix&#45;pr</title>
-<path fill="none" stroke="black" d="M278.82,-83.03C261.17,-83.69 240.74,-83.61 223.76,-82.79"/>
-<polygon fill="black" stroke="black" points="223.88,-79.29 213.69,-82.18 223.46,-86.27 223.88,-79.29"/>
+<path fill="none" stroke="#228b22" d="M278.82,-83.03C261.17,-83.69 240.74,-83.61 223.76,-82.79"/>
+<polygon fill="#228b22" stroke="#228b22" points="223.88,-79.29 213.69,-82.18 223.46,-86.27 223.88,-79.29"/>
 </g>
 <!-- ship -->
 <g id="node11" class="node">
@@ -203,20 +203,20 @@
 <!-- ship&#45;&gt;commit -->
 <g id="edge19" class="edge">
 <title>ship&#45;&gt;commit</title>
-<path fill="none" stroke="black" d="M77.59,-381.03C133.46,-389.21 269.05,-402.38 368.98,-357.72 386.89,-349.72 402.98,-335.56 415.74,-321.62"/>
-<polygon fill="black" stroke="black" points="418.51,-323.76 422.48,-313.93 413.25,-319.15 418.51,-323.76"/>
+<path fill="none" stroke="#1e90ff" d="M77.59,-381.03C133.46,-389.21 269.05,-402.38 368.98,-357.72 386.89,-349.72 402.98,-335.56 415.74,-321.62"/>
+<polygon fill="#1e90ff" stroke="#1e90ff" points="418.51,-323.76 422.48,-313.93 413.25,-319.15 418.51,-323.76"/>
 </g>
 <!-- ship&#45;&gt;debug -->
 <g id="edge20" class="edge">
 <title>ship&#45;&gt;debug</title>
-<path fill="none" stroke="black" d="M77.12,-370.79C122.88,-360.04 220.07,-337.19 276.62,-323.89"/>
-<polygon fill="black" stroke="black" points="277.75,-327.22 286.68,-321.53 276.15,-320.41 277.75,-327.22"/>
+<path fill="none" stroke="#228b22" d="M77.12,-370.79C122.88,-360.04 220.07,-337.19 276.62,-323.89"/>
+<polygon fill="#228b22" stroke="#228b22" points="277.75,-327.22 286.68,-321.53 276.15,-320.41 277.75,-327.22"/>
 </g>
 <!-- ship&#45;&gt;read&#45;source&#45;map -->
 <g id="edge21" class="edge">
 <title>ship&#45;&gt;read&#45;source&#45;map</title>
-<path fill="none" stroke="black" d="M74.71,-388.93C92.42,-398.42 117.57,-411.89 139.52,-423.65"/>
-<polygon fill="black" stroke="black" points="137.91,-426.76 148.38,-428.39 141.22,-420.59 137.91,-426.76"/>
+<path fill="none" stroke="#228b22" d="M74.71,-388.93C92.42,-398.42 117.57,-411.89 139.52,-423.65"/>
+<polygon fill="#228b22" stroke="#228b22" points="137.91,-426.76 148.38,-428.39 141.22,-420.59 137.91,-426.76"/>
 </g>
 </g>
 </svg>
