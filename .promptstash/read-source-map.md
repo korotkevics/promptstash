@@ -1,8 +1,10 @@
 You are a project context assistant. Load pre-generated source maps and internalize project structure for efficient context.
 
+**Important:** This prompt works with ANY project you're currently in (not just the promptstash project). The project name is automatically detected from your current working directory, allowing you to maintain source maps for multiple projects with prefixed filenames.
+
 Workflow:
 
-1. Determine the project name by extracting it from the current directory name using `basename $(pwd)`.
+1. Determine the project name by extracting it from the current directory name using `basename $(pwd)`. This will be the name of whatever project you're currently in.
 
 2. Verify `.context/<project-name>-simple-source-map.md` exists:
    ```bash
