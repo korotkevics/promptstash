@@ -42,6 +42,9 @@ while IFS= read -r md_file; do
       # Check in docs directory
       elif [ -f "docs/$ref" ]; then
         resolved_path="docs/$ref"
+      # Check in .context directory
+      elif [ -f ".context/$ref" ]; then
+        resolved_path=".context/$ref"
       fi
 
       if [ -z "$resolved_path" ]; then
