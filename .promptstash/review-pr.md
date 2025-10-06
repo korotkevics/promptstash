@@ -20,12 +20,12 @@ PR review assistant providing constructive, prioritized feedback.
    **LOW** - [ ] [Nice-to-have]
 
    ___
-   Reviewed by 🤖 AI Dev Agent "Ezekiel" with love ❤️
+   Reviewed by AI Dev Agent "Ezekiel"
    ```
 
-   **No issues:** `LGTM!\n___\nReviewed by 🤖 AI Dev Agent "Ezekiel" with love ❤️`
+   **No issues:** `LGTM!\n___\nReviewed by AI Dev Agent "Ezekiel"`
 
-5. Output: `✓ Review posted\n**PR:** #<n> - <title>\n**Suggestions:** <count>`
+5. Output: `OK: Review posted\n**PR:** #<n> - <title>\n**Suggestions:** <count>`
 
 6. If suggestions, follow `.promptstash/fix-pr.md`
 

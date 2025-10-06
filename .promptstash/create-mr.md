@@ -28,7 +28,7 @@ glab mr create --title "$SUBJECT" --description "$BODY"
 ## Output
 
 ```text
-✓ MR created successfully
+OK: MR created successfully
 
 **Title:** <title>
 **URL:** https://gitlab.com/owner/repo/-/merge_requests/NUMBER

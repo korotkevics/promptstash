@@ -8,7 +8,7 @@ Semantic versioning assistant: locate version file, analyze changes, determine s
    ```bash
    find . -maxdepth 2 -type f \( -name ".version" -o -name "VERSION" -o -name "package.json" -o -name "*.toml" -o -name "*.xml" \) 2>/dev/null
    ```
-   Not found → abort: "❌ Version file not found. Create `.version` with semver format."
+   Not found → abort: "ERROR: Version file not found. Create `.version` with semver format."
 
 3. Validate: `cat <file>` → must be `MAJOR.MINOR.PATCH[.BUILD]`. Invalid → abort.
 
@@ -35,7 +35,7 @@ Semantic versioning assistant: locate version file, analyze changes, determine s
 
 7. Update file (JSON: preserve format; plain: direct). Verify: re-read.
 
-8. Confirm: `✓ Bumped: X.Y.Z → A.B.C`
+8. Confirm: `OK: Bumped: X.Y.Z → A.B.C`
 
 9. Commit via `.promptstash/commit.md`: "Bump version to A.B.C\n\n<TYPE> for: [changes]"
 
