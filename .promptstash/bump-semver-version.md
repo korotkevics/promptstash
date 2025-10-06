@@ -4,7 +4,7 @@ Semantic versioning assistant: locate version file, analyze changes, determine s
 
 1. Clean? `git status` → else `.promptstash/commit.md`
 
-2. Locate version via map (`.promptstash/read-source-map.md` or create via `.promptstash/create-simple-source-map.md`), or scan:
+2. Load map (`.promptstash/read-source-map.md`), then locate version or scan:
    ```bash
    find . -maxdepth 2 -type f \( -name ".version" -o -name "VERSION" -o -name "package.json" -o -name "*.toml" -o -name "*.xml" \) 2>/dev/null
    ```
