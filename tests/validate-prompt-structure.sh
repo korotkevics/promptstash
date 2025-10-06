@@ -56,16 +56,16 @@ while IFS= read -r md_file; do
     ERRORS=$((ERRORS + 1))
   fi
 
-  # Validate review-pr.md and fix-pr.md specific requirements
-  if [[ "$filename" == "review-pr.md" ]] || [[ "$filename" == "fix-pr.md" ]]; then
+  # Validate review-pr.md, fix-pr.md, review-mr.md, and fix-mr.md specific requirements
+  if [[ "$filename" == "review-pr.md" ]] || [[ "$filename" == "fix-pr.md" ]] || [[ "$filename" == "review-mr.md" ]] || [[ "$filename" == "fix-mr.md" ]]; then
     if ! grep -q "Ezekiel" "$md_file"; then
       echo -e "${RED}✗ $filename: Missing 'Ezekiel' agent identity${NC}"
       ERRORS=$((ERRORS + 1))
     fi
   fi
 
-  # Validate review-pr.md has checkbox template
-  if [[ "$filename" == "review-pr.md" ]]; then
+  # Validate review-pr.md and review-mr.md have checkbox template
+  if [[ "$filename" == "review-pr.md" ]] || [[ "$filename" == "review-mr.md" ]]; then
     if ! grep -q '\- \[ \]' "$md_file"; then
       echo -e "${YELLOW}⚠ $filename: Missing checkbox template for suggestions${NC}"
       WARNINGS=$((WARNINGS + 1))
