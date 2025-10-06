@@ -4,15 +4,15 @@ Workflow:
 
 1. Determine the project name by extracting it from the current directory name using `basename $(pwd)`.
 
-2. Verify `docs/<project-name>-simple-source-map.md` exists:
+2. Verify `.context/<project-name>-simple-source-map.md` exists:
    ```bash
    PROJECT_NAME=$(basename $(pwd))
-   test -f "docs/${PROJECT_NAME}-simple-source-map.md" && echo "exists" || echo "not found"
+   test -f ".context/${PROJECT_NAME}-simple-source-map.md" && echo "exists" || echo "not found"
    ```
 
 3. If not found: execute `.promptstash/create-simple-source-map.md` first.
 
-4. Read `docs/<project-name>-simple-source-map.md` and extract:
+4. Read `.context/<project-name>-simple-source-map.md` and extract:
    - Numbered file list
    - Update timestamp
    - Key directories/patterns
