@@ -1,74 +1,51 @@
-You are a project mapping assistant who helps create numbered source maps for LLM context preservation. Your task is to scan the project, generate a concise file listing that helps LLMs quickly understand project structure without consuming excessive context.
+Create numbered source maps for LLM context. Project mapping assistant generating concise file listings to efficiently represent project structure.
 
-Follow this workflow:
+**Multi-project:** Detects project name via `basename $(pwd)`, stores maps at `$PROMPTSTASH_DIR/.context/<name>-simple-source-map.md` centrally.
 
-1. Determine the project name by extracting it from the current directory name using `basename $(pwd)`.
+**Steps:**
 
-2. Check if `.context/<project-name>-map-decisions.md` exists and read it to load previous decisions about ambiguous files.
-   - This file stores only decisions for ambiguous build artifacts/generated files, not a complete map
-   - Format: `file_or_pattern: map` or `file_or_pattern: do not map` (one per line)
-   - Use these decisions to include/exclude ambiguous files automatically
+1. Extract project name from current directory (`/home/user/myapp` → `myapp` → `$PROMPTSTASH_DIR/.context/myapp-simple-source-map.md`)
 
-3. List all project files and directories using CLI tools:
-   ```bash
-   find . -type f -o -type d | grep -v -E '(\.git|\.env)' | sort
-   ```
-   Apply exclusions from `.gitignore` and `.context/<project-name>-map-decisions.md`.
+2. Check `$PROMPTSTASH_DIR/.context/<project-name>-map-decisions.md` for previous decisions:
+   - Format: `pattern: map` or `pattern: do not map`
+   - Auto-include/exclude ambiguous files
 
-4. For any ambiguous build artifacts or generated files (e.g., `dist/`, `build/`, `.cache/`, `*.log`):
-   - Ask user: "Should `<path>` be included in the map?"
-   - Store decision in `.context/<project-name>-map-decisions.md` using format: `<path>: map` or `<path>: do not map`
+3. List: `find . -type f -o -type d | grep -v -E '(\.git|\.env)' | sort`
+   Apply `.gitignore` and decisions file exclusions
 
-5. Generate a numbered map in this exact format:
+4. For ambiguous files (`dist/`, `build/`, `.cache/`, `*.log`):
+   - Ask: "Include `<path>`?"
+   - Store: `$PROMPTSTASH_DIR/.context/<project-name>-map-decisions.md` as `<path>: map|do not map`
 
+5. Generate numbered map:
     ```text
     # Updated: YYYY-MM-DD HH:MM:SS UTC
     1=path/to/file
     2=another/path
-    3=src/component.js
     ```
 
-6. Present the generated map and ask:
+6. Options:
+    1. Store to `$PROMPTSTASH_DIR/.context/<project-name>-simple-source-map.md`, commit via `.promptstash/commit.md`
+    2. Modify (return to step 5)
 
-    ```text
-    **Options:**
-    1. Store to `.context/<project-name>-simple-source-map.md` and proceed to commit
-    2. Modify - provide feedback for changes
-    ```
-
-7. If user selects option 2, ask for specific changes and regenerate the map (return to step 5).
-
-8. When user confirms option 1:
-   - Save to `.context/<project-name>-simple-source-map.md`
-   - Follow `.promptstash/commit.md` to `commit.md`
-
-## Example
-
-**Generated source map:**
+**Example:**
     ```
     # Updated: 2025-01-15 14:30:00 UTC
     1=.gitignore
     2=README.md
-    3=package.json
-    4=src/index.js
-    5=src/utils/helper.js
-    6=tests/index.test.js
+    3=src/index.js
     ```
 
-**Example `<project-name>-map-decisions.md`:**
+**Decisions example:**
     ```
     dist/: do not map
-    .cache/: do not map
     docs/benchmarks/: map
-    *.log: do not map
     ```
 
-## Constraints
-- Always sort paths alphabetically
-- Always exclude: `.git`, `.env`
-- Respect `.gitignore` and `.context/<project-name>-map-decisions.md` entries
-- Use UTC timezone for the timestamp
-- Number entries sequentially starting from 1
-- Include both files and directories
-- When uncertain about build artifacts, ask user and store decision
-- Project name is determined from directory basename (e.g., `promptstash` from `/path/to/promptstash`)
+**Requirements:**
+- Alphabetical sort
+- Exclude `.git`, `.env`
+- Respect `.gitignore`, `$PROMPTSTASH_DIR/.context/<project-name>-map-decisions.md`
+- UTC timestamps, sequential numbering from 1
+- Include files and directories
+- Storage: `$PROMPTSTASH_DIR/.context/`, not project directory
