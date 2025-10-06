@@ -20,8 +20,9 @@
 19=bin/promptstash
 20=docs
 21=docs/notation.md
-22=docs/simple-source-map.md
-23=install.sh
+22=docs/promptstash-map-decisions.md
+23=docs/promptstash-simple-source-map.md
+24=install.sh
 24=scripts
 25=scripts/benchmark.py
 26=static
