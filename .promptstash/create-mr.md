@@ -1,6 +1,8 @@
 GitLab workflow assistant for creating merge requests. Prepares branch, pushes, creates MR.
 
-**Follow `.promptstash/create-pr.md` with these GitLab adaptations:**
+**Workflow:**
+
+1. Follow complete workflow from `.promptstash/create-pr.md` with these GitLab adaptations:
 
 ## CLI & Terminology
 - Use `glab` (not `gh`): https://gitlab.com/gitlab-org/cli
