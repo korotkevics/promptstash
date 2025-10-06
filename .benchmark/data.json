@@ -354,6 +354,27 @@
         "squash.md": 180,
         "suggest-better-function-names.md": 620
       }
+    },
+    {
+      "commit": "db357f5",
+      "version": "0.15.0",
+      "timestamp": "2025-10-06T20:01:22.921952+00:00",
+      "prompts": {
+        "bump-semver-version.md": 864,
+        "commit.md": 286,
+        "create-mr.md": 590,
+        "create-pr.md": 490,
+        "create-simple-source-map.md": 505,
+        "debug.md": 317,
+        "fix-pr.md": 580,
+        "improve-prompt.md": 416,
+        "optimize-prompt.md": 1186,
+        "read-source-map.md": 308,
+        "review-pr.md": 625,
+        "ship.md": 202,
+        "squash.md": 180,
+        "suggest-better-function-names.md": 620
+      }
     }
   ]
 }
