@@ -6,7 +6,7 @@
 
 
 ![Version](https://img.shields.io/github/v/release/korotkevics/promptstash)
-![Tests](https://github.com/korotkevics/promptstash/actions/workflows/test.yml/badge.svg)
+![Tests](https://github.com/korotkevics/promptstash/actions/workflows/test.yml/badge.svg?branch=main)
 
 A free, open-source collection of generic, reusable developer prompts for various workflows.
 
