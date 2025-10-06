@@ -275,6 +275,25 @@
         "ship.md": 202,
         "squash.md": 180
       }
+    },
+    {
+      "commit": "e354b67",
+      "version": "0.13.0",
+      "timestamp": "2025-10-06T12:46:38.479508+00:00",
+      "prompts": {
+        "bump-semver-version.md": 864,
+        "commit.md": 286,
+        "create-pr.md": 490,
+        "create-simple-source-map.md": 706,
+        "debug.md": 317,
+        "fix-pr.md": 580,
+        "improve-prompt.md": 416,
+        "optimize-prompt.md": 1186,
+        "read-source-map.md": 317,
+        "review-pr.md": 625,
+        "ship.md": 202,
+        "squash.md": 180
+      }
     }
   ]
 }
