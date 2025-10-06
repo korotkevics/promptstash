@@ -107,6 +107,7 @@ def test_generate_readme_table():
     # Check table structure
     assert "## 📊 Benchmarks" in table
     assert "Token counts by version" in table
+    assert "| Prompt | Cost |" in table, "Should include Cost column header"
     assert "0.2.0" in table, "Should include latest version"
     assert "0.1.0" in table, "Should include older version"
     assert "**test**" in table, "Should include prompt name without .md"
@@ -115,8 +116,8 @@ def test_generate_readme_table():
     # Check deltas are shown
     assert "🔴" in table or "🟢" in table, "Should show delta indicators"
     
-    # Check dollar signs are present (120 tokens -> 1 sign, 50 tokens -> 1 sign)
-    assert "$" in table, "Should include dollar signs based on token count"
+    # Check dollar signs are present in Cost column (120 tokens -> 1 sign, 50 tokens -> 1 sign)
+    assert "$" in table, "Should include dollar signs in Cost column based on token count"
 
     print("✓ test_generate_readme_table passed")
 

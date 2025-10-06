@@ -123,8 +123,8 @@ def generate_readme_table(data: Dict) -> str:
 
     # Build table header
     versions = [c["version"] for c in recent_commits]
-    header = "| Prompt | " + " | ".join(f"**{v}**" for v in versions) + " |\n"
-    separator = "|" + "|".join(["---"] * (len(versions) + 1)) + "|\n"
+    header = "| Prompt | Cost | " + " | ".join(f"**{v}**" for v in versions) + " |\n"
+    separator = "|" + "|".join(["---"] * (len(versions) + 2)) + "|\n"
 
     # Build table rows
     rows = []
@@ -133,8 +133,9 @@ def generate_readme_table(data: Dict) -> str:
         latest_token_count = recent_commits[0]["prompts"].get(prompt, 0)
         dollar_signs = get_dollar_signs(latest_token_count) if latest_token_count > 0 else ""
         
-        prompt_name = f"**{prompt.replace('.md', '')}**{dollar_signs}"
-        cells = [prompt_name]
+        prompt_name = f"**{prompt.replace('.md', '')}**"
+        cost_cell = dollar_signs.strip()  # Remove leading space for cost column
+        cells = [prompt_name, cost_cell]
 
         # Calculate deltas from right to left (oldest to newest)
         reversed_commits = list(reversed(recent_commits))
@@ -154,7 +155,7 @@ def generate_readme_table(data: Dict) -> str:
         rows.append("| " + " | ".join(cells) + " |")
 
     # Add total row
-    total_cells = ["**TOTAL**"]
+    total_cells = ["**TOTAL**", ""]  # Empty cost cell for total row
     reversed_commits = list(reversed(recent_commits))
     total_values = []
     prev_total = None
