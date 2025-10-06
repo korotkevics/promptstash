@@ -63,22 +63,22 @@ Load $PROMPTSTASH_DIR/.promptstash/debug.md and help me investigate this error:
 
 Token counts by version (latest 5):
 
-| Prompt | **0.14.0** | **0.13.3** | **0.13.1** | **0.12.1** | **0.12.0** |
+| Prompt | **0.14.0** | **0.14.0** | **0.13.3** | **0.13.1** | **0.12.1** |
 |---|---|---|---|---|---|
 | **bump-semver-version** | 864 | 864 | 864 | 864 | 864 |
 | **commit** | 286 | 286 | 286 | 286 | 286 |
 | **create-pr** | 490 | 490 | 490 | 490 | 490 |
-| **create-simple-source-map** | 505 | 505 | 505 <sub>🟢 -201</sub> | 706 | 706 |
+| **create-simple-source-map** | 505 | 505 | 505 | 505 <sub>🟢 -201</sub> | 706 |
 | **debug** | 317 | 317 | 317 | 317 | 317 |
 | **fix-pr** | 580 | 580 | 580 | 580 | 580 |
 | **improve-prompt** | 416 | 416 | 416 | 416 | 416 |
 | **optimize-prompt** | 1186 | 1186 | 1186 | 1186 | 1186 |
-| **read-source-map** | 308 | 308 | 308 <sub>🟢 -9</sub> | 317 | 317 |
+| **read-source-map** | 308 | 308 | 308 | 308 <sub>🟢 -9</sub> | 317 |
 | **review-pr** | 625 | 625 | 625 | 625 | 625 |
 | **ship** | 202 | 202 | 202 | 202 | 202 |
 | **squash** | 180 | 180 | 180 | 180 | 180 |
-| **suggest-better-function-names** | 620 | - | - | - | - |
-| **TOTAL** | **6579** <sub>🔴 +620</sub> | **5959** | **5959** <sub>🟢 -210</sub> | **6169** | **6169** |
+| **suggest-better-function-names** | 620 | 620 | - | - | - |
+| **TOTAL** | **6579** | **6579** <sub>🔴 +620</sub> | **5959** | **5959** <sub>🟢 -210</sub> | **6169** |
 
 
 ## Prompt Reference Graph
