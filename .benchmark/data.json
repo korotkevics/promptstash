@@ -220,10 +220,11 @@
       }
     },
     {
-      "commit": "9d80f23",
-      "version": "0.10.0",
-      "timestamp": "2025-10-06T10:05:38.327986+00:00",
+      "commit": "e0d11bc",
+      "version": "0.11.0",
+      "timestamp": "2025-10-06T10:08:06.064555+00:00",
       "prompts": {
+        "bump-semver-version.md": 864,
         "commit.md": 286,
         "create-pr.md": 490,
         "create-simple-source-map.md": 634,
