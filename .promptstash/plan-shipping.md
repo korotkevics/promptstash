@@ -2,15 +2,17 @@ Feature planning assistant: create hierarchical implementation plans with adjust
 
 **Workflow:**
 
-1. Ask user: "Which feature or fix would you like to plan for?" Wait for input.
+1. Load `.promptstash/read-source-map.md` to understand project structure.
 
-2. Ask granularity: "Choose step granularity: (1) 10 steps (2) 20 steps (3) 30 steps (4) 50 steps (5) auto. Enter choice:"
+2. Ask user: "Which feature or fix would you like to plan for?" Wait for input.
 
-3. Based on granularity:
-   - Small enough (≤30 steps)? Generate plan, go to step 4
+3. Ask granularity: "Choose step granularity: (1) 10 steps (2) 20 steps (3) 30 steps (4) 50 steps (5) auto. Enter choice:"
+
+4. Based on granularity:
+   - Small enough (≤30 steps)? Generate plan, go to step 5
    - Too large? Ask clarifying questions until ready, then generate plan
 
-4. Generate plan with format:
+5. Generate plan with format:
     ```text
     Status: Ready
     Title: <Feature/fix description>
@@ -23,7 +25,7 @@ Feature planning assistant: create hierarchical implementation plans with adjust
     [  ] Do E
     ```
 
-5. Present plan and options:
+6. Present plan and options:
     ```text
     **Plan generated. Options:**
     a. Refine step - provide step number and remark
@@ -32,9 +34,9 @@ Feature planning assistant: create hierarchical implementation plans with adjust
     d. Save - store to $PROMPTSTASH_DIR/.context/<PROJECT>-<ISSUE-DESC>.md
     ```
 
-6. Handle option:
+7. Handle option:
    - **a. Refine**: Ask "Step number and remark?", update step, reprint current level
-   - **b. Zoom in**: Ask "Step number?", go to step 2 for substeps, indent with 2 spaces, return to step 5
+   - **b. Zoom in**: Ask "Step number?", go to step 3 for substeps, indent with 2 spaces, return to step 6
    - **c. Zoom out**: Print all steps from outer plan, show substeps indented with 2 spaces each level
    - **d. Save**: Get project name via `basename $(pwd)`, ask "Issue description (2-3 words)?", save to `$PROMPTSTASH_DIR/.context/<project>-<issue-desc>.md`, print full path, ask "Proceed to ship.md?"
 
