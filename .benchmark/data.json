@@ -554,6 +554,30 @@
         "squash.md": 180,
         "suggest-better-function-names.md": 303
       }
+    },
+    {
+      "commit": "f8fed96",
+      "version": "0.21.0",
+      "timestamp": "2025-10-07T18:30:37.029374+00:00",
+      "prompts": {
+        "bump-semver-version.md": 421,
+        "commit.md": 325,
+        "create-mr.md": 272,
+        "create-pr.md": 403,
+        "create-simple-source-map.md": 332,
+        "debug.md": 317,
+        "fix-mr.md": 202,
+        "fix-pr.md": 275,
+        "improve-prompt.md": 352,
+        "optimize-prompt.md": 1022,
+        "plan-shipping.md": 371,
+        "read-source-map.md": 308,
+        "review-mr.md": 228,
+        "review-pr.md": 282,
+        "ship.md": 469,
+        "squash.md": 180,
+        "suggest-better-function-names.md": 303
+      }
     }
   ]
 }
