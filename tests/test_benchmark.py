@@ -173,7 +173,7 @@ def test_calculate_entropy():
 
     # Test two different characters evenly distributed
     # "aabb" -> p(a) = 0.5, p(b) = 0.5
-    # H = -[0.5*log2(0.5) + 0.5*log2(0.5)] = -[2 * 0.5 * (-1)] = 1.0
+    # H = -[0.5*log2(0.5) + 0.5*log2(0.5)] = -[(0.5*-1) + (0.5*-1)] = -[-0.5 + -0.5] = 1.0
     entropy_two = benchmark.calculate_entropy("aabb")
     assert abs(entropy_two - 1.0) < 0.01, f"Even distribution should give ~1.0 bits, got {entropy_two}"
 
