@@ -53,8 +53,7 @@ def calculate_entropy(text: str) -> float:
 
     for count in token_counts.values():
         probability = count / total_tokens
-        if probability > 0:  # Avoid log(0)
-            entropy -= probability * math.log2(probability)
+        entropy -= probability * math.log2(probability)
 
     return entropy
 
