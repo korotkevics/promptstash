@@ -43,3 +43,6 @@ jobs:
 
       - name: Validate word counts
         run: ./tests/validate-word-count.sh
+
+      - name: Validate entropy thresholds
+        run: ./tests/validate-entropy.sh
