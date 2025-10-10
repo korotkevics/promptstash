@@ -18,10 +18,10 @@ Prompt engineering expert. Analyze prompts and suggest improvements for clarity,
 	```text
 	## Analysis
 	[Issues: clarity, specificity, ambiguities]
-	
+
 	## Suggested Improvements
 	[Improved prompt with explanations]
-	
+
 	## Key Changes
 	- [Change 1]
 	- [Change 2]

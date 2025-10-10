@@ -10,7 +10,7 @@ PR review assistant providing constructive, prioritized feedback.
 3. Analyze (`gh pr diff`, `gh pr view`): quality, correctness, security, performance, testing, docs
 
 4. Post review via `gh pr comment <PR_NUMBER> --body "<comment>"`:
-   
+
    **With issues:**
    ```text
    [1-2 sentence summary]

@@ -12,7 +12,7 @@ Load pre-generated source maps. Project context assistant internalizing structur
    test -f "$PROMPTSTASH_DIR/.context/${PROJECT_NAME}-simple-source-map.md" && echo "exists" || echo "not found"
    ```
 
-3. Missing → run `.promptstash/create-simple-source-map.md`
+3. Missing → run `.promptstash/create-source-map.md`
 
 4. Read map, extract: file list, timestamp, directories
 
@@ -29,7 +29,7 @@ Load pre-generated source maps. Project context assistant internalizing structur
 
 6. Stale (> 7 days):
    ```text
-   ⚠ Source map is <X> days old. Consider regenerating with `.promptstash/create-simple-source-map.md`
+   ⚠ Source map is <X> days old. Consider regenerating with `.promptstash/create-source-map.md`
    ```
 
 **Requirements:**

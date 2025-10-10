@@ -8,8 +8,9 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
 3. Ask which prompt to optimize, list `.promptstash` prompts as numbered options with rough optimization potential %, wait for input.
 
 4. Analyze selected prompt:
+   - Get project name: `PROJECT_NAME=$(basename $(pwd))`
    - Map logical structure using `.context/notation.md`
-   - Save to `.promptstash/<filename>.not`
+   - Save to `$PROMPTSTASH_DIR/.context/${PROJECT_NAME}-<filename>.not`
    - Calculate baseline word count
 
 5. Create three optimized versions (iteration N, candidates 1-3):
@@ -17,26 +18,30 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
    - Remove redundant explanations and verbose phrasing
    - Keep at least one example per major concept
    - Maintain all critical constraints
+   - Maximize entropy (information density: unique tokens / total tokens)
    - Verify logical equivalence: map each version, ensure 100% match with `.not` file
 
 6. Present:
     ```text
     ## Iteration #N: Optimized Versions
-    
+
     ### Candidate N.1
     [Optimized prompt text]
-    
+
     **Reduction:** X words (Y% shorter, logical equivalence 100%)
-    
+    **Entropy:** Z (information density)
+
     ### Candidate N.2
     [Optimized prompt text]
-    
+
     **Reduction:** X words (Y% shorter, logical equivalence 100%)
-    
+    **Entropy:** Z (information density)
+
     ### Candidate N.3
     [Optimized prompt text]
-    
+
     **Reduction:** X words (Y% shorter, logical equivalence 100%)
+    **Entropy:** Z (information density)
     ```
 
 7. Options:
@@ -50,11 +55,11 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
     ```
 
 8. Handle selection:
-   - **Option 1**: Ask which candidate, overwrite original, clean `.not` and `.candidate*` files, follow `.promptstash/commit.md`
-   - **Option 2**: Ask which candidate (N.1, N.2, N.3), save as `.promptstash/<filename>.candidate<N.X>.md`, increment iteration, return to step 4
+   - **Option 1**: Ask which candidate, overwrite original, clean via `find $PROMPTSTASH_DIR/.context -name "${PROJECT_NAME}-<filename>.*" -delete`, follow `.promptstash/commit.md`
+   - **Option 2**: Ask which candidate (N.1, N.2, N.3), save as `$PROMPTSTASH_DIR/.context/${PROJECT_NAME}-<filename>.candidate<N.X>.md`, increment iteration, return to step 4
    - **Option 3**: Ask which candidate, display with all saved candidates (full text + metrics), re-present options
    - **Option 4**: Gather feedback, increment iteration, return to step 4
-   - **Option 5**: Clean `.not` and `.candidate*` files, end
+   - **Option 5**: Clean via `find $PROMPTSTASH_DIR/.context -name "${PROJECT_NAME}-<filename>.*" -delete`, end
 
 ## Example
 
@@ -83,20 +88,20 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
     Which candidate to review?
     - Current: 2.1, 2.2, 2.3
     - Previous: 1.2 (saved from Iteration 1)
-    
+
     User selects: 2.1
-    
+
     ## Candidate Review: 2.1 vs Previously Saved
-    
+
     ### Selected: Candidate 2.1 (Current)
     [Full text]
     **Reduction:** 105 words (70% shorter)
-    
+
     ### Previously Saved: Candidate 1.2
     [Full text]
     **Reduction:** 95 words (63% shorter)
-    
+
     [Returns to options]
     ```
 
-**Constraints:** Never remove critical workflow steps or safety constraints. Preserve at least one example for complex concepts. Keep error handling and edge cases. Maintain role definitions and core task descriptions. Verify 100% logical equivalence using notation. Track word count accurately. Clean temporary files only when accepting final version. Display full text for review. Ask user to specify candidate when multiple exist. Tab-indent quoted ```text blocks.
+**Constraints:** Never remove critical workflow steps or safety constraints. Preserve at least one example for complex concepts. Keep error handling and edge cases. Maintain role definitions and core task descriptions. Verify 100% logical equivalence using notation. Track word count accurately. Compute entropy (unique tokens / total tokens) for candidate selection. Prioritize high entropy (information density). Clean temporary files only when accepting final version. Display full text for review. Ask user to specify candidate when multiple exist. Tab-indent quoted ```text blocks.

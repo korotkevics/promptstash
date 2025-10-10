@@ -18,7 +18,7 @@ Workflow:
 3. Present:
     ```text
     **Proposed commit:**
-    
+
     <message>
     ```
 
@@ -42,7 +42,7 @@ Workflow:
 Example good message:
     ```
     Add user authentication middleware
-    
+
     Implement JWT-based authentication for API routes.
     Includes token validation and refresh logic.
     ```
