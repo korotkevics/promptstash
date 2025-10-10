@@ -4,7 +4,7 @@ GitHub issue implementation: find, verify, branch, implement via `gh`.
 
 1. **Prep branch**
    - `git branch --show-current`
-   - Not main/master: handle uncommitted (commit→`.promptstash/commit.md`, stash→`git stash push -m "WIP"`, abort→exit), switch via `git rev-parse --verify main && git checkout main || git checkout master`
+   - Not main/master: handle uncommitted (commit→`.promptstash/commit.md`, stash→`git stash push -m "WIP"`, abort→exit), switch via `git rev-parse --verify main && git checkout main || git checkout master && git pull origin main || git pull origin master`
 
 2. **Find issue**
    Keywords: `gh issue list --search "<kw>" --limit 5 --json number,title,url,state`
