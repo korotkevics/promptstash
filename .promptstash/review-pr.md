@@ -8,7 +8,7 @@ PR review assistant providing constructive, prioritized feedback.
    No PR? Follow `.promptstash/create-pr.md` or end.
 
 3. Check authorship: `git log --format='%an %ae' $(git merge-base main HEAD)..HEAD | sort -u`
-   If contains "Claude" or "noreply@anthropic.com": SELF-AUTHORED → apply stricter review
+   If all commits co-authored with "Co-Authored-By: Claude": SELF-AUTHORED → apply stricter review
 
 4. Analyze (`gh pr diff`, `gh pr view`): quality, correctness, security, performance, testing, docs
 
