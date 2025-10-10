@@ -157,6 +157,18 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
+# Test 17: Verify self-update ignores generated files
+TESTS=$((TESTS + 1))
+if grep -q ':!.benchmark/' bin/promptstash && \
+   grep -q ':!README.md' bin/promptstash && \
+   grep -q ':!static/prompt-graph.svg' bin/promptstash && \
+   grep -q ':!static/prompt-graph.dot' bin/promptstash; then
+  echo -e "${GREEN}✓ self-update excludes generated files from uncommitted check${NC}"
+else
+  echo -e "${RED}✗ self-update doesn't exclude generated files${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
 echo ""
 echo "Ran $TESTS tests"
 
