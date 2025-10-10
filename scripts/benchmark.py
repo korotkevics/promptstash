@@ -8,7 +8,7 @@ import subprocess
 import sys
 from datetime import datetime, UTC
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 try:
     import tiktoken
@@ -78,11 +78,11 @@ def get_current_commit() -> str:
     return result.stdout.strip()
 
 
-def benchmark_prompts() -> tuple[Dict[str, int], Dict[str, float]]:
+def benchmark_prompts() -> Tuple[Dict[str, int], Dict[str, float]]:
     """Count tokens and calculate entropy for all prompts in .promptstash/.
 
     Returns:
-        tuple: (token_counts dict, entropy_values dict)
+        Tuple: (token_counts dict, entropy_values dict)
     """
     prompts_dir = Path(".promptstash")
     token_counts = {}
