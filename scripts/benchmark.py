@@ -6,6 +6,7 @@ import math
 import os
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -52,9 +53,7 @@ def calculate_entropy(text: str) -> float:
         return 0.0
 
     # Count token frequencies
-    token_counts = {}
-    for token in tokens:
-        token_counts[token] = token_counts.get(token, 0) + 1
+    token_counts = Counter(tokens)
 
     # Calculate probabilities and Shannon entropy
     total_tokens = len(tokens)
