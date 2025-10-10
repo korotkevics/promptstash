@@ -26,6 +26,39 @@ def count_tokens(text: str) -> int:
     return len(TOKENIZER.encode(text))
 
 
+def calculate_entropy(text: str) -> float:
+    """Calculate Shannon entropy of text.
+
+    H = -Σ(p(token) * log₂(p(token))) where p(token) = frequency/total
+
+    Returns entropy in bits.
+    """
+    if not text:
+        return 0.0
+
+    # Tokenize the text
+    tokens = TOKENIZER.encode(text)
+
+    if not tokens:
+        return 0.0
+
+    # Count token frequencies
+    token_counts = {}
+    for token in tokens:
+        token_counts[token] = token_counts.get(token, 0) + 1
+
+    # Calculate probabilities and Shannon entropy
+    total_tokens = len(tokens)
+    entropy = 0.0
+
+    for count in token_counts.values():
+        probability = count / total_tokens
+        if probability > 0:  # Avoid log(0)
+            entropy -= probability * math.log2(probability)
+
+    return entropy
+
+
 def get_current_version() -> str:
     """Read current version from .version file."""
     version_file = Path(".version")
@@ -45,17 +78,24 @@ def get_current_commit() -> str:
     return result.stdout.strip()
 
 
-def benchmark_prompts() -> Dict[str, int]:
-    """Count tokens for all prompts in .promptstash/."""
+def benchmark_prompts() -> tuple[Dict[str, int], Dict[str, float]]:
+    """Count tokens and calculate entropy for all prompts in .promptstash/.
+
+    Returns:
+        tuple: (token_counts dict, entropy_values dict)
+    """
     prompts_dir = Path(".promptstash")
     token_counts = {}
+    entropy_values = {}
 
     for prompt_file in sorted(prompts_dir.glob("*.md")):
         content = prompt_file.read_text()
         token_count = count_tokens(content)
+        entropy = calculate_entropy(content)
         token_counts[prompt_file.name] = token_count
+        entropy_values[prompt_file.name] = entropy
 
-    return token_counts
+    return token_counts, entropy_values
 
 
 def load_benchmark_data() -> Dict:
@@ -123,19 +163,21 @@ def generate_readme_table(data: Dict) -> str:
 
     # Build table header
     versions = [c["version"] for c in recent_commits]
-    header = "| Prompt | Cost | " + " | ".join(f"**{v}**" for v in versions) + " |\n"
-    separator = "|" + "|".join(["---"] * (len(versions) + 2)) + "|\n"
+    header = "| Prompt | Cost | Entropy | " + " | ".join(f"**{v}**" for v in versions) + " |\n"
+    separator = "|" + "|".join(["---"] * (len(versions) + 3)) + "|\n"
 
     # Build table rows
     rows = []
     for prompt in all_prompts:
-        # Get latest token count for this prompt (from most recent commit)
+        # Get latest token count and entropy for this prompt (from most recent commit)
         latest_token_count = recent_commits[0]["prompts"].get(prompt, 0)
+        latest_entropy = recent_commits[0].get("entropy", {}).get(prompt, 0.0)
         dollar_signs = get_dollar_signs(latest_token_count) if latest_token_count > 0 else ""
-        
+
         prompt_name = f"**{prompt.replace('.md', '')}**"
         cost_cell = dollar_signs.strip()  # Remove leading space for cost column
-        cells = [prompt_name, cost_cell]
+        entropy_cell = f"{latest_entropy:.2f}" if latest_entropy > 0 else "-"
+        cells = [prompt_name, cost_cell, entropy_cell]
 
         # Calculate deltas from right to left (oldest to newest)
         reversed_commits = list(reversed(recent_commits))
@@ -155,7 +197,7 @@ def generate_readme_table(data: Dict) -> str:
         rows.append("| " + " | ".join(cells) + " |")
 
     # Add total row
-    total_cells = ["**TOTAL**", ""]  # Empty cost cell for total row
+    total_cells = ["**TOTAL**", "", ""]  # Empty cost and entropy cells for total row
     reversed_commits = list(reversed(recent_commits))
     total_values = []
     prev_total = None
@@ -259,14 +301,16 @@ def main():
 
     print(f"Benchmarking version {version} (commit {commit})...")
 
-    # Count tokens
-    token_counts = benchmark_prompts()
+    # Count tokens and calculate entropy
+    token_counts, entropy_values = benchmark_prompts()
     total_tokens = sum(token_counts.values())
 
-    print(f"Token counts:")
-    for prompt, count in token_counts.items():
-        print(f"  {prompt}: {count}")
-    print(f"  TOTAL: {total_tokens}")
+    print(f"Token counts and entropy:")
+    for prompt in sorted(token_counts.keys()):
+        tokens = token_counts[prompt]
+        entropy = entropy_values[prompt]
+        print(f"  {prompt}: {tokens} tokens, {entropy:.2f} bits")
+    print(f"  TOTAL: {total_tokens} tokens")
 
     # Load and update benchmark data
     data = load_benchmark_data()
@@ -276,6 +320,7 @@ def main():
     if existing:
         print(f"Commit {commit} already benchmarked, updating...")
         existing["prompts"] = token_counts
+        existing["entropy"] = entropy_values
         existing["timestamp"] = timestamp
         existing["version"] = version
     else:
@@ -283,7 +328,8 @@ def main():
             "commit": commit,
             "version": version,
             "timestamp": timestamp,
-            "prompts": token_counts
+            "prompts": token_counts,
+            "entropy": entropy_values
         })
 
     # Save benchmark data
@@ -294,7 +340,7 @@ def main():
     table = generate_readme_table(data)
     update_readme(table)
     print("Updated README.md")
-    
+
     # Generate prompt reference graph
     print("\nGenerating prompt reference graph...")
     generate_prompt_graph()
