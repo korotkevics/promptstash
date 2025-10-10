@@ -1,47 +1,39 @@
-GitHub issue implementation: find, verify, branch, implement via `gh`.
+GitHub issue handler: locate, check, branch, build via `gh`.
 
-**Workflow:**
+**Flow:**
 
-1. **Prep branch**
-   - `git branch --show-current`
-   - Not main/master: handle uncommitted (commit→`.promptstash/commit.md`, stash→`git stash push -m "WIP"`, abort→exit), switch via `git rev-parse --verify main && git checkout main || git checkout master && git pull origin main || git pull origin master`
+1. **Prep**
+   - Check: `git branch --show-current`
+   - Not main/master: resolve uncommitted (commit->`.promptstash/commit.md` | stash->`git stash push -m "WIP"` | abort), switch+pull: `git rev-parse --verify main && git checkout main || git checkout master && git pull origin main || git pull origin master`
 
-2. **Find issue**
-   Ask user: "Enter keywords to search or exact issue number:"
-   Wait for input.
-   If keywords: `gh issue list --search "<kw>" --limit 5 --json number,title,url,state`
-   Display results, ask: "Select issue number:"
-   If direct number: use it
+2. **Locate**
+   - Ask: "Enter keywords to search or exact issue number:"
+   - Wait input
+   - Keywords: `gh issue list --search "<kw>" --limit 5 --json number,title,url,state`, show, ask: "Select issue number:"
+   - Number: use direct
 
-3. **Verify issue**
-   `gh issue view <N> --json number,title,body,labels,comments,state`
-   Not found→ERROR, retry step 2
-   Found→summary, confirm (decline→retry/exit)
+3. **Check**
+   - `gh issue view <N> --json number,title,body,labels,comments,state`
+   - Not found->ERROR, back to 2
+   - Found->display, confirm (decline->retry/exit)
 
-4. **Create branch**
-   `git checkout -b feature/issue-<N>-<verb-2-4w>` (lowercase, hyphens, ≤50 chars, alphanumeric)
+4. **Branch**
+   - `git checkout -b feature/issue-<N>-<verb-2-4w>` (lowercase, hyphens, ≤50, alphanumeric)
 
-5. **Claim issue**
-   Comment on issue: `gh issue comment <N> -b "This issue will be worked on by AI Dev Agent \"Noah\"."`
+5. **Claim**: `gh issue comment <N> -b "This issue will be worked on by AI Dev Agent \"Noah\"."`
 
-6. **Implement**
-   Follow `.promptstash/ship.md` with issue context
+6. **Build**: Execute `.promptstash/ship.md` with context
 
-7. **Create PR**
-   Follow `.promptstash/create-pr.md`
-   PR body must include: `Fixes #<N>.`
+7. **PR**: Run `.promptstash/create-pr.md`, include: `Fixes #<N>.`
 
-8. **Update issue**
-   Comment on issue: `gh issue comment <N> -b "This issue was implemented by AI Dev Agent \"Noah\"."`
+8. **Close**: `gh issue comment <N> -b "This issue was implemented by AI Dev Agent \"Noah\"."`
 
-**Examples:**
+**Paths:**
+Search: ask->"auth bug"->list->pick->#42->check->branch->build
+Direct: ask->"123"->check->OK->branch->build
 
-Keyword flow: ask user→"auth bug"→list→ask selection→#42→verify→branch→implement
-Direct flow: ask user→"123"→verify→confirm→branch→implement
-Uncommitted: stash→switch→continue
+**Require:** main baseline | dirty managed | issue valid | branch OK | user OK
 
-**Validation:** main before branch | uncommitted handled | issue valid | branch valid | user confirms
+**Limits:** `gh` auth | git main/master | GitHub only | access | no auto-assign | name sanitize | dirty handle
 
-**Constraints:** `gh` CLI auth | git main/master | GitHub only | access required | no auto-assign | sanitize names | handle uncommitted | new implementations
-
-**Refs:** `.promptstash/ship.md` | `commit.md` | `create-pr.md`
+**See:** `.promptstash/ship.md` | `commit.md` | `create-pr.md`
