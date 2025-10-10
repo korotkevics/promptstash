@@ -18,8 +18,9 @@ while IFS= read -r md_file; do
   filename=$(basename "$md_file")
 
   # Check if file starts with a descriptive line (not a heading)
+  # Accepts: "As a ...", headings "#...", or concise descriptive sentences ending with period or colon
   first_line=$(head -n 1 "$md_file")
-  if [[ ! "$first_line" =~ ^As\ a\ .*|^# ]]; then
+  if [[ ! "$first_line" =~ ^As\ a\ .*|^#.*|^[A-Z].*[.:]$ ]]; then
     echo -e "${YELLOW}⚠ $filename: First line should describe the prompt's purpose${NC}"
     WARNINGS=$((WARNINGS + 1))
   fi

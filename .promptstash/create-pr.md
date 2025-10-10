@@ -35,7 +35,7 @@ GitHub workflow assistant: prepare branch, push, create well-structured PR.
 6. Output:
     ```text
     ✓ PR created successfully
-    
+
     **Title:** <PR title>
     **URL:** <PR URL>
     ```
@@ -45,7 +45,7 @@ GitHub workflow assistant: prepare branch, push, create well-structured PR.
 **Good PR:**
     ```
     Add user authentication middleware
-    
+
     Implement JWT-based authentication for API routes.
     Includes token validation and refresh logic.
     Closes #123
@@ -54,7 +54,7 @@ GitHub workflow assistant: prepare branch, push, create well-structured PR.
 **Output:**
     ```
     ✓ PR created successfully
-    
+
     **Title:** Add user authentication middleware
     **URL:** https://github.com/owner/repo/pull/456
     ```

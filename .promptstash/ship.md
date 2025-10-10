@@ -1,55 +1,33 @@
-Feature implementation assistant: build/ship features with TDD, optionally following existing plan.
+Ship features via TDD: select ad-hoc, load plan, or create plan.
 
-**Workflow:**
+**Flow:**
 
-1. Ask: "Proceed with (1) ad-hoc implementation or (2) existing plan?" Wait for input.
+1. Pick mode: (1) ad-hoc (2) plan (3) plan-creator
 
-2. If option 2 (existing plan):
-   - List plans: `find $PROMPTSTASH_DIR/.context -name "*-*.md" -exec grep -l "Status: Ready" {} \;`
-   - Display numbered list of plans with "Status: Ready"
-   - Ask: "Select plan number:" Wait for input
-   - Load selected plan
-   - Go to step 4
+2. Plan: search `$PROMPTSTASH_DIR/.context` for `Status: Ready`, pick, execute
 
-3. If option 1 (ad-hoc):
-   - Ask: feature details, criteria, files
-   - Load `.promptstash/read-source-map.md`, review code/tests
-   - Complex → TDD. Simple → direct
+3. Ad-hoc: gather requirements, review via `read-source-map.md`, TDD for complexity
 
-4. Implement (tests first if TDD), document
-   - If following plan: check `[x]` for completed steps
+4. Plan-creator: invoke `plan-shipping.md` then mode 2
 
-5. Test (fail → `.promptstash/debug.md`)
+5. Build (TDD: tests->code), doc, check plan boxes
 
-6. Report:
-    ```text
-    **Changes:** [summary]
-    **Files:** paths + descriptions
-    **Tests:** ✓ status
-    **Plan:** [if using plan: show progress X/Y steps completed]
-    ```
+6. Validate -> errors: `debug.md`
 
-7. If following plan and all steps checked:
-   - Update plan status from "Status: Ready" to "Status: Done"
-   - Save updated plan
+7. Summary:
+   ```text
+   **Changes:** overview
+   **Files:** modified
+   **Tests:** results
+   **Plan:** completion %
+   ```
 
-8. Options: (1) commit (2) review
+8. Finished plan: flip Ready->Done status
 
-9. (2) → iterate step 4. (1) → `.promptstash/commit.md`
+9. Commit (`.promptstash/commit.md`) or iterate (step 5)
 
-**Example (ad-hoc):**
-    ```text
-    **Changes:** JWT auth
-    **Files:** `auth.js`, `jwt.js`, tests
-    **Tests:** ✓ 15/15
-    ```
+**Samples:**
+JWT: auth.js, jwt.js, 15/15
+Plan: 8/8 complete
 
-**Example (plan-based):**
-    ```text
-    **Changes:** Completed authentication steps
-    **Files:** `auth.js`, `jwt.js`, tests
-    **Tests:** ✓ 15/15
-    **Plan:** 8/8 steps completed ✓
-    ```
-
-**Constraints:** Always test, follow patterns, handle edges, document, ask when unclear. When using plan, check steps as completed.
+**Bounds:** Test mandatory. Complexity needs TDD. Plans tracked. Failures debugged.
