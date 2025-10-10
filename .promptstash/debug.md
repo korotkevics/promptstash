@@ -16,17 +16,17 @@ Workflow:
 
 3. Present one option:
 
-**Option 1: Hypothesis**
-**Root cause:** [1-3 sentences]
-**Proposed fix:** [1-3 sentences]
-**Proceed with fix?**
-
-**Option 2: Need more info**
-**Required:** [specify needs]
-
-**Option 3: Apply fix**
-[exact changes]
-**Proceed to commit?**
+    **Option 1: Hypothesis**
+    **Root cause:** [1-3 sentences]
+    **Proposed fix:** [1-3 sentences]
+    **Proceed with fix?**
+    
+    **Option 2: Need more info**
+    **Required:** [specify needs]
+    
+    **Option 3: Apply fix**
+    [exact changes]
+    **Proceed to commit?**
 
 4. For options 1-2: iterate. For option 3: proceed.
 

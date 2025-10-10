@@ -9,7 +9,7 @@
 8=.promptstash/bump-semver-version.md
 9=.promptstash/commit.md
 10=.promptstash/create-pr.md
-11=.promptstash/create-simple-source-map.md
+11=.promptstash/create-source-map.md
 12=.promptstash/debug.md
 13=.promptstash/fix-pr.md
 14=.promptstash/improve-prompt.md

@@ -162,6 +162,37 @@ def test_generate_readme_table_sliding_window():
     print("✓ test_generate_readme_table_sliding_window passed")
 
 
+def test_calculate_entropy():
+    """Test Shannon entropy calculation."""
+    # Test empty string
+    assert benchmark.calculate_entropy("") == 0.0
+
+    # Test single character (no entropy - completely predictable)
+    entropy_single = benchmark.calculate_entropy("aaaa")
+    assert entropy_single == 0.0, "Repeated character should have 0 entropy"
+
+    # Test two different characters evenly distributed
+    # "aabb" -> p(a) = 0.5, p(b) = 0.5
+    # H = -[0.5*log2(0.5) + 0.5*log2(0.5)] = -[(0.5*-1) + (0.5*-1)] = -[-0.5 + -0.5] = 1.0
+    entropy_two = benchmark.calculate_entropy("aabb")
+    assert abs(entropy_two - 1.0) < 0.01, f"Even distribution should give ~1.0 bits, got {entropy_two}"
+
+    # Test higher entropy with more diverse tokens
+    diverse_text = "The quick brown fox jumps over the lazy dog"
+    entropy_diverse = benchmark.calculate_entropy(diverse_text)
+    assert entropy_diverse > 0, "Diverse text should have positive entropy"
+    assert entropy_diverse > entropy_two, "More diverse text should have higher entropy"
+
+    # Test that entropy increases with vocabulary diversity
+    repetitive = "test test test test test"
+    varied = "alpha beta gamma delta epsilon"
+    entropy_rep = benchmark.calculate_entropy(repetitive)
+    entropy_var = benchmark.calculate_entropy(varied)
+    assert entropy_var > entropy_rep, "Varied vocabulary should have higher entropy"
+
+    print("✓ test_calculate_entropy passed")
+
+
 def run_all_tests():
     """Run all tests."""
     print("Running benchmark.py unit tests...\n")
@@ -169,6 +200,7 @@ def run_all_tests():
     test_count_tokens()
     test_get_delta()
     test_get_dollar_signs()
+    test_calculate_entropy()
     test_generate_readme_table()
     test_generate_readme_table_empty()
     test_generate_readme_table_sliding_window()

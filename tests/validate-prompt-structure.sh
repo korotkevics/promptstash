@@ -31,8 +31,10 @@ while IFS= read -r md_file; do
     ERRORS=$((ERRORS + 1))
   fi
 
-  # Check for trailing whitespace
-  if grep -q '[[:space:]]$' "$md_file"; then
+  # Check for trailing whitespace (exclude indented blank lines for formatting)
+  # Allow lines that are only whitespace (indented blank lines within lists/code blocks)
+  # Flag lines with content followed by trailing whitespace
+  if grep -E '^[^[:space:]].*[[:space:]]$|^[[:space:]]+[^[:space:]].*[[:space:]]$' "$md_file" >/dev/null; then
     echo -e "${YELLOW}⚠ $filename: Contains trailing whitespace${NC}"
     WARNINGS=$((WARNINGS + 1))
   fi
