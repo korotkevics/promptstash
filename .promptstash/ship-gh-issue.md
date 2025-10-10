@@ -26,9 +26,11 @@ GitHub issue handler: locate, check, branch, build via `gh`.
 
 7. **PR**: Run `.promptstash/create-pr.md`, include: `Fixes #<N>.`
 
-8. **Close**: `gh issue comment <N> -b "This issue was implemented by AI Dev Agent \"Noah\"."`
+8. **Review**: Execute `.promptstash/review-pr.md`
 
-9. **Version**: Execute `.promptstash/bump-semver-version.md`
+9. **Close**: `gh issue comment <N> -b "This issue was implemented by AI Dev Agent \"Noah\"."`
+
+10. **Version**: Execute `.promptstash/bump-semver-version.md`
 
 **Paths:**
 Search: ask->"auth bug"->list->pick->#42->check->branch->build
@@ -38,4 +40,4 @@ Direct: ask->"123"->check->OK->branch->build
 
 **Limits:** `gh` auth | git main/master | GitHub only | access | no auto-assign | name sanitize | dirty handle
 
-**See:** `.promptstash/ship.md` | `commit.md` | `create-pr.md` | `bump-semver-version.md`
+**See:** `.promptstash/ship.md` | `commit.md` | `create-pr.md` | `review-pr.md` | `bump-semver-version.md`
