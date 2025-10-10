@@ -71,8 +71,12 @@ if __name__ == "__main__":
         print(f"Usage: {sys.argv[0]} <file_path>", file=sys.stderr)
         sys.exit(1)
     file_path = sys.argv[1]
-    with open(file_path, 'r') as f:
-        content = f.read()
+    try:
+        with open(file_path, 'r') as f:
+            content = f.read()
+    except OSError as e:
+        print(f"Error: Could not open or read file '{file_path}': {e}", file=sys.stderr)
+        sys.exit(1)
     entropy = calculate_entropy(content)
     print(f"{entropy:.2f}")
 PYTHON_EOF
