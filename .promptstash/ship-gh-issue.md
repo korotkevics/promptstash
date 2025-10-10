@@ -7,8 +7,11 @@ GitHub issue implementation: find, verify, branch, implement via `gh`.
    - Not main/master: handle uncommitted (commit→`.promptstash/commit.md`, stash→`git stash push -m "WIP"`, abort→exit), switch via `git rev-parse --verify main && git checkout main || git checkout master && git pull origin main || git pull origin master`
 
 2. **Find issue**
-   Keywords: `gh issue list --search "<kw>" --limit 5 --json number,title,url,state`
-   Or direct number
+   Ask user: "Enter keywords to search or exact issue number:"
+   Wait for input.
+   If keywords: `gh issue list --search "<kw>" --limit 5 --json number,title,url,state`
+   Display results, ask: "Select issue number:"
+   If direct number: use it
 
 3. **Verify issue**
    `gh issue view <N> --json number,title,body,labels,comments,state`
@@ -33,8 +36,8 @@ GitHub issue implementation: find, verify, branch, implement via `gh`.
 
 **Examples:**
 
-Keyword flow: "auth bug"→list→#42→verify→branch→implement
-Direct flow: "123"→verify→confirm→branch→implement
+Keyword flow: ask user→"auth bug"→list→ask selection→#42→verify→branch→implement
+Direct flow: ask user→"123"→verify→confirm→branch→implement
 Uncommitted: stash→switch→continue
 
 **Validation:** main before branch | uncommitted handled | issue valid | branch valid | user confirms
