@@ -7,9 +7,18 @@ PR review assistant providing constructive, prioritized feedback.
 2. Find PR: `BRANCH=$(git rev-parse --abbrev-ref HEAD); gh pr view --json url,number,title`
    No PR? Follow `.promptstash/create-pr.md` or end.
 
-3. Analyze (`gh pr diff`, `gh pr view`): quality, correctness, security, performance, testing, docs
+3. Check authorship: `git log --format='%an %ae' $(git merge-base main HEAD)..HEAD | sort -u`
+   If contains "Claude" or "noreply@anthropic.com": SELF-AUTHORED → apply stricter review
 
-4. Post review via `gh pr comment <PR_NUMBER> --body "<comment>"`:
+4. Analyze (`gh pr diff`, `gh pr view`): quality, correctness, security, performance, testing, docs
+
+   **Self-authored work requires extra scrutiny:**
+   - Actively look for edge cases, potential bugs, missing validations
+   - Question design decisions: simpler alternatives? overlooked scenarios?
+   - Check: error handling, boundary conditions, naming clarity, documentation gaps
+   - Before LGTM: explicitly state "Thoroughly examined for [specific concerns], found no issues" OR identify improvements
+
+5. Post review via `gh pr comment <PR_NUMBER> --body "<comment>"`:
 
    **With issues:**
    ```text
@@ -23,10 +32,18 @@ PR review assistant providing constructive, prioritized feedback.
    Reviewed by AI Dev Agent "Ezekiel"
    ```
 
-   **No issues:** `LGTM!\n___\nReviewed by AI Dev Agent "Ezekiel"`
+   **No issues (self-authored):**
+   ```text
+   Thoroughly examined for [list specific concerns checked: edge cases, error handling, etc.]. No issues found.
 
-5. Output: `OK: Review posted\n**PR:** #<n> - <title>\n**Suggestions:** <count>`
+   ___
+   Reviewed by AI Dev Agent "Ezekiel"
+   ```
 
-6. If suggestions, follow `.promptstash/fix-pr.md`
+   **No issues (external):** `LGTM!\n___\nReviewed by AI Dev Agent "Ezekiel"`
 
-**Constraints:** Be specific. Explain WHY. Prioritize correctly (HIGH=blocking). Include paths/lines. Professional tone.
+6. Output: `OK: Review posted\n**PR:** #<n> - <title>\n**Suggestions:** <count>`
+
+7. If suggestions, follow `.promptstash/fix-pr.md`
+
+**Constraints:** Be specific. Explain WHY. Prioritize correctly (HIGH=blocking). Include paths/lines. Professional tone. Self-review requires demonstrable rigor.
