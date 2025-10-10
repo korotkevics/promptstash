@@ -30,14 +30,18 @@ Workflow:
 
 4. If confirm: `git commit -m "<message>"`
 
-5. Present next steps:
+5. Present next steps (mandatory - always show this):
     ```text
     **Next steps:**
     1. Push changes - `git push`
     2. Done
+
+    Choose 1 to push, or 2 to finish without pushing.
     ```
 
-6. If push fails: explain error and suggest solutions (pull with rebase, force-with-lease)
+6. If user chooses push: execute `git push`, then `git status` to verify
+
+7. If push fails: explain error and suggest solutions (pull with rebase, force-with-lease)
 
 Example good message:
     ```
