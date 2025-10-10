@@ -87,6 +87,8 @@ while IFS= read -r md_file; do
   filename=$(basename "$md_file")
 
   # Exclude optimize-prompt.md from checking
+  # Reason: 'optimize-prompt.md' contains optimization instructions or meta-prompts,
+  # which are not subject to entropy validation as they do not represent user-facing prompts.
   if [ "$filename" = "optimize-prompt.md" ]; then
     continue
   fi
