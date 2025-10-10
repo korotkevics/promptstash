@@ -66,6 +66,10 @@ def calculate_entropy(text):
     return entropy
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Error: No file path argument provided.", file=sys.stderr)
+        print(f"Usage: {sys.argv[0]} <file_path>", file=sys.stderr)
+        sys.exit(1)
     file_path = sys.argv[1]
     with open(file_path, 'r') as f:
         content = f.read()
