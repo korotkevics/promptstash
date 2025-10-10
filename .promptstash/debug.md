@@ -33,7 +33,7 @@ Workflow:
 5. Apply fix (option 3):
    - Make changes
    - Test if possible
-   - Follow `.promptstash/commit.md`
+   - Follow `.promptstash/commit.md` (mandatory - must complete full commit workflow including push option)
 
 Example - Option 1:
 **Root cause:** API fails with 401 - token expired (>24h TTL)

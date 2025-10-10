@@ -22,7 +22,8 @@ if ! command -v python3 &> /dev/null; then
 fi
 
 # Create a temporary Python script to calculate entropy
-TEMP_SCRIPT=$(mktemp)
+TEMP_SCRIPT=$(mktemp /tmp/validate-entropy.XXXXXX)
+chmod 600 "$TEMP_SCRIPT"
 trap "rm -f $TEMP_SCRIPT" EXIT
 
 cat > "$TEMP_SCRIPT" << 'PYTHON_EOF'
