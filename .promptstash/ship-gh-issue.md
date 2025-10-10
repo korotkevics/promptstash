@@ -28,6 +28,8 @@ GitHub issue handler: locate, check, branch, build via `gh`.
 
 8. **Close**: `gh issue comment <N> -b "This issue was implemented by AI Dev Agent \"Noah\"."`
 
+9. **Version**: Execute `.promptstash/bump-semver-version.md`
+
 **Paths:**
 Search: ask->"auth bug"->list->pick->#42->check->branch->build
 Direct: ask->"123"->check->OK->branch->build
@@ -36,4 +38,4 @@ Direct: ask->"123"->check->OK->branch->build
 
 **Limits:** `gh` auth | git main/master | GitHub only | access | no auto-assign | name sanitize | dirty handle
 
-**See:** `.promptstash/ship.md` | `commit.md` | `create-pr.md`
+**See:** `.promptstash/ship.md` | `commit.md` | `create-pr.md` | `bump-semver-version.md`
