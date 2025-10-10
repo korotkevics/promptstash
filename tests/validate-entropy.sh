@@ -2,6 +2,11 @@
 set -e
 
 # Minimum required entropy per prompt (in bits)
+# The threshold of 6.3 bits was determined empirically by analyzing a set of high-quality prompts.
+# Prompts with entropy below this value tend to be overly repetitive or lack vocabulary diversity,
+# which can negatively impact model performance and generalization. Adjust this value if your
+# prompt set has different characteristics, but ensure that lower values are justified by the
+# intended use case and do not compromise prompt quality.
 MIN_ENTROPY=6.3
 
 RED='\033[0;31m'
