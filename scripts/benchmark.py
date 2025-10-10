@@ -27,11 +27,20 @@ def count_tokens(text: str) -> int:
 
 
 def calculate_entropy(text: str) -> float:
-    """Calculate Shannon entropy of text.
+    """Calculate Shannon entropy of text using tiktoken tokenization.
 
     H = -Σ(p(token) * log₂(p(token))) where p(token) = frequency/total
 
-    Returns entropy in bits.
+    Parameters:
+        text (str): The input text to calculate entropy for.
+
+    Returns:
+        float: The Shannon entropy in bits.
+
+    Notes:
+        - Tokenization is performed using the tiktoken library (cl100k_base encoding).
+        - If the input text is empty or tokenizes to zero tokens, returns 0.0.
+        - If the text tokenizes to a single token type, returns 0.0.
     """
     if not text:
         return 0.0
