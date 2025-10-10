@@ -18,7 +18,7 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
    - Remove redundant explanations and verbose phrasing
    - Keep at least one example per major concept
    - Maintain all critical constraints
-   - Maximize entropy (information density: unique tokens / total tokens)
+   - Maximize entropy: H = -Σ(p(token) * log₂(p(token))) where p(token) = frequency/total
    - Verify logical equivalence: map each version, ensure 100% match with `.not` file
 
 6. Present:
@@ -29,19 +29,19 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
     [Optimized prompt text]
 
     **Reduction:** X words (Y% shorter, logical equivalence 100%)
-    **Entropy:** Z (information density)
+    **Entropy:** Z bits (Shannon entropy)
 
     ### Candidate N.2
     [Optimized prompt text]
 
     **Reduction:** X words (Y% shorter, logical equivalence 100%)
-    **Entropy:** Z (information density)
+    **Entropy:** Z bits (Shannon entropy)
 
     ### Candidate N.3
     [Optimized prompt text]
 
     **Reduction:** X words (Y% shorter, logical equivalence 100%)
-    **Entropy:** Z (information density)
+    **Entropy:** Z bits (Shannon entropy)
     ```
 
 7. Options:
@@ -104,4 +104,4 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
     [Returns to options]
     ```
 
-**Constraints:** Never remove critical workflow steps or safety constraints. Preserve at least one example for complex concepts. Keep error handling and edge cases. Maintain role definitions and core task descriptions. Verify 100% logical equivalence using notation. Track word count accurately. Compute entropy (unique tokens / total tokens) for candidate selection. Prioritize high entropy (information density). Clean temporary files only when accepting final version. Display full text for review. Ask user to specify candidate when multiple exist. Tab-indent quoted ```text blocks.
+**Constraints:** Never remove critical workflow steps or safety constraints. Preserve at least one example for complex concepts. Keep error handling and edge cases. Maintain role definitions and core task descriptions. Verify 100% logical equivalence using notation. Track word count accurately. Compute Shannon entropy H = -Σ(p(token) * log₂(p(token))) for candidate selection. Prioritize high entropy (information density). Clean temporary files only when accepting final version. Display full text for review. Ask user to specify candidate when multiple exist. Tab-indent quoted ```text blocks.
