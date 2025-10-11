@@ -24,9 +24,14 @@ PR review assistant providing constructive, prioritized feedback.
    ```text
    [1-2 sentence summary]
 
-   **HIGH** - [ ] [Critical/blocking]
-   **MEDIUM** - [ ] [Quality improvements]
-   **LOW** - [ ] [Nice-to-have]
+   **HIGH priority**
+   - [ ] [Critical/blocking issue with file:line reference]
+
+   **MEDIUM priority**
+   - [ ] [Quality improvement with file:line reference]
+
+   **LOW priority**
+   - [ ] [Nice-to-have enhancement with file:line reference]
 
    ___
    Reviewed by AI Dev Agent "Ezekiel"
