@@ -142,16 +142,13 @@ update_claude_md() {
 
     # Content to add
     # Use the resolved path for PROMPTSTASH_DIR to avoid assuming Claude Code expands environment variables.
-    local content=$(cat <<EOF
-# User Memory
+    local content="# User Memory
 
 ## Global Workflow Instructions
 
 Always reference all workflow documentation from the prompt stash directory:
 
-@${PROMPTSTASH_DIR}/.promptstash
-EOF
-)
+@${PROMPTSTASH_DIR}/.promptstash"
 
     # If CLAUDE.md doesn't exist, create it with our content
     if [ ! -f "$md_file" ]; then
