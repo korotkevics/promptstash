@@ -141,16 +141,15 @@ update_claude_md() {
     local md_file="$1"
 
     # Content to add
-    # Note: Using 'EOF' (quoted) to prevent bash variable expansion.
-    # The $PROMPTSTASH_DIR variable will be expanded by Claude Code at runtime.
-    local content=$(cat << 'EOF'
+    # Use the resolved path for PROMPTSTASH_DIR to avoid assuming Claude Code expands environment variables.
+    local content=$(cat <<EOF
 # User Memory
 
 ## Global Workflow Instructions
 
 Always reference all workflow documentation from the prompt stash directory:
 
-@$PROMPTSTASH_DIR/.promptstash
+@${PROMPTSTASH_DIR}/.promptstash
 EOF
 )
 
