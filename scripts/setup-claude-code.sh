@@ -162,7 +162,7 @@ EOF
     fi
 
     # Check if our content already exists
-    if grep -Fq "@\$PROMPTSTASH_DIR/.promptstash" "$md_file" 2>/dev/null; then
+    if grep -Fq "@${PROMPTSTASH_DIR}/.promptstash" "$md_file" 2>/dev/null; then
         echo -e "${YELLOW}⚠ PromptStash instructions are already in CLAUDE.md${NC}"
         return 0
     fi
