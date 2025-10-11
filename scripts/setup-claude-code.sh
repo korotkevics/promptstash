@@ -74,8 +74,8 @@ EOF
            "$json_file" > "$json_file.tmp" && mv "$json_file.tmp" "$json_file"
         echo -e "${GREEN}✓ Updated config.json${NC}"
     else
-        # Fallback: manual JSON editing without jq
-        echo -e "${YELLOW}⚠ jq not found - using fallback method${NC}"
+        # Fallback: Python-based JSON editing without jq
+        echo -e "${YELLOW}⚠ jq not found - using Python fallback${NC}"
 
         # Check if our path already exists
         if grep -F -q "$promptstash_path/**" "$json_file" 2>/dev/null; then
@@ -83,8 +83,46 @@ EOF
             return 0
         fi
 
-        # Try to add the path - this is a simple approach
-        echo -e "${YELLOW}⚠ Manual update required${NC}"
+        # Try Python-based JSON manipulation
+        if command -v python3 &> /dev/null; then
+            echo "Adding PromptStash directory to config.json using Python..."
+            python3 << EOF
+import json
+import sys
+
+try:
+    with open("$json_file", "r") as f:
+        config = json.load(f)
+
+    # Ensure permissions and additionalDirectories exist
+    if "permissions" not in config:
+        config["permissions"] = {}
+    if "additionalDirectories" not in config["permissions"]:
+        config["permissions"]["additionalDirectories"] = []
+
+    # Add our path if not already present
+    path = "$promptstash_path/**"
+    if path not in config["permissions"]["additionalDirectories"]:
+        config["permissions"]["additionalDirectories"].append(path)
+
+    with open("$json_file", "w") as f:
+        json.dump(config, f, indent=2)
+
+    print("success")
+except Exception as e:
+    print(f"error: {e}", file=sys.stderr)
+    sys.exit(1)
+EOF
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}✓ Updated config.json${NC}"
+                return 0
+            else
+                echo -e "${RED}✗ Python update failed${NC}"
+            fi
+        fi
+
+        # Final fallback: manual instructions
+        echo -e "${YELLOW}⚠ Automatic update unavailable (missing jq and python3)${NC}"
         echo "Please manually add the following to your $json_file:"
         echo ""
         echo '  "permissions": {'
@@ -102,6 +140,8 @@ update_claude_md() {
     local md_file="$1"
 
     # Content to add
+    # Note: Using 'EOF' (quoted) to prevent bash variable expansion.
+    # The $PROMPTSTASH_DIR variable will be expanded by Claude Code at runtime.
     local content=$(cat << 'EOF'
 # User Memory
 
