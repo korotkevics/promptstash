@@ -70,7 +70,7 @@ EOF
         # Add our path to the additionalDirectories array
         echo "Adding PromptStash directory to config.json..."
         jq --arg path "$promptstash_path/**" \
-           '.permissions.additionalDirectories |= (if . then . else [] end) + [$path] | unique' \
+           '.permissions.additionalDirectories //= [] | .permissions.additionalDirectories += [$path] | .permissions.additionalDirectories |= unique' \
            "$json_file" > "$json_file.tmp" && mv "$json_file.tmp" "$json_file"
         echo -e "${GREEN}✓ Updated config.json${NC}"
     else
