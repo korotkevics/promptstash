@@ -69,9 +69,10 @@ EOF
 
         # Add our path to the additionalDirectories array
         echo "Adding PromptStash directory to config.json..."
+        tmpfile=$(mktemp)
         jq --arg path "$promptstash_path/**" \
            '.permissions.additionalDirectories //= [] | .permissions.additionalDirectories += [$path] | .permissions.additionalDirectories |= unique' \
-           "$json_file" > "$json_file.tmp" && mv "$json_file.tmp" "$json_file"
+           "$json_file" > "$tmpfile" && mv "$tmpfile" "$json_file"
         echo -e "${GREEN}✓ Updated config.json${NC}"
     else
         # Fallback: Python-based JSON editing without jq
