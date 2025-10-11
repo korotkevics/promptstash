@@ -27,6 +27,51 @@ After installation, reload your shell or start a new terminal session:
 source ~/.bashrc  # or ~/.zshrc for zsh users
 ```
 
+## Claude Code Integration (Optional)
+
+If you're using [Claude Code](https://claude.com/claude-code), you can configure it to automatically access your PromptStash workflows. This setup provides a seamless experience by allowing Claude Code to reference workflow documentation from your prompt stash directory.
+
+Run the integration setup script:
+
+```bash
+$PROMPTSTASH_DIR/scripts/setup-claude-code.sh
+```
+
+This will:
+- Configure Claude Code's `config.json` to grant access to your PromptStash directory
+- Update your global `CLAUDE.md` with instructions to reference PromptStash workflows
+- Safely append to existing configurations if they already exist
+
+After running the script, restart Claude Code to apply the changes.
+
+### What Gets Configured
+
+The script updates two files in your `~/.claude` directory:
+
+1. **config.json** - Adds permissions:
+   ```json
+   {
+     "permissions": {
+       "additionalDirectories": [
+         "$PROMPTSTASH_DIR/.promptstash/**"
+       ]
+     }
+   }
+   ```
+
+2. **CLAUDE.md** - Adds workflow instructions:
+   ```md
+   # User Memory
+
+   ## Global Workflow Instructions
+
+   Always reference all workflow documentation from the prompt stash directory:
+
+   @$PROMPTSTASH_DIR/.promptstash
+   ```
+
+With this integration, Claude Code will automatically have access to your PromptStash workflows and documentation.
+
 ## Dry Run
 
 To preview what the installer would do without making any changes, use the `--dry-run` flag:
