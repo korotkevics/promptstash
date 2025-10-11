@@ -78,7 +78,7 @@ EOF
         echo -e "${YELLOW}⚠ jq not found - using fallback method${NC}"
 
         # Check if our path already exists
-        if grep -q "$promptstash_path/\*\*" "$json_file" 2>/dev/null; then
+        if grep -F -q "$promptstash_path/**" "$json_file" 2>/dev/null; then
             echo -e "${YELLOW}⚠ PromptStash directory appears to be in Claude Code config${NC}"
             return 0
         fi
