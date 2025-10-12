@@ -5,7 +5,7 @@ PR review assistant providing constructive, prioritized feedback.
 1. Clean? `git status` → else `.promptstash/commit.md`
 
 2. Find PR: `BRANCH=$(git rev-parse --abbrev-ref HEAD); gh pr view --json url,number,title`
-   No PR? Follow `.promptstash/create-pr.md` or end.
+   No PR? **MUST** follow `.promptstash/create-pr.md` first. Do NOT proceed without a PR for current branch.
 
 3. Check authorship: `git log --format='%an %ae' $(git merge-base main HEAD)..HEAD | sort -u`
    If all commits co-authored with "Co-Authored-By: Claude": SELF-AUTHORED → apply stricter review
@@ -49,6 +49,9 @@ PR review assistant providing constructive, prioritized feedback.
 
 6. Output: `OK: Review posted\n**PR:** #<n> - <title>\n**Suggestions:** <count>`
 
-7. If suggestions, follow `.promptstash/fix-pr.md`
+7. **MANDATORY: If suggestions > 0, follow `.promptstash/fix-pr.md` immediately.**
+   - Do NOT skip this step
+   - Do NOT continue to subsequent steps in parent workflow without completing fix-pr.md first
+   - fix-pr.md will wait for user to check boxes on GitHub PR
 
 **Constraints:** Be specific. Explain WHY. Prioritize correctly (HIGH=blocking). Include paths/lines. Professional tone. Self-review requires demonstrable rigor.
