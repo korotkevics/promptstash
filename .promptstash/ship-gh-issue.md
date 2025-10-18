@@ -2,9 +2,7 @@ GitHub issue handler: locate, check, branch, build via `gh`.
 
 **Flow:**
 
-1. **Prep**
-   - Check: `git branch --show-current`
-   - Not main/master: resolve uncommitted (commit->`.promptstash/commit.md` | stash->`git stash push -m "WIP"` | abort), switch+pull: `git rev-parse --verify main && git checkout main || git checkout master && git pull origin main || git pull origin master`
+1. Follow `.promptstash/switch-branches.md` completely
 
 2. **Locate**
    - Ask: "Enter keywords to search or exact issue number:"

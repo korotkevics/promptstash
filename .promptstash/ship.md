@@ -2,19 +2,21 @@ Ship features via TDD: select ad-hoc, load plan, or create plan.
 
 **Flow:**
 
-1. Pick mode: (1) ad-hoc (2) plan (3) plan-creator
+1. Follow `.promptstash/switch-branches.md` completely
 
-2. Plan: search `$PROMPTSTASH_DIR/.context` for `Status: Ready`, pick, execute
+2. Pick mode: (1) ad-hoc (2) plan (3) plan-creator
 
-3. Ad-hoc: gather requirements, review via `read-source-map.md`, TDD for complexity
+3. Plan: search `$PROMPTSTASH_DIR/.context` for `Status: Ready`, pick, execute
 
-4. Plan-creator: invoke `plan-shipping.md` then mode 2
+4. Ad-hoc: gather requirements, review via `read-source-map.md`, TDD for complexity
 
-5. Build (TDD: tests->code), doc, check plan boxes
+5. Plan-creator: invoke `plan-shipping.md` then mode 2
 
-6. Validate -> errors: `debug.md`
+6. Build (TDD: tests->code), doc, check plan boxes
 
-7. Summary:
+7. Validate -> errors: `debug.md`
+
+8. Summary:
    ```text
    **Changes:** overview
    **Files:** modified
@@ -22,9 +24,9 @@ Ship features via TDD: select ad-hoc, load plan, or create plan.
    **Plan:** completion %
    ```
 
-8. Finished plan: flip Ready->Done status
+9. Finished plan: flip Ready->Done status
 
-9. Commit (`.promptstash/commit.md`) or iterate (step 5)
+10. Commit (`.promptstash/commit.md`) or iterate (step 5)
 
 **Samples:**
 JWT: auth.js, jwt.js, 15/15
