@@ -118,7 +118,7 @@ Available prompts:
 3 - ship.md
 
 Select a prompt number (or 'q' to quit): 1
-✓ Saved to clipboard: /Users/username/.promptstash/.promptstash/commit.md
+✓ Saved to clipboard: $PROMPTSTASH_DIR/commit.md
 ```
 
 **Use case:** When you need to reference a prompt file in commands or scripts using its full path.
