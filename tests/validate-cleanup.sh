@@ -159,7 +159,7 @@ fi
 
 # Test 17: Verify cleanup saves deleted aliens to tracking file
 TESTS=$((TESTS + 1))
-if grep -q 'echo "\$alien" >> "\$deleted_file"' bin/promptstash; then
+if grep -q 'echo "$alien" >> "$deleted_file"' bin/promptstash; then
   echo -e "${GREEN}✓ cleanup saves deleted aliens to tracking file${NC}"
 else
   echo -e "${RED}✗ cleanup doesn't save deleted aliens${NC}"
