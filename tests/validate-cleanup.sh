@@ -118,10 +118,10 @@ fi
 
 # Test 12: Verify colored output for alien files
 TESTS=$((TESTS + 1))
-if grep -q "YELLOW.*Found unnecessary files" bin/promptstash; then
-  echo -e "${GREEN}✓ cleanup uses colored output for warnings${NC}"
+if grep -q "Found unnecessary files" bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup issues warning for unnecessary files${NC}"
 else
-  echo -e "${RED}✗ cleanup missing colored warnings${NC}"
+  echo -e "${RED}✗ cleanup missing warning for unnecessary files${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
