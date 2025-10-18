@@ -298,6 +298,122 @@ check_alien_files() {
     done
 }
 
+# List all prompts (non-interactive)
+list_prompts() {
+    local prompts_dir="$INSTALL_DIR/.promptstash"
+
+    if [ ! -d "$prompts_dir" ]; then
+        echo -e "${RED}✗ Error: Prompts directory not found${NC}"
+        exit 1
+    fi
+
+    # Get all .md files and sort them alphabetically
+    local prompts=($(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort))
+
+    if [ ${#prompts[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No prompts found in $prompts_dir${NC}"
+        return 0
+    fi
+
+    # Display prompts in alphanumeric order
+    for prompt in "${prompts[@]}"; do
+        echo "$prompt"
+    done
+}
+
+# Pick a prompt interactively
+pick_prompts() {
+    local mode="$1"
+    local prompts_dir="$INSTALL_DIR/.promptstash"
+
+    if [ ! -d "$prompts_dir" ]; then
+        echo -e "${RED}✗ Error: Prompts directory not found${NC}"
+        exit 1
+    fi
+
+    # Get all .md files and sort them alphabetically
+    local prompts=($(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort))
+
+    if [ ${#prompts[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No prompts found in $prompts_dir${NC}"
+        exit 1
+    fi
+
+    # Detect clipboard command
+    local clipboard_cmd=""
+    if command -v pbcopy &> /dev/null; then
+        clipboard_cmd="pbcopy"
+    elif command -v xclip &> /dev/null; then
+        clipboard_cmd="xclip -selection clipboard"
+    elif command -v wl-copy &> /dev/null; then
+        clipboard_cmd="wl-copy"
+    else
+        echo -e "${RED}✗ Error: No clipboard command found (pbcopy, xclip, or wl-copy)${NC}"
+        echo "Please install one of these clipboard utilities to use the pick command."
+        exit 1
+    fi
+
+    # Display numbered list
+    echo -e "${BLUE}Available prompts:${NC}"
+    echo ""
+    local index=1
+    for prompt in "${prompts[@]}"; do
+        printf "%d - %s\n" "$index" "$prompt"
+        index=$((index + 1))
+    done
+    echo ""
+
+    # Interactive loop for user input
+    while true; do
+        read -p "Select a prompt number (or 'q' to quit): " choice
+
+        # Check if user wants to quit
+        if [ "$choice" = "q" ] || [ "$choice" = "Q" ]; then
+            echo "Cancelled."
+            exit 0
+        fi
+
+        # Validate input is a number
+        if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+            echo -e "${RED}✗ Invalid input. Please enter a number.${NC}"
+            continue
+        fi
+
+        # Validate number is in range
+        if [ "$choice" -lt 1 ] || [ "$choice" -gt ${#prompts[@]} ]; then
+            echo -e "${RED}✗ Invalid selection. Please choose a number between 1 and ${#prompts[@]}.${NC}"
+            continue
+        fi
+
+        # Get selected prompt (arrays are 0-indexed)
+        local selected_prompt="${prompts[$((choice - 1))]}"
+        local prompt_path="$prompts_dir/$selected_prompt"
+
+        # Copy based on mode
+        case "$mode" in
+            name)
+                echo -n "$selected_prompt" | eval $clipboard_cmd
+                echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
+                ;;
+            content)
+                cat "$prompt_path" | eval $clipboard_cmd
+                echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
+                ;;
+            path)
+                echo -n "$prompt_path" | eval $clipboard_cmd
+                echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
+                ;;
+            *)
+                echo -e "${RED}✗ Unknown mode: $mode${NC}"
+                exit 1
+                ;;
+        esac
+
+        # Successfully copied, exit the loop
+        break
+    done
+}
+
 # Show help
 show_help() {
     cat << EOF
@@ -306,16 +422,24 @@ PromptStash CLI - A collection of generic, reusable developer prompts
 Usage: promptstash [command]
 
 Commands:
-  self-update    Update PromptStash to the latest version
-  cleanup        Check for and remove unnecessary files
-  version        Show the current version
-  help           Show this help message
+  list             List all available prompts (non-interactive)
+  pick name        Interactive prompt picker - copies filename to clipboard
+  pick content     Interactive prompt picker - copies file contents to clipboard
+  pick path        Interactive prompt picker - copies absolute path to clipboard
+  self-update      Update PromptStash to the latest version
+  cleanup          Check for and remove unnecessary files
+  version          Show the current version
+  help             Show this help message
 
 Environment Variables:
   PROMPTSTASH_DIR              Path to the prompts directory
   PROMPTSTASH_NO_UPDATE_CHECK  Set to '1' to disable update checks
 
 Examples:
+  promptstash list             # List all prompts
+  promptstash pick name        # Pick a prompt and copy its filename
+  promptstash pick content     # Pick a prompt and copy its contents
+  promptstash pick path        # Pick a prompt and copy its absolute path
   promptstash self-update      # Update to the latest version
   promptstash cleanup          # Check for unnecessary files
   promptstash version          # Show current version
@@ -328,6 +452,33 @@ EOF
 # Main command handler
 main() {
     case "$1" in
+        list)
+            list_prompts
+            ;;
+        pick)
+            # Pick command requires a subcommand
+            case "$2" in
+                name|content|path)
+                    pick_prompts "$2"
+                    ;;
+                "")
+                    echo -e "${RED}✗ Error: pick command requires a subcommand${NC}"
+                    echo ""
+                    echo "Usage: promptstash pick [name|content|path]"
+                    echo ""
+                    echo "  name     - Copy filename to clipboard"
+                    echo "  content  - Copy file contents to clipboard"
+                    echo "  path     - Copy absolute path to clipboard"
+                    exit 1
+                    ;;
+                *)
+                    echo -e "${RED}✗ Unknown pick subcommand: $2${NC}"
+                    echo ""
+                    echo "Usage: promptstash pick [name|content|path]"
+                    exit 1
+                    ;;
+            esac
+            ;;
         self-update)
             self_update
             ;;

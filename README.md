@@ -32,6 +32,19 @@ wget -qO- https://raw.githubusercontent.com/korotkevics/promptstash/main/install
 
 For detailed installation options, updating, manual installation, and uninstalling instructions, see the [Installation Guide](docs/installation.md).
 
+### CLI Commands
+
+PromptStash includes a CLI with commands to list and pick prompts:
+
+```bash
+promptstash list              # List all available prompts
+promptstash pick name         # Pick a prompt and copy its filename
+promptstash pick content      # Pick a prompt and copy its contents
+promptstash pick path         # Pick a prompt and copy its path
+```
+
+For complete CLI documentation, see the [CLI Usage Guide](docs/cli-usage.md).
+
 ### Using Prompts
 
 PromptStash prompts are stored in `$PROMPTSTASH_DIR/.promptstash/`. When working with your AI assistant, reference these prompts by their full path so the assistant can load and follow the instructions.
