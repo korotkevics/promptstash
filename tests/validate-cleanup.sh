@@ -138,12 +138,12 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 15: Verify self-update restores deleted files before update
+# Test 15: Verify cleanup untracks deleted files from git
 TESTS=$((TESTS + 1))
-if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q "git checkout HEAD"; then
-  echo -e "${GREEN}✓ self-update restores deleted files before update${NC}"
+if grep -q "git rm.*--cached" bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup untracks deleted files from git${NC}"
 else
-  echo -e "${RED}✗ self-update doesn't restore deleted files${NC}"
+  echo -e "${RED}✗ cleanup doesn't untrack deleted files${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
