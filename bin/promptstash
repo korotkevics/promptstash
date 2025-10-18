@@ -195,7 +195,6 @@ check_alien_files() {
         "scripts/generate_graph.py"
         "static/prompt-graph.dot"
         ".idea"
-        ".context"
     )
 
     local found_aliens=()
