@@ -3,6 +3,7 @@ set -e
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+NC='\033[0m' # No Color
 
 echo "Testing list and pick commands functionality..."
 
@@ -29,8 +30,8 @@ fi
 
 # Test 3: Verify list command is registered
 TESTS=$((TESTS + 1))
-if grep -q "list)" bin/promptstash; then
 if grep -Eq '^[[:space:]]*list[[:space:]]*\)' bin/promptstash; then
+  echo -e "${GREEN}✓ list command is registered${NC}"
 else
   echo -e "${RED}✗ list command is not registered${NC}"
   ERRORS=$((ERRORS + 1))
@@ -38,7 +39,7 @@ fi
 
 # Test 4: Verify pick command is registered
 TESTS=$((TESTS + 1))
-if grep -q "pick)" bin/promptstash; then
+if grep -Eq '^[[:space:]]*pick[[:space:]]*\)' bin/promptstash; then
   echo -e "${GREEN}✓ pick command is registered${NC}"
 else
   echo -e "${RED}✗ pick command is not registered${NC}"
@@ -47,8 +48,8 @@ fi
 
 # Test 5: Verify help message includes list command
 TESTS=$((TESTS + 1))
-CLI_HELP=$(./bin/promptstash help)
 CLI_HELP=$(./bin/promptstash help || true)
+if echo "$CLI_HELP" | grep -q "list"; then
   echo -e "${GREEN}✓ CLI help includes list command${NC}"
 else
   echo -e "${RED}✗ CLI help missing list command${NC}"
@@ -66,7 +67,7 @@ fi
 
 # Test 7: Verify pick command supports 'name' subcommand
 TESTS=$((TESTS + 1))
-if grep -q "name)" bin/promptstash; then
+if grep -Eq '^[[:space:]]*name[[:space:]]*\)' bin/promptstash; then
   echo -e "${GREEN}✓ pick command supports 'name' subcommand${NC}"
 else
   echo -e "${RED}✗ pick command missing 'name' subcommand${NC}"
@@ -75,7 +76,7 @@ fi
 
 # Test 8: Verify pick command supports 'content' subcommand
 TESTS=$((TESTS + 1))
-if grep -q "content)" bin/promptstash; then
+if grep -Eq '^[[:space:]]*content[[:space:]]*\)' bin/promptstash; then
   echo -e "${GREEN}✓ pick command supports 'content' subcommand${NC}"
 else
   echo -e "${RED}✗ pick command missing 'content' subcommand${NC}"
@@ -84,7 +85,7 @@ fi
 
 # Test 9: Verify pick command supports 'path' subcommand
 TESTS=$((TESTS + 1))
-if grep -q "path)" bin/promptstash; then
+if grep -Eq '^[[:space:]]*path[[:space:]]*\)' bin/promptstash; then
   echo -e "${GREEN}✓ pick command supports 'path' subcommand${NC}"
 else
   echo -e "${RED}✗ pick command missing 'path' subcommand${NC}"
