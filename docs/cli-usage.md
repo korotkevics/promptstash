@@ -45,7 +45,7 @@ Select a prompt number (or 'q' to quit): 2
 
 ### `promptstash pick content`
 
-Interactive prompt picker that copies the file contents to clipboard.
+Interactive prompt picker that copies the file contents to the clipboard.
 
 ```bash
 promptstash pick content
