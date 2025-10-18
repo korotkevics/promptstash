@@ -50,7 +50,7 @@ fi
 
 # Test 5: Verify .promptstash is marked as essential
 TESTS=$((TESTS + 1))
-if grep "essential_patterns=(" bin/promptstash -A 100 | grep -q '".promptstash"'; then
+if awk '/essential_patterns=\(/{flag=1; next} flag && /^\s*\)/{flag=0} flag' bin/promptstash | grep -q '".promptstash"'; then
   echo -e "${GREEN}✓ .promptstash directory is marked as essential${NC}"
 else
   echo -e "${RED}✗ .promptstash directory is not in essential patterns${NC}"
@@ -59,7 +59,7 @@ fi
 
 # Test 6: Verify bin is marked as essential
 TESTS=$((TESTS + 1))
-if grep "essential_patterns=(" bin/promptstash -A 100 | grep -q '"bin"'; then
+if awk '/essential_patterns=\(/{flag=1; next} flag && /^\s*\)/{flag=0} flag' bin/promptstash | grep -q '"bin"'; then
   echo -e "${GREEN}✓ bin directory is marked as essential${NC}"
 else
   echo -e "${RED}✗ bin directory is not in essential patterns${NC}"
@@ -68,7 +68,7 @@ fi
 
 # Test 7: Verify .git is marked as essential
 TESTS=$((TESTS + 1))
-if grep "essential_patterns=(" bin/promptstash -A 100 | grep -q '".git"'; then
+if awk '/essential_patterns=\(/{flag=1; next} flag && /^\s*\)/{flag=0} flag' bin/promptstash | grep -q '".git"'; then
   echo -e "${GREEN}✓ .git directory is marked as essential${NC}"
 else
   echo -e "${RED}✗ .git directory is not in essential patterns${NC}"
@@ -77,7 +77,7 @@ fi
 
 # Test 8: Verify .gitignore is marked as essential
 TESTS=$((TESTS + 1))
-if grep "essential_patterns=(" bin/promptstash -A 100 | grep -q '".gitignore"'; then
+if awk '/essential_patterns=\(/{flag=1; next} flag && /^\s*\)/{flag=0} flag' bin/promptstash | grep -q '".gitignore"'; then
   echo -e "${GREEN}✓ .gitignore file is marked as essential${NC}"
 else
   echo -e "${RED}✗ .gitignore file is not in essential patterns${NC}"
