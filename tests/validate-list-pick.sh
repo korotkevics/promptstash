@@ -104,7 +104,7 @@ fi
 
 # Test 11: Verify PROMPTSTASH_DIR is used for finding prompts
 TESTS=$((TESTS + 1))
-if grep -q 'INSTALL_DIR/\.promptstash\|PROMPTSTASH_DIR' bin/promptstash; then
+if grep -Eq 'INSTALL_DIR/\.promptstash|PROMPTSTASH_DIR' bin/promptstash; then
   echo -e "${GREEN}✓ uses proper prompt directory${NC}"
 else
   echo -e "${RED}✗ prompt directory path is missing${NC}"
