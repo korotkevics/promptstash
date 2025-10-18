@@ -94,7 +94,7 @@ fi
 
 # Test 10: Verify clipboard detection (pbcopy or xclip)
 TESTS=$((TESTS + 1))
-if grep -q "pbcopy\|xclip\|wl-copy" bin/promptstash; then
+if grep -Eq 'pbcopy|xclip|wl-copy' bin/promptstash; then
   echo -e "${GREEN}✓ clipboard command detection exists${NC}"
 else
   echo -e "${RED}✗ clipboard command detection is missing${NC}"
@@ -112,7 +112,7 @@ fi
 
 # Test 12: Verify error handling for invalid pick input
 TESTS=$((TESTS + 1))
-if grep -q "Invalid\|invalid" bin/promptstash; then
+if grep -Eq 'Invalid|invalid' bin/promptstash; then
   echo -e "${GREEN}✓ includes input validation${NC}"
 else
   echo -e "${RED}✗ input validation is missing${NC}"
@@ -121,7 +121,7 @@ fi
 
 # Test 13: Verify success message when copying to clipboard
 TESTS=$((TESTS + 1))
-if grep -q "clipboard\|Copied" bin/promptstash; then
+if grep -Eq 'clipboard|Copied' bin/promptstash; then
   echo -e "${GREEN}✓ includes clipboard success message${NC}"
 else
   echo -e "${RED}✗ clipboard success message is missing${NC}"
