@@ -174,6 +174,99 @@ show_version() {
     fi
 }
 
+# Check for alien files (files not needed in user installations)
+check_alien_files() {
+    local config_file="$HOME/.promptstash_cleanup_pref"
+
+    # Check if user said "never ask again"
+    if [ -f "$config_file" ]; then
+        local pref=$(cat "$config_file" 2>/dev/null)
+        if [ "$pref" = "never" ]; then
+            return 0
+        fi
+    fi
+
+    # Define alien files/directories (not needed for user installations)
+    local alien_patterns=(
+        "tests"
+        ".github"
+        ".benchmark"
+        "scripts/benchmark.py"
+        "scripts/generate_graph.py"
+        "static/prompt-graph.dot"
+        ".idea"
+        ".context"
+    )
+
+    local found_aliens=()
+
+    # Check for alien files
+    for pattern in "${alien_patterns[@]}"; do
+        local full_path="$INSTALL_DIR/$pattern"
+        if [ -e "$full_path" ]; then
+            found_aliens+=("$pattern")
+        fi
+    done
+
+    # If no alien files found, exit
+    if [ ${#found_aliens[@]} -eq 0 ]; then
+        return 0
+    fi
+
+    # Display found alien files
+    echo -e "${YELLOW}⚠ Found unnecessary files in your PromptStash installation:${NC}"
+    echo ""
+    for alien in "${found_aliens[@]}"; do
+        echo -e "  ${YELLOW}•${NC} $alien"
+    done
+    echo ""
+    echo "These files are not needed for using PromptStash and can be safely removed."
+    echo ""
+
+    # Ask user what to do
+    while true; do
+        echo -e "${BLUE}Delete these files?${NC}"
+        echo "  1) Yes - Delete now"
+        echo "  2) No - Keep them for now"
+        echo "  3) Never ask again"
+        echo ""
+        read -p "Your choice (1/2/3): " choice
+
+        case "$choice" in
+            1|yes|y|Y)
+                echo ""
+                echo -e "${BLUE}Removing unnecessary files...${NC}"
+                for alien in "${found_aliens[@]}"; do
+                    local full_path="$INSTALL_DIR/$alien"
+                    if rm -rf "$full_path" 2>/dev/null; then
+                        echo -e "  ${GREEN}✓${NC} Removed $alien"
+                    else
+                        echo -e "  ${RED}✗${NC} Failed to remove $alien"
+                    fi
+                done
+                echo ""
+                echo -e "${GREEN}✓ Cleanup complete!${NC}"
+                break
+                ;;
+            2|no|n|N)
+                echo ""
+                echo -e "${YELLOW}Keeping files. Run 'promptstash cleanup' to check again later.${NC}"
+                break
+                ;;
+            3|never)
+                echo "never" > "$config_file"
+                echo ""
+                echo -e "${GREEN}✓ Won't ask again. To re-enable, delete: $config_file${NC}"
+                break
+                ;;
+            *)
+                echo -e "${RED}Invalid choice. Please enter 1, 2, or 3.${NC}"
+                echo ""
+                ;;
+        esac
+    done
+}
+
 # Show help
 show_help() {
     cat << EOF
@@ -183,6 +276,7 @@ Usage: promptstash [command]
 
 Commands:
   self-update    Update PromptStash to the latest version
+  cleanup        Check for and remove unnecessary files
   version        Show the current version
   help           Show this help message
 
@@ -192,6 +286,7 @@ Environment Variables:
 
 Examples:
   promptstash self-update      # Update to the latest version
+  promptstash cleanup          # Check for unnecessary files
   promptstash version          # Show current version
 
 Prompts are located in: \$PROMPTSTASH_DIR
@@ -204,6 +299,9 @@ main() {
     case "$1" in
         self-update)
             self_update
+            ;;
+        cleanup)
+            check_alien_files
             ;;
         version)
             show_version
