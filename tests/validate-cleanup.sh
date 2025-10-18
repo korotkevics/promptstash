@@ -138,12 +138,13 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 15: Verify self-update only checks essential files
+# Test 15: Verify self-update checks specific paths (not all files)
 TESTS=$((TESTS + 1))
-if awk '/^[[:space:]]*self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q 'essential_paths'; then
-  echo -e "${GREEN}✓ self-update only checks essential files${NC}"
+self_update_content=$(awk '/^[[:space:]]*self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash)
+if echo "$self_update_content" | grep -q 'git diff-index.*--.*"\$path"' && echo "$self_update_content" | grep -q '\.promptstash'; then
+  echo -e "${GREEN}✓ self-update checks specific whitelisted paths${NC}"
 else
-  echo -e "${RED}✗ self-update doesn't use essential paths whitelist${NC}"
+  echo -e "${RED}✗ self-update doesn't check whitelisted paths only${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
