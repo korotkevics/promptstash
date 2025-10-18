@@ -31,7 +31,7 @@ fi
 # Test 3: Verify list command is registered
 TESTS=$((TESTS + 1))
 if grep -q "list)" bin/promptstash; then
-  echo -e "${GREEN}✓ list command is registered${NC}"
+if grep -Eq '^[[:space:]]*list[[:space:]]*\)' bin/promptstash; then
 else
   echo -e "${RED}✗ list command is not registered${NC}"
   ERRORS=$((ERRORS + 1))
