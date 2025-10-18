@@ -131,7 +131,7 @@ fi
 
 # Test 14: Verify self-update calls cleanup
 TESTS=$((TESTS + 1))
-if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q "check_alien_files"; then
+if awk '/^[[:space:]]*self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q "check_alien_files"; then
   echo -e "${GREEN}✓ self-update calls cleanup after update${NC}"
 else
   echo -e "${RED}✗ self-update doesn't call cleanup${NC}"
@@ -140,7 +140,7 @@ fi
 
 # Test 15: Verify self-update only checks essential files
 TESTS=$((TESTS + 1))
-if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q 'essential_paths'; then
+if awk '/^[[:space:]]*self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q 'essential_paths'; then
   echo -e "${GREEN}✓ self-update only checks essential files${NC}"
 else
   echo -e "${RED}✗ self-update doesn't use essential paths whitelist${NC}"
