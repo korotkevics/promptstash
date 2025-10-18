@@ -95,12 +95,17 @@ fi
 
 # Test 10: Verify cleanup function handles no alien files case
 TESTS=$((TESTS + 1))
-if grep -q "If no alien files found" bin/promptstash || grep -q "# If no alien files" bin/promptstash; then
+TMPDIR=$(mktemp -d)
+# Assume bin/promptstash can be run with a working directory argument, or run in TMPDIR
+# Copy/symlink any required files to TMPDIR if needed (skipped here for simplicity)
+OUTPUT=$(cd "$TMPDIR" && ../../bin/promptstash cleanup 2>&1 || true)
+if echo "$OUTPUT" | grep -qi "no alien files found"; then
   echo -e "${GREEN}✓ cleanup handles no alien files case${NC}"
 else
   echo -e "${RED}✗ cleanup missing no-files handling${NC}"
   ERRORS=$((ERRORS + 1))
 fi
+rm -rf "$TMPDIR"
 
 # Test 11: Verify user can opt for "never ask again"
 TESTS=$((TESTS + 1))
