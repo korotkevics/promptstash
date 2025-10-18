@@ -146,32 +146,46 @@ self_update() {
     echo "Fetching latest changes..."
     git fetch --tags origin
 
+    # Check Git version for sparse checkout compatibility (requires Git 2.25+)
+    local git_version=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
+    local major=$(echo "$git_version" | cut -d. -f1)
+    local minor=$(echo "$git_version" | cut -d. -f2)
+    local can_use_sparse=true
+
+    if [ "$major" -lt 2 ] || ([ "$major" -eq 2 ] && [ "$minor" -lt 25 ]); then
+        can_use_sparse=false
+    fi
+
     # Ensure sparse checkout is configured (for installations made before sparse checkout feature)
     # Migration happens AFTER fetch to ensure we have the latest sparse checkout paths from remote
     if ! git config --get core.sparsecheckout &>/dev/null; then
-        echo "Migrating to sparse checkout (user-facing files only)..."
+        if [ "$can_use_sparse" = true ]; then
+            echo "Migrating to sparse checkout (user-facing files only)..."
 
-        if ! git sparse-checkout init --cone 2>/dev/null; then
-            echo -e "${YELLOW}⚠ Warning: Failed to initialize sparse checkout. Continuing with full checkout.${NC}"
-        elif ! git sparse-checkout set \
-            .promptstash \
-            bin \
-            docs \
-            static \
-            .context \
-            .gitignore \
-            .version \
-            LICENSE \
-            README.md \
-            install.sh 2>/dev/null; then
-            echo -e "${YELLOW}⚠ Warning: Failed to configure sparse checkout paths. Continuing with full checkout.${NC}"
-        else
-            # Verify sparse checkout is working
-            if git config --get core.sparsecheckout &>/dev/null && [ -f "$INSTALL_DIR/bin/promptstash" ]; then
-                echo -e "${GREEN}✓ Successfully migrated to sparse checkout${NC}"
+            if ! git sparse-checkout init --cone 2>/dev/null; then
+                echo -e "${YELLOW}⚠ Warning: Failed to initialize sparse checkout. Continuing with full checkout.${NC}"
+            elif ! git sparse-checkout set \
+                .promptstash \
+                bin \
+                docs \
+                static \
+                .context \
+                .gitignore \
+                .version \
+                LICENSE \
+                README.md \
+                install.sh 2>/dev/null; then
+                echo -e "${YELLOW}⚠ Warning: Failed to configure sparse checkout paths. Continuing with full checkout.${NC}"
             else
-                echo -e "${YELLOW}⚠ Warning: Sparse checkout may not be working correctly. Essential files appear to be missing.${NC}"
+                # Verify sparse checkout is working
+                if git config --get core.sparsecheckout &>/dev/null && [ -f "$INSTALL_DIR/bin/promptstash" ]; then
+                    echo -e "${GREEN}✓ Successfully migrated to sparse checkout${NC}"
+                else
+                    echo -e "${YELLOW}⚠ Warning: Sparse checkout may not be working correctly. Essential files appear to be missing.${NC}"
+                fi
             fi
+        else
+            echo -e "${YELLOW}⚠ Git version $git_version detected. Sparse checkout requires Git 2.25+. Skipping migration.${NC}"
         fi
     fi
 
@@ -323,8 +337,11 @@ check_alien_files() {
                         echo -e "  ${GREEN}✓${NC} Removed $alien"
                         # Remember this deletion (with lock to prevent race conditions)
                         local lock_file="$deleted_file.lock"
-                        local timeout=10
+                        local timeout=100  # 100 iterations * 0.1s = 10 seconds
                         local waited=0
+
+                        # Setup trap to cleanup lock file on exit
+                        trap 'rm -f "$lock_file"' EXIT INT TERM
 
                         # Wait for lock (with timeout)
                         while [ -f "$lock_file" ] && [ $waited -lt $timeout ]; do
@@ -334,10 +351,13 @@ check_alien_files() {
 
                         # Acquire lock
                         touch "$lock_file"
-                        # Append deletion (atomic within lock)
-                        echo "$alien" >> "$deleted_file"
+                        # Append deletion only if not already recorded (prevent duplicates)
+                        if ! grep -Fxq "$alien" "$deleted_file" 2>/dev/null; then
+                            echo "$alien" >> "$deleted_file"
+                        fi
                         # Release lock
                         rm -f "$lock_file"
+                        trap - EXIT INT TERM
 
                         # Untrack from git if it was tracked
                         if [ -d "$INSTALL_DIR/.git" ]; then
