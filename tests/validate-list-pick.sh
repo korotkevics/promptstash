@@ -139,7 +139,7 @@ touch "$TMPDIR/.promptstash/c.md" "$TMPDIR/.promptstash/a.md" "$TMPDIR/.promptst
 # Copy the script to tmpdir so INSTALL_DIR resolves correctly
 cp bin/promptstash "$TMPDIR/bin/"
 EXPECTED_OUTPUT="a.md\nb.md\nc.md"
-ACTUAL_OUTPUT=$("$TMPDIR/bin/promptstash" list 2>/dev/null | tr -d '\r')
+ACTUAL_OUTPUT=$(PROMPTSTASH_DIR="$TMPDIR" "$TMPDIR/bin/promptstash" list 2>/dev/null | tr -d '\r')
 if [ "$ACTUAL_OUTPUT" = "$(echo -e "$EXPECTED_OUTPUT")" ]; then
   echo -e "${GREEN}✓ list command outputs sorted filenames${NC}"
 else
