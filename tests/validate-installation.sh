@@ -157,15 +157,53 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 17: Verify self-update ignores generated files
+# Test 17: Verify self-update uses whitelist approach (checks only essential paths)
 TESTS=$((TESTS + 1))
-if grep -q ':!.benchmark/' bin/promptstash && \
-   grep -q ':!README.md' bin/promptstash && \
-   grep -q ':!static/prompt-graph.svg' bin/promptstash && \
-   grep -q ':!static/prompt-graph.dot' bin/promptstash; then
-  echo -e "${GREEN}✓ self-update excludes generated files from uncommitted check${NC}"
+if grep -q 'essential_paths=' bin/promptstash && \
+   sed -n '/self_update[[:space:]]*()/,/^}/p' bin/promptstash | grep -q 'for path in.*essential_paths'; then
+  echo -e "${GREEN}✓ self-update uses whitelist approach (checks only essential paths)${NC}"
 else
-  echo -e "${RED}✗ self-update doesn't exclude generated files${NC}"
+  echo -e "${RED}✗ self-update doesn't use whitelist approach${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 18: Verify install.sh uses sparse checkout
+TESTS=$((TESTS + 1))
+if grep -q 'git sparse-checkout init' install.sh && \
+   grep -q 'git sparse-checkout set' install.sh; then
+  echo -e "${GREEN}✓ install.sh uses sparse checkout for user installations${NC}"
+else
+  echo -e "${RED}✗ install.sh doesn't use sparse checkout${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 19: Verify install.sh sparse checkout includes essential paths
+TESTS=$((TESTS + 1))
+if grep -A20 'git sparse-checkout set' install.sh | grep -q '.promptstash' && \
+   grep -A20 'git sparse-checkout set' install.sh | grep -q 'bin' && \
+   grep -A20 'git sparse-checkout set' install.sh | grep -q 'docs'; then
+  echo -e "${GREEN}✓ install.sh sparse checkout includes essential user paths${NC}"
+else
+  echo -e "${RED}✗ install.sh sparse checkout missing essential paths${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 20: Verify install.sh uses --no-checkout initially
+TESTS=$((TESTS + 1))
+if grep -q 'git clone --no-checkout' install.sh; then
+  echo -e "${GREEN}✓ install.sh uses --no-checkout for sparse setup${NC}"
+else
+  echo -e "${RED}✗ install.sh doesn't use --no-checkout${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 21: Verify self-update migrates old installations to sparse checkout
+TESTS=$((TESTS + 1))
+if grep -q 'core.sparsecheckout' bin/promptstash && \
+   grep -q 'Migrating to sparse checkout' bin/promptstash; then
+  echo -e "${GREEN}✓ self-update migrates old installations to sparse checkout${NC}"
+else
+  echo -e "${RED}✗ self-update doesn't migrate to sparse checkout${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 

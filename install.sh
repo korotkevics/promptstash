@@ -44,6 +44,25 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
+# Check Git version for sparse checkout compatibility (requires Git 2.25+)
+check_git_version() {
+    local git_version=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
+    local major=$(echo "$git_version" | cut -d. -f1)
+    local minor=$(echo "$git_version" | cut -d. -f2)
+
+    if [ "$major" -lt 2 ] || ([ "$major" -eq 2 ] && [ "$minor" -lt 25 ]); then
+        echo -e "${YELLOW}⚠ Warning: Git version $git_version detected. Sparse checkout requires Git 2.25+ (March 2020).${NC}"
+        echo -e "${YELLOW}  Falling back to full repository clone.${NC}"
+        return 1
+    fi
+    return 0
+}
+
+USE_SPARSE_CHECKOUT=false
+if check_git_version; then
+    USE_SPARSE_CHECKOUT=true
+fi
+
 # Clone or update repository
 if [ -d "$INSTALL_DIR/.git" ]; then
     echo -e "${YELLOW}⚠ PromptStash is already installed at $INSTALL_DIR${NC}"
@@ -88,11 +107,60 @@ if [ -d "$INSTALL_DIR/.git" ]; then
 else
     if [ "$DRY_RUN" = true ]; then
         echo "[DRY RUN] Would install PromptStash to $INSTALL_DIR:"
-        echo "[DRY RUN]   git clone $REPO_URL $INSTALL_DIR"
+        if [ "$USE_SPARSE_CHECKOUT" = true ]; then
+            echo "[DRY RUN]   git clone --no-checkout $REPO_URL $INSTALL_DIR"
+            echo "[DRY RUN]   Configure sparse checkout for user-facing files only"
+        else
+            echo "[DRY RUN]   git clone $REPO_URL $INSTALL_DIR"
+        fi
     else
         echo "Installing PromptStash to $INSTALL_DIR..."
-        git clone "$REPO_URL" "$INSTALL_DIR"
-        echo -e "${GREEN}✓ Cloned repository successfully!${NC}"
+
+        if [ "$USE_SPARSE_CHECKOUT" = true ]; then
+            # Clone with --no-checkout to configure sparse checkout first
+            if ! git clone --no-checkout "$REPO_URL" "$INSTALL_DIR"; then
+                echo -e "${RED}✗ Failed to clone repository${NC}"
+                exit 1
+            fi
+            cd "$INSTALL_DIR"
+
+            # Enable sparse checkout
+            if ! git sparse-checkout init --cone; then
+                echo -e "${RED}✗ Failed to initialize sparse checkout${NC}"
+                exit 1
+            fi
+
+            # Define user-facing paths only (no tests/, .github/, etc.)
+            if ! git sparse-checkout set \
+                .promptstash \
+                bin \
+                docs \
+                static \
+                .context \
+                .gitignore \
+                .version \
+                LICENSE \
+                README.md \
+                install.sh; then
+                echo -e "${RED}✗ Failed to configure sparse checkout paths${NC}"
+                exit 1
+            fi
+
+            # Checkout the files
+            if ! git checkout main; then
+                echo -e "${RED}✗ Failed to checkout files${NC}"
+                exit 1
+            fi
+
+            echo -e "${GREEN}✓ Installed PromptStash (user-facing files only)${NC}"
+        else
+            # Fallback: Full clone for older Git versions
+            if ! git clone "$REPO_URL" "$INSTALL_DIR"; then
+                echo -e "${RED}✗ Failed to clone repository${NC}"
+                exit 1
+            fi
+            echo -e "${GREEN}✓ Installed PromptStash${NC}"
+        fi
     fi
 fi
 

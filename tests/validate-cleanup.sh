@@ -122,10 +122,10 @@ fi
 
 # Test 13: Verify warning message for alien files
 TESTS=$((TESTS + 1))
-if grep -q "Found unnecessary files" bin/promptstash; then
-  echo -e "${GREEN}✓ cleanup issues warning for unnecessary files${NC}"
+if grep -q "Found unrelated files" bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup issues warning for unrelated files${NC}"
 else
-  echo -e "${RED}✗ cleanup missing warning for unnecessary files${NC}"
+  echo -e "${RED}✗ cleanup missing warning for unrelated files${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
@@ -145,6 +145,42 @@ if echo "$self_update_content" | grep -q 'git diff-index.*--.*"\$path"' && echo 
   echo -e "${GREEN}✓ self-update checks specific whitelisted paths${NC}"
 else
   echo -e "${RED}✗ self-update doesn't check whitelisted paths only${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 16: Verify deleted aliens tracking file is referenced
+TESTS=$((TESTS + 1))
+if grep -q ".promptstash_deleted_aliens" bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup tracks deleted alien files${NC}"
+else
+  echo -e "${RED}✗ cleanup doesn't track deleted alien files${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 17: Verify cleanup saves deleted aliens to tracking file
+TESTS=$((TESTS + 1))
+if grep -q 'echo "$alien" >> "$deleted_file"' bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup saves deleted aliens to tracking file${NC}"
+else
+  echo -e "${RED}✗ cleanup doesn't save deleted aliens${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 18: Verify cleanup loads previously deleted aliens
+TESTS=$((TESTS + 1))
+if grep -q "while IFS= read -r line" bin/promptstash && grep -q "deleted_aliens" bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup loads previously deleted aliens${NC}"
+else
+  echo -e "${RED}✗ cleanup doesn't load previously deleted aliens${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 19: Verify cleanup filters out previously deleted aliens
+TESTS=$((TESTS + 1))
+if grep -q "was_deleted=false" bin/promptstash && grep -q "was_deleted=true" bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup filters out previously deleted aliens${NC}"
+else
+  echo -e "${RED}✗ cleanup doesn't filter previously deleted aliens${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
