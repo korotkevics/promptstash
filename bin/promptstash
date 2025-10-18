@@ -155,13 +155,17 @@ self_update() {
     
     # Clear update check cache
     rm -f "$HOME/.promptstash_update_check"
-    
+
     echo ""
     if [ "$before_version" = "$after_version" ]; then
         echo -e "${GREEN}✓ You are already on the latest version ($after_version)${NC}"
     else
         echo -e "${GREEN}✓ Successfully updated from v$before_version to v$after_version${NC}"
     fi
+
+    # Run cleanup to remove unnecessary files
+    echo ""
+    check_alien_files
 }
 
 # Show version

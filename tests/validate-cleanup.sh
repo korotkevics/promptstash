@@ -120,6 +120,15 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
+# Test 13: Verify self-update calls cleanup
+TESTS=$((TESTS + 1))
+if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q "check_alien_files"; then
+  echo -e "${GREEN}✓ self-update calls cleanup after update${NC}"
+else
+  echo -e "${RED}✗ self-update doesn't call cleanup${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
 echo ""
 echo "Ran $TESTS tests"
 
