@@ -128,15 +128,19 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 14: Verify alphanumeric sorting for list command
+# Test 14: Verify alphanumeric sorting for list command (behavioral)
 TESTS=$((TESTS + 1))
-if grep -q "sort" bin/promptstash; then
-  echo -e "${GREEN}✓ includes sorting functionality${NC}"
+TMPDIR=$(mktemp -d)
+touch "$TMPDIR/c.md" "$TMPDIR/a.md" "$TMPDIR/b.md"
+EXPECTED_OUTPUT="a\nb\nc"
+ACTUAL_OUTPUT=$(PROMPTSTASH_DIR="$TMPDIR" bin/promptstash list | tr -d '\r')
+if [ "$ACTUAL_OUTPUT" = "$(echo -e "$EXPECTED_OUTPUT")" ]; then
+  echo -e "${GREEN}✓ list command outputs sorted filenames${NC}"
 else
-  echo -e "${RED}✗ sorting functionality is missing${NC}"
+  echo -e "${RED}✗ list command does not output sorted filenames${NC}"
   ERRORS=$((ERRORS + 1))
 fi
-
+rm -rf "$TMPDIR"
 # Test 15: Verify numbered list output for pick commands
 TESTS=$((TESTS + 1))
 if grep -q "printf.*%.*d" bin/promptstash; then
