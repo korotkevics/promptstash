@@ -85,7 +85,7 @@ Token counts by version (latest 5):
 | **suggest-better-function-names** | $$ | 6.92 | 303 | 303 | 303 | 303 | 303 |
 | **TOTAL** |  |  | **6930** | **6930** | **6930** <sub>🔴 +65</sub> | **6865** | **6865** |
 
-> **Note:** Benchmarks are automatically updated only when prompt files in `.promptstash/` are modified. Changes to documentation, tests, or other non-prompt files will not trigger benchmark updates.
+> **Note:** Benchmarks are automatically updated only when any prompt file in `.promptstash/` or its subdirectories is modified. Changes to documentation, tests, or other non-prompt files will not trigger benchmark updates.
 
 ## Prompt Reference Graph
 
