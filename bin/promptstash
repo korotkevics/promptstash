@@ -146,6 +146,17 @@ self_update() {
     echo "Fetching latest changes..."
     git fetch --tags origin
 
+    local before_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
+
+    # Check current branch and switch to main if needed
+    local current_branch=$(git branch --show-current)
+    if [ "$current_branch" != "main" ]; then
+        echo "Switching from branch '$current_branch' to 'main'..."
+        git checkout main
+    fi
+
+    git pull origin main
+
     # Check Git version for sparse checkout compatibility (requires Git 2.25+)
     local git_version=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
     local major=$(echo "$git_version" | cut -d. -f1)
@@ -157,7 +168,7 @@ self_update() {
     fi
 
     # Ensure sparse checkout is configured (for installations made before sparse checkout feature)
-    # Migration happens AFTER fetch to ensure we have the latest sparse checkout paths from remote
+    # CRITICAL: Migration happens AFTER pull to avoid deleting files before they're updated
     if ! git config --get core.sparsecheckout &>/dev/null; then
         if [ "$can_use_sparse" = true ]; then
             echo "Migrating to sparse checkout (user-facing files only)..."
@@ -200,17 +211,6 @@ self_update() {
             echo -e "${YELLOW}⚠ Git version $git_version detected. Sparse checkout requires Git 2.25+. Skipping migration.${NC}"
         fi
     fi
-
-    local before_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
-
-    # Check current branch and switch to main if needed
-    local current_branch=$(git branch --show-current)
-    if [ "$current_branch" != "main" ]; then
-        echo "Switching from branch '$current_branch' to 'main'..."
-        git checkout main
-    fi
-
-    git pull origin main
     
     local after_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
     
