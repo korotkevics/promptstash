@@ -1,0 +1,169 @@
+#!/bin/bash
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+echo "Testing list and pick commands functionality..."
+
+ERRORS=0
+TESTS=0
+
+# Test 1: Verify list_prompts function exists
+TESTS=$((TESTS + 1))
+if grep -q "list_prompts" bin/promptstash; then
+  echo -e "${GREEN}✓ list_prompts function exists${NC}"
+else
+  echo -e "${RED}✗ list_prompts function is missing${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 2: Verify pick_prompts function exists
+TESTS=$((TESTS + 1))
+if grep -q "pick_prompts" bin/promptstash; then
+  echo -e "${GREEN}✓ pick_prompts function exists${NC}"
+else
+  echo -e "${RED}✗ pick_prompts function is missing${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 3: Verify list command is registered
+TESTS=$((TESTS + 1))
+if grep -Eq '^[[:space:]]*list[[:space:]]*\)' bin/promptstash; then
+  echo -e "${GREEN}✓ list command is registered${NC}"
+else
+  echo -e "${RED}✗ list command is not registered${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 4: Verify pick command is registered
+TESTS=$((TESTS + 1))
+if grep -Eq '^[[:space:]]*pick[[:space:]]*\)' bin/promptstash; then
+  echo -e "${GREEN}✓ pick command is registered${NC}"
+else
+  echo -e "${RED}✗ pick command is not registered${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 5: Verify help message includes list command
+TESTS=$((TESTS + 1))
+CLI_HELP=$(./bin/promptstash help || true)
+if echo "$CLI_HELP" | grep -q "list"; then
+  echo -e "${GREEN}✓ CLI help includes list command${NC}"
+else
+  echo -e "${RED}✗ CLI help missing list command${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 6: Verify help message includes pick command
+TESTS=$((TESTS + 1))
+if echo "$CLI_HELP" | grep -q "pick"; then
+  echo -e "${GREEN}✓ CLI help includes pick command${NC}"
+else
+  echo -e "${RED}✗ CLI help missing pick command${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 7: Verify pick command supports 'name' subcommand
+TESTS=$((TESTS + 1))
+if grep -Eq '^[[:space:]]*name[[:space:]]*\)' bin/promptstash; then
+  echo -e "${GREEN}✓ pick command supports 'name' subcommand${NC}"
+else
+  echo -e "${RED}✗ pick command missing 'name' subcommand${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 8: Verify pick command supports 'content' subcommand
+TESTS=$((TESTS + 1))
+if grep -Eq '^[[:space:]]*content[[:space:]]*\)' bin/promptstash; then
+  echo -e "${GREEN}✓ pick command supports 'content' subcommand${NC}"
+else
+  echo -e "${RED}✗ pick command missing 'content' subcommand${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 9: Verify pick command supports 'path' subcommand
+TESTS=$((TESTS + 1))
+if grep -Eq '^[[:space:]]*path[[:space:]]*\)' bin/promptstash; then
+  echo -e "${GREEN}✓ pick command supports 'path' subcommand${NC}"
+else
+  echo -e "${RED}✗ pick command missing 'path' subcommand${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 10: Verify clipboard detection (pbcopy, xclip, or wl-copy)
+TESTS=$((TESTS + 1))
+if grep -Eq 'pbcopy|xclip|wl-copy' bin/promptstash; then
+  echo -e "${GREEN}✓ clipboard command detection exists${NC}"
+else
+  echo -e "${RED}✗ clipboard command detection is missing${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 11: Verify proper prompt directory variable is used
+TESTS=$((TESTS + 1))
+if grep -Eq '\$INSTALL_DIR/\.promptstash' bin/promptstash; then
+  echo -e "${GREEN}✓ prompt directory path exists${NC}"
+elif grep -Eq '\$PROMPTSTASH_DIR/\.promptstash' bin/promptstash; then
+  echo -e "${GREEN}✓ prompt directory path exists${NC}"
+else
+  echo -e "${RED}✗ prompt directory path is missing${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 12: Verify error handling for invalid pick input
+TESTS=$((TESTS + 1))
+if grep -Eq 'Invalid|invalid' bin/promptstash; then
+  echo -e "${GREEN}✓ includes input validation${NC}"
+else
+  echo -e "${RED}✗ input validation is missing${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 13: Verify success message when copying to clipboard
+TESTS=$((TESTS + 1))
+if grep -Eq 'clipboard|Copied' bin/promptstash; then
+  echo -e "${GREEN}✓ includes clipboard success message${NC}"
+else
+  echo -e "${RED}✗ clipboard success message is missing${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 14: Verify alphanumeric sorting for list command (behavioral)
+TESTS=$((TESTS + 1))
+TEST_DIR=$(mktemp -d)
+mkdir -p "$TEST_DIR/bin"
+mkdir -p "$TEST_DIR/.promptstash"
+touch "$TEST_DIR/.promptstash/c.md" "$TEST_DIR/.promptstash/a.md" "$TEST_DIR/.promptstash/b.md"
+# Copy the script to TEST_DIR so INSTALL_DIR resolves correctly
+cp bin/promptstash "$TEST_DIR/bin/"
+EXPECTED_OUTPUT="a.md\nb.md\nc.md"
+ACTUAL_OUTPUT=$(PROMPTSTASH_DIR="$TEST_DIR" "$TEST_DIR/bin/promptstash" list 2>/dev/null | tr -d '\r')
+if [ "$ACTUAL_OUTPUT" = "$(echo -e "$EXPECTED_OUTPUT")" ]; then
+  echo -e "${GREEN}✓ list command outputs sorted filenames${NC}"
+else
+  echo -e "${RED}✗ list command does not output sorted filenames${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+rm -rf "$TEST_DIR"
+
+# Test 15: Verify numbered list output for pick commands
+TESTS=$((TESTS + 1))
+if grep -q "printf.*%.*d" bin/promptstash; then
+  echo -e "${GREEN}✓ includes numbered list formatting${NC}"
+else
+  echo -e "${RED}✗ numbered list formatting is missing${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+echo ""
+echo "Ran $TESTS tests"
+
+if [ $ERRORS -eq 0 ]; then
+  echo -e "${GREEN}✓ All list and pick tests passed!${NC}"
+  exit 0
+else
+  echo -e "${RED}✗ Found $ERRORS error(s)${NC}"
+  exit 1
+fi
