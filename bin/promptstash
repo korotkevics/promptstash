@@ -141,12 +141,19 @@ self_update() {
             exit 1
         fi
     done
-    
+
+    # Fetch and pull latest changes
+    echo "Fetching latest changes..."
+    git fetch --tags origin
+
     # Ensure sparse checkout is configured (for installations made before sparse checkout feature)
+    # Migration happens AFTER fetch to ensure we have the latest sparse checkout paths from remote
     if ! git config --get core.sparsecheckout &>/dev/null; then
         echo "Migrating to sparse checkout (user-facing files only)..."
-        git sparse-checkout init --cone
-        git sparse-checkout set \
+
+        if ! git sparse-checkout init --cone 2>/dev/null; then
+            echo -e "${YELLOW}⚠ Warning: Failed to initialize sparse checkout. Continuing with full checkout.${NC}"
+        elif ! git sparse-checkout set \
             .promptstash \
             bin \
             docs \
@@ -156,12 +163,17 @@ self_update() {
             .version \
             LICENSE \
             README.md \
-            install.sh
+            install.sh 2>/dev/null; then
+            echo -e "${YELLOW}⚠ Warning: Failed to configure sparse checkout paths. Continuing with full checkout.${NC}"
+        else
+            # Verify sparse checkout is working
+            if git config --get core.sparsecheckout &>/dev/null && [ -f "$INSTALL_DIR/bin/promptstash" ]; then
+                echo -e "${GREEN}✓ Successfully migrated to sparse checkout${NC}"
+            else
+                echo -e "${YELLOW}⚠ Warning: Sparse checkout may not be working correctly. Essential files appear to be missing.${NC}"
+            fi
+        fi
     fi
-
-    # Fetch and pull latest changes
-    echo "Fetching latest changes..."
-    git fetch --tags origin
 
     local before_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
 
@@ -309,8 +321,24 @@ check_alien_files() {
                     local full_path="$INSTALL_DIR/$alien"
                     if rm -rf "$full_path" 2>/dev/null; then
                         echo -e "  ${GREEN}✓${NC} Removed $alien"
-                        # Remember this deletion
+                        # Remember this deletion (with lock to prevent race conditions)
+                        local lock_file="$deleted_file.lock"
+                        local timeout=10
+                        local waited=0
+
+                        # Wait for lock (with timeout)
+                        while [ -f "$lock_file" ] && [ $waited -lt $timeout ]; do
+                            sleep 0.1
+                            waited=$((waited + 1))
+                        done
+
+                        # Acquire lock
+                        touch "$lock_file"
+                        # Append deletion (atomic within lock)
                         echo "$alien" >> "$deleted_file"
+                        # Release lock
+                        rm -f "$lock_file"
+
                         # Untrack from git if it was tracked
                         if [ -d "$INSTALL_DIR/.git" ]; then
                             cd "$INSTALL_DIR"
