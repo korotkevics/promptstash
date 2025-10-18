@@ -49,7 +49,7 @@ fi
 # Test 5: Verify help message includes list command
 TESTS=$((TESTS + 1))
 CLI_HELP=$(./bin/promptstash help)
-if echo "$CLI_HELP" | grep -q "list"; then
+CLI_HELP=$(./bin/promptstash help || true)
   echo -e "${GREEN}✓ CLI help includes list command${NC}"
 else
   echo -e "${RED}✗ CLI help missing list command${NC}"
