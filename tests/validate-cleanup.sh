@@ -138,6 +138,15 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
+# Test 15: Verify cleanup untracks deleted files from git
+TESTS=$((TESTS + 1))
+if grep -q "git rm.*--cached" bin/promptstash; then
+  echo -e "${GREEN}✓ cleanup untracks deleted files from git${NC}"
+else
+  echo -e "${RED}✗ cleanup doesn't untrack deleted files${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
 echo ""
 echo "Ran $TESTS tests"
 
