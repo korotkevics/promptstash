@@ -133,9 +133,13 @@ fi
 # Test 14: Verify alphanumeric sorting for list command (behavioral)
 TESTS=$((TESTS + 1))
 TMPDIR=$(mktemp -d)
-touch "$TMPDIR/c.md" "$TMPDIR/a.md" "$TMPDIR/b.md"
-EXPECTED_OUTPUT="a\nb\nc"
-ACTUAL_OUTPUT=$(PROMPTSTASH_DIR="$TMPDIR" bin/promptstash list | tr -d '\r')
+mkdir -p "$TMPDIR/bin"
+mkdir -p "$TMPDIR/.promptstash"
+touch "$TMPDIR/.promptstash/c.md" "$TMPDIR/.promptstash/a.md" "$TMPDIR/.promptstash/b.md"
+# Copy the script to tmpdir so INSTALL_DIR resolves correctly
+cp bin/promptstash "$TMPDIR/bin/"
+EXPECTED_OUTPUT="a.md\nb.md\nc.md"
+ACTUAL_OUTPUT=$("$TMPDIR/bin/promptstash" list 2>/dev/null | tr -d '\r')
 if [ "$ACTUAL_OUTPUT" = "$(echo -e "$EXPECTED_OUTPUT")" ]; then
   echo -e "${GREEN}✓ list command outputs sorted filenames${NC}"
 else
