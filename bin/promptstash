@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+# Verify bash is being used (required for array syntax)
+if [ -z "$BASH_VERSION" ]; then
+    echo "Error: This script requires bash to run."
+    echo "Please run with: bash $0 $*"
+    exit 1
+fi
+
 # PromptStash CLI
 # A simple CLI for managing your PromptStash installation
 
@@ -348,8 +355,14 @@ pick_prompts() {
     elif command -v wl-copy &> /dev/null; then
         clipboard_cmd="wl-copy"
     else
-        echo -e "${RED}✗ Error: No clipboard command found (pbcopy, xclip, or wl-copy)${NC}"
-        echo "Please install one of these clipboard utilities to use the pick command."
+        echo -e "${RED}✗ Error: No clipboard command found${NC}"
+        echo ""
+        echo "The pick command requires a clipboard utility. Please install one:"
+        echo ""
+        echo "  macOS:        pbcopy (pre-installed)"
+        echo "  Linux (X11):  sudo apt install xclip"
+        echo "  Linux (Wayland): sudo apt install wl-clipboard"
+        echo ""
         exit 1
     fi
 
@@ -375,13 +388,13 @@ pick_prompts() {
 
         # Validate input is a number
         if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
-            echo -e "${RED}✗ Invalid input. Please enter a number.${NC}"
+            echo -e "${RED}✗ Error: Invalid input. Please enter a number.${NC}"
             continue
         fi
 
         # Validate number is in range
         if [ "$choice" -lt 1 ] || [ "$choice" -gt ${#prompts[@]} ]; then
-            echo -e "${RED}✗ Invalid selection. Please choose a number between 1 and ${#prompts[@]}.${NC}"
+            echo -e "${RED}✗ Error: Invalid selection. Please choose a number between 1 and ${#prompts[@]}.${NC}"
             continue
         fi
 
@@ -392,19 +405,34 @@ pick_prompts() {
         # Copy based on mode
         case "$mode" in
             name)
-                echo -n "$selected_prompt" | eval $clipboard_cmd
-                echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
+                if echo -n "$selected_prompt" | eval $clipboard_cmd 2>/dev/null; then
+                    echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
+                else
+                    echo -e "${RED}✗ Error: Failed to copy to clipboard${NC}"
+                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    exit 1
+                fi
                 ;;
             content)
-                cat "$prompt_path" | eval $clipboard_cmd
-                echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
+                if cat "$prompt_path" | eval $clipboard_cmd 2>/dev/null; then
+                    echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
+                else
+                    echo -e "${RED}✗ Error: Failed to copy to clipboard${NC}"
+                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    exit 1
+                fi
                 ;;
             path)
-                echo -n "$prompt_path" | eval $clipboard_cmd
-                echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
+                if echo -n "$prompt_path" | eval $clipboard_cmd 2>/dev/null; then
+                    echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
+                else
+                    echo -e "${RED}✗ Error: Failed to copy to clipboard${NC}"
+                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    exit 1
+                fi
                 ;;
             *)
-                echo -e "${RED}✗ Unknown mode: $mode${NC}"
+                echo -e "${RED}✗ Error: Unknown mode: $mode${NC}"
                 exit 1
                 ;;
         esac

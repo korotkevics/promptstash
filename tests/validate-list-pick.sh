@@ -104,7 +104,9 @@ fi
 # Test 11: Verify proper prompt directory variable is used
 TESTS=$((TESTS + 1))
 if grep -Eq '\$INSTALL_DIR/\.promptstash' bin/promptstash; then
-if grep -Eq '\$PROMPTSTASH_DIR/\.promptstash' bin/promptstash; then
+  echo -e "${GREEN}✓ prompt directory path exists${NC}"
+elif grep -Eq '\$PROMPTSTASH_DIR/\.promptstash' bin/promptstash; then
+  echo -e "${GREEN}✓ prompt directory path exists${NC}"
 else
   echo -e "${RED}✗ prompt directory path is missing${NC}"
   ERRORS=$((ERRORS + 1))
