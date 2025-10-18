@@ -177,11 +177,23 @@ self_update() {
                 install.sh 2>/dev/null; then
                 echo -e "${YELLOW}⚠ Warning: Failed to configure sparse checkout paths. Continuing with full checkout.${NC}"
             else
-                # Verify sparse checkout is working
-                if git config --get core.sparsecheckout &>/dev/null && [ -f "$INSTALL_DIR/bin/promptstash" ]; then
+                # Verify sparse checkout is working by checking multiple essential paths
+                local missing_paths=()
+                local check_paths=("bin/promptstash" ".promptstash" ".version")
+
+                for check_path in "${check_paths[@]}"; do
+                    if [ ! -e "$INSTALL_DIR/$check_path" ]; then
+                        missing_paths+=("$check_path")
+                    fi
+                done
+
+                if git config --get core.sparsecheckout &>/dev/null && [ ${#missing_paths[@]} -eq 0 ]; then
                     echo -e "${GREEN}✓ Successfully migrated to sparse checkout${NC}"
                 else
-                    echo -e "${YELLOW}⚠ Warning: Sparse checkout may not be working correctly. Essential files appear to be missing.${NC}"
+                    echo -e "${YELLOW}⚠ Warning: Sparse checkout may not be working correctly.${NC}"
+                    if [ ${#missing_paths[@]} -gt 0 ]; then
+                        echo -e "${YELLOW}  Missing essential files: ${missing_paths[*]}${NC}"
+                    fi
                 fi
             fi
         else
