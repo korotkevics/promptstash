@@ -209,7 +209,7 @@ fi
 
 # Test 22: Verify install.sh PATH detection includes dot before promptstash
 TESTS=$((TESTS + 1))
-if grep -q 'PATH.*\\\.promptstash/bin' install.sh; then
+if grep -q 'PATH.*\.promptstash/bin' install.sh; then
   echo -e "${GREEN}✓ install.sh correctly detects .promptstash/bin in PATH${NC}"
 else
   echo -e "${RED}✗ install.sh PATH detection missing dot (should be \.promptstash/bin)${NC}"
