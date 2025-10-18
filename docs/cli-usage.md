@@ -67,7 +67,7 @@ Select a prompt number (or 'q' to quit): 3
 
 ### `promptstash pick path`
 
-Interactive prompt picker that copies the absolute file path to clipboard.
+Interactive prompt picker that copies the absolute file path to the clipboard.
 
 ```bash
 promptstash pick path
