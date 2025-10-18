@@ -893,6 +893,51 @@
         "squash.md": 6.55241179191008,
         "suggest-better-function-names.md": 6.9165798652499015
       }
+    },
+    {
+      "commit": "4f91e03",
+      "version": "0.26.0",
+      "timestamp": "2025-10-18T14:48:42.957302+00:00",
+      "prompts": {
+        "bump-semver-version.md": 422,
+        "commit.md": 365,
+        "create-mr.md": 272,
+        "create-pr.md": 403,
+        "create-source-map.md": 332,
+        "debug.md": 340,
+        "fix-mr.md": 202,
+        "fix-pr.md": 275,
+        "improve-prompt.md": 350,
+        "optimize-prompt.md": 1258,
+        "plan-shipping.md": 371,
+        "read-source-map.md": 306,
+        "review-mr.md": 228,
+        "review-pr.md": 568,
+        "ship-gh-issue.md": 511,
+        "ship.md": 244,
+        "squash.md": 180,
+        "suggest-better-function-names.md": 303
+      },
+      "entropy": {
+        "bump-semver-version.md": 7.325051404239735,
+        "commit.md": 6.986556640147105,
+        "create-mr.md": 6.934080983268506,
+        "create-pr.md": 7.181423724985091,
+        "create-source-map.md": 7.060697239902902,
+        "debug.md": 6.9547332504713735,
+        "fix-mr.md": 6.546293041922094,
+        "fix-pr.md": 6.966299663500081,
+        "improve-prompt.md": 6.802720927253869,
+        "optimize-prompt.md": 7.9606790203198114,
+        "plan-shipping.md": 6.5308767449479,
+        "read-source-map.md": 7.037030420092649,
+        "review-mr.md": 6.682863778371895,
+        "review-pr.md": 7.668984517284332,
+        "ship-gh-issue.md": 7.224952942076589,
+        "ship.md": 6.634770365298701,
+        "squash.md": 6.55241179191008,
+        "suggest-better-function-names.md": 6.9165798652499015
+      }
     }
   ]
 }
