@@ -132,21 +132,22 @@ fi
 
 # Test 14: Verify alphanumeric sorting for list command (behavioral)
 TESTS=$((TESTS + 1))
-TMPDIR=$(mktemp -d)
-mkdir -p "$TMPDIR/bin"
-mkdir -p "$TMPDIR/.promptstash"
-touch "$TMPDIR/.promptstash/c.md" "$TMPDIR/.promptstash/a.md" "$TMPDIR/.promptstash/b.md"
-# Copy the script to tmpdir so INSTALL_DIR resolves correctly
-cp bin/promptstash "$TMPDIR/bin/"
+TEST_DIR=$(mktemp -d)
+mkdir -p "$TEST_DIR/bin"
+mkdir -p "$TEST_DIR/.promptstash"
+touch "$TEST_DIR/.promptstash/c.md" "$TEST_DIR/.promptstash/a.md" "$TEST_DIR/.promptstash/b.md"
+# Copy the script to TEST_DIR so INSTALL_DIR resolves correctly
+cp bin/promptstash "$TEST_DIR/bin/"
 EXPECTED_OUTPUT="a.md\nb.md\nc.md"
-ACTUAL_OUTPUT=$(PROMPTSTASH_DIR="$TMPDIR" "$TMPDIR/bin/promptstash" list 2>/dev/null | tr -d '\r')
+ACTUAL_OUTPUT=$(PROMPTSTASH_DIR="$TEST_DIR" "$TEST_DIR/bin/promptstash" list 2>/dev/null | tr -d '\r')
 if [ "$ACTUAL_OUTPUT" = "$(echo -e "$EXPECTED_OUTPUT")" ]; then
   echo -e "${GREEN}✓ list command outputs sorted filenames${NC}"
 else
   echo -e "${RED}✗ list command does not output sorted filenames${NC}"
   ERRORS=$((ERRORS + 1))
 fi
-rm -rf "$TMPDIR"
+rm -rf "$TEST_DIR"
+
 # Test 15: Verify numbered list output for pick commands
 TESTS=$((TESTS + 1))
 if grep -q "printf.*%.*d" bin/promptstash; then

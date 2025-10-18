@@ -310,12 +310,15 @@ list_prompts() {
     local prompts_dir="$INSTALL_DIR/.promptstash"
 
     if [ ! -d "$prompts_dir" ]; then
-        echo -e "${RED}✗ Error: Prompts directory not found${NC}"
+        echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}"
         exit 1
     fi
 
     # Get all .md files and sort them alphabetically
-    local prompts=($(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort))
+    local prompts=()
+    while IFS= read -r prompt; do
+        prompts+=("$prompt")
+    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort)
 
     if [ ${#prompts[@]} -eq 0 ]; then
         echo -e "${YELLOW}No prompts found in $prompts_dir${NC}"
@@ -334,12 +337,15 @@ pick_prompts() {
     local prompts_dir="$INSTALL_DIR/.promptstash"
 
     if [ ! -d "$prompts_dir" ]; then
-        echo -e "${RED}✗ Error: Prompts directory not found${NC}"
+        echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}"
         exit 1
     fi
 
     # Get all .md files and sort them alphabetically
-    local prompts=($(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort))
+    local prompts=()
+    while IFS= read -r prompt; do
+        prompts+=("$prompt")
+    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort)
 
     if [ ${#prompts[@]} -eq 0 ]; then
         echo -e "${YELLOW}No prompts found in $prompts_dir${NC}"
@@ -405,28 +411,28 @@ pick_prompts() {
         # Copy based on mode
         case "$mode" in
             name)
-                if echo -n "$selected_prompt" | eval $clipboard_cmd 2>/dev/null; then
+                if echo -n "$selected_prompt" | $clipboard_cmd 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
                 else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard${NC}"
+                    echo -e "${RED}✗ Error: Failed to copy to clipboard: $selected_prompt${NC}"
                     echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
             content)
-                if cat "$prompt_path" | eval $clipboard_cmd 2>/dev/null; then
+                if cat "$prompt_path" | $clipboard_cmd 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
                 else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard${NC}"
+                    echo -e "${RED}✗ Error: Failed to copy to clipboard: contents of $selected_prompt${NC}"
                     echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
             path)
-                if echo -n "$prompt_path" | eval $clipboard_cmd 2>/dev/null; then
+                if echo -n "$prompt_path" | $clipboard_cmd 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
                 else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard${NC}"
+                    echo -e "${RED}✗ Error: Failed to copy to clipboard: $prompt_path${NC}"
                     echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
                     exit 1
                 fi
