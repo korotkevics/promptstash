@@ -82,7 +82,7 @@ Available prompts:
 3 - ship.md
 
 Select a prompt number (or 'q' to quit): 1
-✓ Saved to clipboard: $PROMPTSTASH_DIR/commit.md
+✓ Saved to clipboard: $PROMPTSTASH_DIR/.promptstash/commit.md
 ```
 
 ---
