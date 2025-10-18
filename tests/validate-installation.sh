@@ -160,7 +160,7 @@ fi
 # Test 17: Verify self-update uses whitelist approach (checks only essential paths)
 TESTS=$((TESTS + 1))
 if grep -q 'essential_paths=' bin/promptstash && \
-   awk '/self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q 'for path in.*essential_paths'; then
+   sed -n '/self_update[[:space:]]*()/,/^}/p' bin/promptstash | grep -q 'for path in.*essential_paths'; then
   echo -e "${GREEN}✓ self-update uses whitelist approach (checks only essential paths)${NC}"
 else
   echo -e "${RED}✗ self-update doesn't use whitelist approach${NC}"
