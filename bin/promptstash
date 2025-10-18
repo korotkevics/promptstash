@@ -142,6 +142,23 @@ self_update() {
         fi
     done
     
+    # Ensure sparse checkout is configured (for installations made before sparse checkout feature)
+    if ! git config --get core.sparsecheckout &>/dev/null; then
+        echo "Migrating to sparse checkout (user-facing files only)..."
+        git sparse-checkout init --cone
+        git sparse-checkout set \
+            .promptstash \
+            bin \
+            docs \
+            static \
+            .context \
+            .gitignore \
+            .version \
+            LICENSE \
+            README.md \
+            install.sh
+    fi
+
     # Fetch and pull latest changes
     echo "Fetching latest changes..."
     git fetch --tags origin
@@ -192,6 +209,7 @@ show_version() {
 # Check for alien files (files not needed in user installations)
 check_alien_files() {
     local config_file="$HOME/.promptstash_cleanup_pref"
+    local deleted_file="$HOME/.promptstash_deleted_aliens"
 
     # Check if user said "never ask again"
     if [ -f "$config_file" ]; then
@@ -199,6 +217,14 @@ check_alien_files() {
         if [ "$pref" = "never" ]; then
             return 0
         fi
+    fi
+
+    # Load previously deleted aliens
+    local deleted_aliens=()
+    if [ -f "$deleted_file" ]; then
+        while IFS= read -r line; do
+            [ -n "$line" ] && deleted_aliens+=("$line")
+        done < "$deleted_file"
     fi
 
     # Define essential files/directories that users need
@@ -235,8 +261,17 @@ check_alien_files() {
             fi
         done
 
-        # If not essential, it's alien
-        if [ "$is_essential" = false ]; then
+        # Check if this item was previously deleted
+        local was_deleted=false
+        for deleted in "${deleted_aliens[@]}"; do
+            if [ "$basename" = "$deleted" ]; then
+                was_deleted=true
+                break
+            fi
+        done
+
+        # If not essential and not previously deleted, it's a new alien
+        if [ "$is_essential" = false ] && [ "$was_deleted" = false ]; then
             found_aliens+=("$basename")
         fi
     done
@@ -247,13 +282,14 @@ check_alien_files() {
     fi
 
     # Display found alien files
-    echo -e "${YELLOW}⚠ Found unnecessary files in your PromptStash installation:${NC}"
+    echo -e "${YELLOW}⚠ Found unrelated files in your PromptStash installation:${NC}"
     echo ""
     for alien in "${found_aliens[@]}"; do
         echo -e "  ${YELLOW}•${NC} $alien"
     done
     echo ""
-    echo "These files are not needed for using PromptStash and can be safely removed."
+    echo "These files are not part of a standard PromptStash installation."
+    echo "They may have been added manually or left over from a development setup."
     echo ""
 
     # Ask user what to do
@@ -273,6 +309,8 @@ check_alien_files() {
                     local full_path="$INSTALL_DIR/$alien"
                     if rm -rf "$full_path" 2>/dev/null; then
                         echo -e "  ${GREEN}✓${NC} Removed $alien"
+                        # Remember this deletion
+                        echo "$alien" >> "$deleted_file"
                         # Untrack from git if it was tracked
                         if [ -d "$INSTALL_DIR/.git" ]; then
                             cd "$INSTALL_DIR"

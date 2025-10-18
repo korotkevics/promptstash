@@ -88,11 +88,35 @@ if [ -d "$INSTALL_DIR/.git" ]; then
 else
     if [ "$DRY_RUN" = true ]; then
         echo "[DRY RUN] Would install PromptStash to $INSTALL_DIR:"
-        echo "[DRY RUN]   git clone $REPO_URL $INSTALL_DIR"
+        echo "[DRY RUN]   git clone --no-checkout $REPO_URL $INSTALL_DIR"
+        echo "[DRY RUN]   Configure sparse checkout for user-facing files only"
     else
         echo "Installing PromptStash to $INSTALL_DIR..."
-        git clone "$REPO_URL" "$INSTALL_DIR"
-        echo -e "${GREEN}✓ Cloned repository successfully!${NC}"
+
+        # Clone with --no-checkout to configure sparse checkout first
+        git clone --no-checkout "$REPO_URL" "$INSTALL_DIR"
+        cd "$INSTALL_DIR"
+
+        # Enable sparse checkout
+        git sparse-checkout init --cone
+
+        # Define user-facing paths only (no tests/, .github/, etc.)
+        git sparse-checkout set \
+            .promptstash \
+            bin \
+            docs \
+            static \
+            .context \
+            .gitignore \
+            .version \
+            LICENSE \
+            README.md \
+            install.sh
+
+        # Checkout the files
+        git checkout main
+
+        echo -e "${GREEN}✓ Installed PromptStash (user-facing files only)${NC}"
     fi
 fi
 
