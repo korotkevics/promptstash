@@ -92,7 +92,6 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 10: Verify clipboard detection (pbcopy or xclip)
 # Test 10: Verify clipboard detection (pbcopy, xclip, or wl-copy)
 TESTS=$((TESTS + 1))
 if grep -Eq 'pbcopy|xclip|wl-copy' bin/promptstash; then
