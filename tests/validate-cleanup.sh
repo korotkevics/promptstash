@@ -138,6 +138,15 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
+# Test 15: Verify self-update restores deleted alien files
+TESTS=$((TESTS + 1))
+if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q "git checkout HEAD"; then
+  echo -e "${GREEN}✓ self-update restores deleted alien files${NC}"
+else
+  echo -e "${RED}✗ self-update doesn't restore deleted alien files${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
 echo ""
 echo "Ran $TESTS tests"
 
