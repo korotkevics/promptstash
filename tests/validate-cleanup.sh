@@ -138,12 +138,12 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 15: Verify cleanup untracks deleted files from git
+# Test 15: Verify self-update only checks essential files
 TESTS=$((TESTS + 1))
-if grep -q "git rm.*--cached" bin/promptstash; then
-  echo -e "${GREEN}✓ cleanup untracks deleted files from git${NC}"
+if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q 'essential_paths'; then
+  echo -e "${GREEN}✓ self-update only checks essential files${NC}"
 else
-  echo -e "${RED}✗ cleanup doesn't untrack deleted files${NC}"
+  echo -e "${RED}✗ self-update doesn't use essential paths whitelist${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
