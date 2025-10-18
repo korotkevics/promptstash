@@ -75,7 +75,16 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 8: Verify preference file handling exists
+# Test 8: Verify .gitignore is marked as essential
+TESTS=$((TESTS + 1))
+if grep "essential_patterns=(" bin/promptstash -A 100 | grep -q '".gitignore"'; then
+  echo -e "${GREEN}✓ .gitignore file is marked as essential${NC}"
+else
+  echo -e "${RED}✗ .gitignore file is not in essential patterns${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Test 9: Verify preference file handling exists
 TESTS=$((TESTS + 1))
 if grep -q ".promptstash_cleanup_pref" bin/promptstash; then
   echo -e "${GREEN}✓ preference file handling exists${NC}"
@@ -84,7 +93,7 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 9: Verify install.sh calls cleanup
+# Test 10: Verify install.sh calls cleanup
 TESTS=$((TESTS + 1))
 if grep -q "promptstash.*cleanup" install.sh; then
   echo -e "${GREEN}✓ install.sh calls cleanup command${NC}"
@@ -93,7 +102,7 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 10: Verify cleanup function handles no alien files case
+# Test 11: Verify cleanup function handles no alien files case
 TESTS=$((TESTS + 1))
 if grep -q "no alien files" bin/promptstash; then
   echo -e "${GREEN}✓ cleanup handles no alien files case${NC}"
@@ -102,7 +111,7 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 11: Verify user can opt for "never ask again"
+# Test 12: Verify user can opt for "never ask again"
 TESTS=$((TESTS + 1))
 if grep -qi "never ask again" bin/promptstash; then
   echo -e "${GREEN}✓ cleanup includes 'never ask again' option${NC}"
@@ -111,7 +120,7 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 12: Verify warning message for alien files
+# Test 13: Verify warning message for alien files
 TESTS=$((TESTS + 1))
 if grep -q "Found unnecessary files" bin/promptstash; then
   echo -e "${GREEN}✓ cleanup issues warning for unnecessary files${NC}"
@@ -120,7 +129,7 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 13: Verify self-update calls cleanup
+# Test 14: Verify self-update calls cleanup
 TESTS=$((TESTS + 1))
 if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q "check_alien_files"; then
   echo -e "${GREEN}✓ self-update calls cleanup after update${NC}"

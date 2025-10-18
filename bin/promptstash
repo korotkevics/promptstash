@@ -196,6 +196,7 @@ check_alien_files() {
         ".promptstash"     # The actual prompts
         "bin"              # CLI executable
         ".git"             # Git repository (for updates)
+        ".gitignore"       # Git ignore patterns
         ".version"         # Version file
         "LICENSE"          # Legal requirement
         "README.md"        # Documentation
