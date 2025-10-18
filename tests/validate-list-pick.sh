@@ -93,7 +93,7 @@ else
 fi
 
 # Test 10: Verify clipboard detection (pbcopy or xclip)
-TESTS=$((TESTS + 1))
+# Test 10: Verify clipboard detection (pbcopy, xclip, or wl-copy)
 if grep -Eq 'pbcopy|xclip|wl-copy' bin/promptstash; then
   echo -e "${GREEN}✓ clipboard command detection exists${NC}"
 else
