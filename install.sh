@@ -173,13 +173,6 @@ if [ -f "$INSTALL_DIR/bin/promptstash" ]; then
     fi
 fi
 
-# Run cleanup to remove unnecessary files
-if [ "$DRY_RUN" = false ] && [ -x "$INSTALL_DIR/bin/promptstash" ]; then
-    echo ""
-    echo "Cleaning up unnecessary files..."
-    "$INSTALL_DIR/bin/promptstash" cleanup
-fi
-
 # Detect shell and rc file
 detect_shell() {
     local shell_name=$(basename "$SHELL")
