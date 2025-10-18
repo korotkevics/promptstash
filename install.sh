@@ -257,7 +257,7 @@ add_to_rc() {
     fi
 
     # Check if PATH is already added
-    if grep -q "PATH.*promptstash/bin" "$rc_file" 2>/dev/null; then
+    if grep -q "PATH.*\.promptstash/bin" "$rc_file" 2>/dev/null; then
         echo -e "${YELLOW}⚠ PromptStash bin is already in PATH in $rc_file${NC}"
     else
         if [ "$DRY_RUN" = true ]; then
