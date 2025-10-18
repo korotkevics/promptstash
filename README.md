@@ -63,7 +63,7 @@ Load $PROMPTSTASH_DIR/.promptstash/debug.md and help me investigate this error:
 
 Token counts by version (latest 5):
 
-| Prompt | Cost | Entropy | **0.26.1** | **0.26.0** | **0.25.1** | **0.25.0** | **0.24.0** |
+| Prompt | Cost | Entropy | **0.26.2** | **0.26.1** | **0.26.0** | **0.25.1** | **0.25.0** |
 |---|---|---|---|---|---|---|---|
 | **bump-semver-version** | $$$ | 7.33 | 422 | 422 | 422 | 422 | 422 |
 | **commit** | $$ | 6.99 | 365 | 365 | 365 | 365 | 365 |
@@ -78,14 +78,13 @@ Token counts by version (latest 5):
 | **plan-shipping** | $$ | 6.53 | 371 | 371 | 371 | 371 | 371 |
 | **read-source-map** | $$ | 7.04 | 306 | 306 | 306 | 306 | 306 |
 | **review-mr** | $$ | 6.68 | 228 | 228 | 228 | 228 | 228 |
-| **review-pr** | $$$ | 7.67 | 568 | 568 | 568 <sub>🔴 +65</sub> | 503 | 503 |
+| **review-pr** | $$$ | 7.67 | 568 | 568 | 568 | 568 <sub>🔴 +65</sub> | 503 |
 | **ship-gh-issue** | $$$ | 7.22 | 511 | 511 | 511 | 511 | 511 |
 | **ship** | $$ | 6.63 | 244 | 244 | 244 | 244 | 244 |
 | **squash** | $ | 6.55 | 180 | 180 | 180 | 180 | 180 |
 | **suggest-better-function-names** | $$ | 6.92 | 303 | 303 | 303 | 303 | 303 |
-| **TOTAL** |  |  | **6930** | **6930** | **6930** <sub>🔴 +65</sub> | **6865** | **6865** |
+| **TOTAL** |  |  | **6930** | **6930** | **6930** | **6930** <sub>🔴 +65</sub> | **6865** |
 
-> **Note:** Benchmarks are automatically updated only when any prompt file in `.promptstash/` or its subdirectories is modified. Changes to documentation, tests, or other non-prompt files will not trigger benchmark updates.
 
 ## Prompt Reference Graph
 
