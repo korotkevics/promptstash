@@ -186,24 +186,42 @@ check_alien_files() {
         fi
     fi
 
-    # Define alien files/directories (not needed for user installations)
-    local alien_patterns=(
-        "tests"
-        ".github"
-        ".benchmark"
-        "scripts/benchmark.py"
-        "scripts/generate_graph.py"
-        "static/prompt-graph.dot"
-        ".idea"
+    # Define essential files/directories that users need
+    # Everything else is considered "alien" and can be removed
+    local essential_patterns=(
+        ".promptstash"     # The actual prompts
+        "bin"              # CLI executable
+        ".git"             # Git repository (for updates)
+        ".version"         # Version file
+        "LICENSE"          # Legal requirement
+        "README.md"        # Documentation
+        "install.sh"       # Installation script
+        "docs"             # Documentation directory
+        "static"           # Static assets (logo, etc.)
+        ".context"         # User context files
     )
 
     local found_aliens=()
 
-    # Check for alien files
-    for pattern in "${alien_patterns[@]}"; do
-        local full_path="$INSTALL_DIR/$pattern"
-        if [ -e "$full_path" ]; then
-            found_aliens+=("$pattern")
+    # Check all top-level files/directories
+    for item in "$INSTALL_DIR"/{*,.[!.]*}; do
+        # Skip if doesn't exist (glob didn't match)
+        [ -e "$item" ] || continue
+
+        local basename=$(basename "$item")
+        local is_essential=false
+
+        # Check if this item is essential
+        for essential in "${essential_patterns[@]}"; do
+            if [ "$basename" = "$essential" ]; then
+                is_essential=true
+                break
+            fi
+        done
+
+        # If not essential, it's alien
+        if [ "$is_essential" = false ]; then
+            found_aliens+=("$basename")
         fi
     done
 

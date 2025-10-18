@@ -39,39 +39,39 @@ else
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 4: Verify alien patterns are defined
+# Test 4: Verify essential patterns are defined (whitelist approach)
 TESTS=$((TESTS + 1))
-if grep -q "alien_patterns=" bin/promptstash; then
-  echo -e "${GREEN}✓ alien_patterns array is defined${NC}"
+if grep -q "essential_patterns=" bin/promptstash; then
+  echo -e "${GREEN}✓ essential_patterns array is defined${NC}"
 else
-  echo -e "${RED}✗ alien_patterns array is missing${NC}"
+  echo -e "${RED}✗ essential_patterns array is missing${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 5: Verify tests directory is in alien patterns
+# Test 5: Verify .promptstash is marked as essential
 TESTS=$((TESTS + 1))
-if grep -A 10 "alien_patterns=" bin/promptstash | grep -q '"tests"'; then
-  echo -e "${GREEN}✓ tests directory is marked as alien${NC}"
+if grep -A 15 "essential_patterns=" bin/promptstash | grep -q '".promptstash"'; then
+  echo -e "${GREEN}✓ .promptstash directory is marked as essential${NC}"
 else
-  echo -e "${RED}✗ tests directory is not in alien patterns${NC}"
+  echo -e "${RED}✗ .promptstash directory is not in essential patterns${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 6: Verify .github directory is in alien patterns
+# Test 6: Verify bin is marked as essential
 TESTS=$((TESTS + 1))
-if grep -A 10 "alien_patterns=" bin/promptstash | grep -q '".github"'; then
-  echo -e "${GREEN}✓ .github directory is marked as alien${NC}"
+if grep -A 15 "essential_patterns=" bin/promptstash | grep -q '"bin"'; then
+  echo -e "${GREEN}✓ bin directory is marked as essential${NC}"
 else
-  echo -e "${RED}✗ .github directory is not in alien patterns${NC}"
+  echo -e "${RED}✗ bin directory is not in essential patterns${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
-# Test 7: Verify .benchmark directory is in alien patterns
+# Test 7: Verify .git is marked as essential
 TESTS=$((TESTS + 1))
-if grep -A 10 "alien_patterns=" bin/promptstash | grep -q '".benchmark"'; then
-  echo -e "${GREEN}✓ .benchmark directory is marked as alien${NC}"
+if grep -A 15 "essential_patterns=" bin/promptstash | grep -q '".git"'; then
+  echo -e "${GREEN}✓ .git directory is marked as essential${NC}"
 else
-  echo -e "${RED}✗ .benchmark directory is not in alien patterns${NC}"
+  echo -e "${RED}✗ .git directory is not in essential patterns${NC}"
   ERRORS=$((ERRORS + 1))
 fi
 
