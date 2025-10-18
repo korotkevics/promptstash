@@ -23,7 +23,7 @@ debug.md
 
 ### `promptstash pick name`
 
-Interactive prompt picker that copies the filename to clipboard.
+Interactive prompt picker that copies the filename to the clipboard.
 
 ```bash
 promptstash pick name
