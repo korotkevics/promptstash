@@ -122,7 +122,7 @@ fi
 
 # Test 13: Verify self-update calls cleanup
 TESTS=$((TESTS + 1))
-if grep "self_update()" bin/promptstash -A 100 | grep -q "check_alien_files"; then
+if awk '/^self_update[[:space:]]*\(\)[[:space:]]*{/{flag=1; brace=1; next} flag{brace+=gsub(/{/,"{")-gsub(/}/,"}"); if(brace==0){flag=0} if(flag) print}' bin/promptstash | grep -q "check_alien_files"; then
   echo -e "${GREEN}✓ self-update calls cleanup after update${NC}"
 else
   echo -e "${RED}✗ self-update doesn't call cleanup${NC}"
