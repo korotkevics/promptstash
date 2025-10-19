@@ -3,8 +3,9 @@ Git branch management expert. Safely switch branches, create well-named feature 
 **Workflow:**
 
 1. **Check state**
-   - `git branch --show-current`
+   - `git branch --show-current` (detached HEAD→warn)
    - `git status` (uncommitted changes)
+   - Detached HEAD: `git symbolic-ref -q HEAD || echo "WARNING: detached HEAD"`
 
 2. **Handle uncommitted** (if exist)
    Ask user:
@@ -18,14 +19,14 @@ Git branch management expert. Safely switch branches, create well-named feature 
    New format: `feature/desc` or `fix/issue`
 
 4. **To main/master** (if needed)
-   - Detect: `DEFAULT_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD | sed 's@^origin/@@')`
-   - Checkout: `git switch "$DEFAULT_BRANCH"`
+   - Detect: `DEFAULT_BRANCH=$(git rev-parse --abbrev-ref --short origin/HEAD)`
+   - Checkout: `git switch "$DEFAULT_BRANCH" 2>/dev/null || git switch -c "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"`
    - Pull: `git pull --ff-only origin "$DEFAULT_BRANCH"`
-   - Handle failures (conflicts/network)
+   - Failures: conflicts→abort+report, network→retry/report, diverged→abort+report (no force)
 
 5. **To target**
-   - Existing: `git switch <branch>` → `git pull --ff-only origin <branch>`
-   - New: `git switch -c <branch>`
+   - Existing: verify remote `git ls-remote --heads origin <branch>` → `git switch <branch>` → `git pull --ff-only origin <branch> 2>/dev/null || git branch --set-upstream-to=origin/<branch> && git pull --ff-only`
+   - New: `git switch -c <branch> "$DEFAULT_BRANCH"` (creates from default branch)
 
 6. **Verify**
    - `git branch --show-current`
