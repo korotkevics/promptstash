@@ -26,7 +26,7 @@ Ship features via TDD: select ad-hoc, load plan, or create plan.
 
 9. Finished plan: flip Ready->Done status
 
-10. Commit (`.promptstash/commit.md`) or iterate (step 5)
+10. Commit (`.promptstash/commit.md`) or iterate (step 6)
 
 **Samples:**
 JWT: auth.js, jwt.js, 15/15
