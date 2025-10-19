@@ -128,7 +128,7 @@ promptstash search name foo
 2 - `bar.md`
   process foo before continuing...
 
-Please select a prompt number to save into clipboard (or 'q' to quit): 1
+Please select a prompt number to copy to the clipboard (or 'q' to quit): 1
 ✓ Saved to clipboard: foo-this.md
 ```
 
