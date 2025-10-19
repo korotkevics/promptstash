@@ -45,7 +45,7 @@ run_test() {
     fi
 
     # Check output if expected pattern provided
-    if [ -n "$expected_output" ]; then
+        if echo "$output" | grep -Fq "$expected_output"; then
         if echo "$output" | grep -F -q -- "$expected_output"; then
             echo -e "${GREEN}PASS${NC}"
             ((TESTS_PASSED++))
