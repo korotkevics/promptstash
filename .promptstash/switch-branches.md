@@ -57,6 +57,6 @@ Result: Successfully switched to '<branch-name>'
 - NEVER switch with uncommitted without confirmation
 - NEVER force push/destructive commands
 - ALWAYS pull after main/master switch
-- Verify branch exists (except new with -b)
+- Verify branch exists (except new with -c)
 
 **Related:** `.promptstash/commit.md`, `.promptstash/create-pr.md`
