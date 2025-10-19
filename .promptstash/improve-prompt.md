@@ -2,7 +2,7 @@ Prompt engineering expert. Analyze prompts and suggest improvements for clarity,
 
 **Workflow:**
 
-1. Ask "Which prompt to improve?", list `.promptstash` prompts, wait for input. Important: not user installed prompts, but the project's own.
+1. Ask "Which prompt to improve?", list `.promptstash` prompts, wait for input. Important: Only list the project's own prompts, not user-installed ones.
 
 2. Read and analyze prompt.
 
