@@ -450,14 +450,14 @@ pick_prompts() {
         exit 1
     fi
 
-    # Detect clipboard command
-    local clipboard_cmd=""
+    # Detect clipboard command (use array for proper handling of multi-word commands)
+    local -a clipboard_cmd=()
     if command -v pbcopy &> /dev/null; then
-        clipboard_cmd="pbcopy"
+        clipboard_cmd=("pbcopy")
     elif command -v xclip &> /dev/null; then
-        clipboard_cmd="xclip -selection clipboard"
+        clipboard_cmd=("xclip" "-selection" "clipboard")
     elif command -v wl-copy &> /dev/null; then
-        clipboard_cmd="wl-copy"
+        clipboard_cmd=("wl-copy")
     else
         echo -e "${RED}✗ Error: No clipboard command found${NC}"
         echo ""
@@ -506,44 +506,56 @@ pick_prompts() {
         local selected_prompt="${prompts[$((choice - 1))]}"
         local prompt_path="$prompts_dir/$selected_prompt"
 
-        # Copy based on mode
-        case "$mode" in
-            name)
-                if echo -n "$selected_prompt" | "${clipboard_cmd[@]}" 2>/dev/null; then
-                    echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
-                else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard: $selected_prompt${NC}"
-                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
-                    exit 1
-                fi
-                ;;
-            content)
-                if cat "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
-                    echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
-                else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard: contents of $selected_prompt${NC}"
-                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
-                    exit 1
-                fi
-                ;;
-            path)
-                if echo -n "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
-                    echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
-                else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard: $prompt_path${NC}"
-                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
-                    exit 1
-                fi
-                ;;
-            *)
-                echo -e "${RED}✗ Error: Unknown mode: $mode${NC}"
-                exit 1
-                ;;
-        esac
+        # Copy to clipboard using helper function
+        copy_to_clipboard "$mode" "$selected_prompt" "$prompt_path" "${clipboard_cmd[@]}"
 
         # Successfully copied, exit the loop
         break
     done
+}
+
+# Copy to clipboard based on mode
+# Args: mode, selected_prompt_name, prompt_path, clipboard_cmd_array
+copy_to_clipboard() {
+    local mode="$1"
+    local selected_prompt="$2"
+    local prompt_path="$3"
+    shift 3
+    local -a clipboard_cmd=("$@")
+
+    case "$mode" in
+        name)
+            if echo -n "$selected_prompt" | "${clipboard_cmd[@]}" 2>/dev/null; then
+                echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
+            else
+                echo -e "${RED}✗ Error: Failed to copy to clipboard: $selected_prompt${NC}"
+                echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
+                exit 1
+            fi
+            ;;
+        content)
+            if cat "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
+                echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
+            else
+                echo -e "${RED}✗ Error: Failed to copy to clipboard: contents of $selected_prompt${NC}"
+                echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
+                exit 1
+            fi
+            ;;
+        path)
+            if echo -n "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
+                echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
+            else
+                echo -e "${RED}✗ Error: Failed to copy to clipboard: $prompt_path${NC}"
+                echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
+                exit 1
+            fi
+            ;;
+        *)
+            echo -e "${RED}✗ Error: Unknown mode: $mode${NC}"
+            exit 1
+            ;;
+    esac
 }
 
 # Show search usage helper
@@ -586,7 +598,7 @@ search_prompts() {
 
     # Search through all .md files
     while IFS= read -r filepath; do
-        local filename=$(basename "$filepath")
+        local filename="${filepath##*/}"
         local found_match=false
         local match_context=""
 
@@ -679,7 +691,7 @@ search_prompts() {
 
     # Prompt for selection
     while true; do
-        read -p "Please select a prompt number to save into clipboard (or 'q' to quit): " choice
+        read -p "Please select a prompt number to copy to clipboard (or 'q' to quit): " choice
 
         # Check if user wants to quit
         if [ "$choice" = "q" ] || [ "$choice" = "Q" ]; then
@@ -703,40 +715,8 @@ search_prompts() {
         local selected_prompt="${match_files[$((choice - 1))]}"
         local prompt_path="$prompts_dir/$selected_prompt"
 
-        # Copy based on mode
-        case "$mode" in
-            name)
-                if echo -n "$selected_prompt" | "${clipboard_cmd[@]}" 2>/dev/null; then
-                    echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
-                else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard: $selected_prompt${NC}"
-                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
-                    exit 1
-                fi
-                ;;
-            content)
-                if cat "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
-                    echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
-                else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard: contents of $selected_prompt${NC}"
-                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
-                    exit 1
-                fi
-                ;;
-            path)
-                if echo -n "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
-                    echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
-                else
-                    echo -e "${RED}✗ Error: Failed to copy to clipboard: $prompt_path${NC}"
-                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
-                    exit 1
-                fi
-                ;;
-            *)
-                echo -e "${RED}✗ Error: Unknown mode: $mode${NC}"
-                exit 1
-                ;;
-        esac
+        # Copy to clipboard using helper function
+        copy_to_clipboard "$mode" "$selected_prompt" "$prompt_path" "${clipboard_cmd[@]}"
 
         # Successfully copied, exit the loop
         break

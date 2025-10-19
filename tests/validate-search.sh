@@ -21,14 +21,11 @@ TESTS_FAILED=0
 # Helper to run tests
 run_test() {
     local test_name="$1"
-    shift
+    local expected_exit="$2"
+    local expected_output="$3"
+    shift 3
+    local cmd=("$@")
 
-    # Last two args are expected_exit and expected_output
-    local expected_exit="${@: -2:1}"
-    local expected_output="${@: -1}"
-
-    # Remaining args form the command
-    local cmd=( "${@:1:$#-2}" )
     echo -n "Testing: $test_name ... "
 
     # Run command and capture output and exit code
@@ -48,7 +45,7 @@ run_test() {
     fi
 
     # Check output if expected pattern provided
-        if echo "$output" | grep -Fq "$expected_output"; then
+    if [ -n "$expected_output" ]; then
         if echo "$output" | grep -F -q -- "$expected_output"; then
             echo -e "${GREEN}PASS${NC}"
             ((TESTS_PASSED++))
@@ -69,6 +66,9 @@ run_test() {
 
 echo "Running promptstash search integration tests..."
 echo ""
+
+# Test 1: Search without query shows error
+run_test "Search without query shows error" \
     1 \
     "Error: search command requires a query" \
     "$PROMPTSTASH_BIN" search
@@ -125,10 +125,7 @@ run_test "Search handles asterisk literally" \
 run_test "Search handles backslash literally" \
     0 \
     "" \
-    "$PROMPTSTASH_BIN" search "\\"  # Just check it doesn't crash
-    "$PROMPTSTASH_BIN" search "\\" \
-    0 \
-    ""  # Just check it doesn't crash
+    "$PROMPTSTASH_BIN" search "\\"
 
 echo ""
 echo "================================"
