@@ -126,7 +126,7 @@ promptstash search name foo
 2 - `bar.md`
   ...when foo then..
 
-Please select a prompt number to save into clipboard (or 'q' to quit): 1
+Please select a prompt number to save to the clipboard (or 'q' to quit): 1
 ✓ Saved to clipboard: foo-this.md
 ```
 
