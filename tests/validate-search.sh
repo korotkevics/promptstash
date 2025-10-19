@@ -21,15 +21,16 @@ TESTS_FAILED=0
 # Helper to run tests
 run_test() {
     local test_name="$1"
-    local command="$2"
-    local expected_exit="$3"
-    local expected_output="$4"
+    local expected_exit="$2"
+    local expected_output="$3"
+    shift 3
+    local cmd=("$@")
 
     echo -n "Testing: $test_name ... "
 
     # Run command and capture output and exit code
     set +e
-    output=$(eval "$command" 2>&1)
+    output=$("${cmd[@]}" 2>&1)
     exit_code=$?
     set -e
 
