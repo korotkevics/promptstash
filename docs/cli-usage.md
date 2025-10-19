@@ -112,7 +112,7 @@ Searches are case-insensitive and support simple patterns/regex. Matches are hig
 
 ### `promptstash search name <query>`
 
-Interactive search that picks from matching prompts and copies the filename to clipboard.
+Interactive search that picks from matching prompts and copies the filename to the clipboard.
 
 ```bash
 promptstash search name foo
