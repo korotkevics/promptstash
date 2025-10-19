@@ -18,7 +18,7 @@ Git branch management expert. Safely switch branches, create well-named feature 
    New format: `feature/desc` or `fix/issue`
 
 4. **To main/master** (if needed)
-   - Detect: `git remote show origin | grep 'HEAD branch'`
+   - Detect: <code>git rev-parse --abbrev-ref origin/HEAD | sed 's@^origin/@@'</code>
    - Checkout: `git checkout main|master`
    - Pull: `git pull origin <branch>`
    - Handle failures (conflicts/network)
