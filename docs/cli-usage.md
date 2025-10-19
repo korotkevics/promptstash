@@ -89,6 +89,81 @@ Select a prompt number (or 'q' to quit): 1
 
 ---
 
+### `promptstash search <query>`
+
+Searches prompts by filename and content, listing all matches (non-interactive).
+
+```bash
+promptstash search foo
+```
+
+**Output:**
+```
+- `foo-this.md`
+  when foo is enabled then...
+
+- `bar.md`
+  process foo before continuing...
+```
+
+*Note: The ellipsis (...) in examples indicates truncated content from matching lines.*
+
+Searches are case-insensitive and match literal strings (not regex). Matches are highlighted in bold red on color-capable terminals.
+
+---
+
+### `promptstash search name <query>`
+
+Interactive search that picks from matching prompts and copies the filename to the clipboard.
+
+```bash
+promptstash search name foo
+```
+
+**Example:**
+```bash
+1 - `foo-this.md`
+  when foo is enabled then...
+
+2 - `bar.md`
+  process foo before continuing...
+
+Please select a prompt number to copy to the clipboard (or 'q' to quit): 1
+✓ Saved to clipboard: foo-this.md
+```
+
+---
+
+### `promptstash search content <query>`
+
+Interactive search that picks from matching prompts and copies the file contents to the clipboard.
+
+```bash
+promptstash search content foo
+```
+
+Works the same as `search name` but copies the file contents instead of the filename.
+
+---
+
+### `promptstash search path <query>`
+
+Interactive search that picks from matching prompts and copies the absolute file path to the clipboard.
+
+```bash
+promptstash search path foo
+```
+
+Works the same as `search name` but copies the absolute path instead of the filename.
+
+---
+
+**Note:** For all `search` commands (`search`, `search name`, `search content`, and `search path`), if no matches are found, it displays:
+```
+No matches found in file names or file contents for `<query>`.
+```
+
+---
 ### `promptstash self-update`
 
 Updates PromptStash to the latest version.
