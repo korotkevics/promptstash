@@ -146,7 +146,7 @@ Works the same as `search name` but copies file contents instead of filename.
 
 ### `promptstash search path <query>`
 
-Interactive search that picks from matching prompts and copies the absolute file path to clipboard.
+Interactive search that picks from matching prompts and copies the absolute file path to the clipboard.
 
 ```bash
 promptstash search path foo
