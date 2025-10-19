@@ -55,7 +55,7 @@ Result: Successfully switched to '<branch-name>'
 - Action: commit/stash → main → pull → create
 
 **Constraints:**
-- NEVER switch with uncommitted without confirmation
+- NEVER switch with uncommitted changes without confirmation
 - NEVER force push/destructive commands
 - ALWAYS pull after main/master switch
 - Verify branch exists (except new with -c)
