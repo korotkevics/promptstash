@@ -140,7 +140,7 @@ Interactive search that picks from matching prompts and copies the file contents
 promptstash search content foo
 ```
 
-Works the same as `search name` but copies file contents instead of filename.
+Works the same as `search name` but copies the file contents instead of the filename.
 
 ---
 
