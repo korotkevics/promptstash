@@ -158,7 +158,7 @@ Works the same as `search name` but copies the absolute path instead of the file
 
 **Note:** If no matches are found, displays:
 ```
-No matches found in filenames or file contents for `xyz`.
+No matches found
 ```
 
 ---
