@@ -582,18 +582,17 @@ search_prompts() {
         # Check if filename matches (case-insensitive)
         if echo "$filename" | grep -iq "$query"; then
             found_match=true
-            # Highlight match in filename using sed for bold red
-            match_context=$(echo "$filename" | sed -E "s/($query)/\x1b[1;31m\1\x1b[0m/gi")
+            # Highlight match in filename using grep color (portable approach)
+            # Use GREP_COLORS to set bold red for matches
+            match_context=$(echo "$filename" | GREP_COLORS='ms=01;31' grep -i --color=always "$query" || echo "$filename")
         fi
 
         # Search file contents (case-insensitive)
         if grep -iq "$query" "$filepath"; then
             found_match=true
-            # Get first matching line with context
-            local matching_line=$(grep -i -m 1 "$query" "$filepath" | sed 's/^[[:space:]]*//' | cut -c1-100)
+            # Get first matching line with context and highlight using grep color
+            local matching_line=$(GREP_COLORS='ms=01;31' grep -i -m 1 --color=always "$query" "$filepath" | sed 's/^[[:space:]]*//' | cut -c1-100)
             if [ -n "$matching_line" ]; then
-                # Highlight the match in the line using sed for bold red
-                matching_line=$(echo "$matching_line" | sed -E "s/($query)/\x1b[1;31m\1\x1b[0m/gi")
                 if [ -z "$match_context" ]; then
                     match_context="$matching_line"
                 else
