@@ -69,61 +69,61 @@ echo ""
 
 # Test 1: Search without query shows error
 run_test "Search without query shows error" \
-    "$PROMPTSTASH_BIN search" \
+    "$PROMPTSTASH_BIN" search \
     1 \
     "Error: search command requires a query"
 
 # Test 2: Search with query that doesn't match
 run_test "Search with non-matching query" \
-    "$PROMPTSTASH_BIN search xyz123notfound456" \
+    "$PROMPTSTASH_BIN" search xyz123notfound456 \
     0 \
     "No matches found"
 
 # Test 3: Search for common word (should find matches)
 run_test "Search for 'commit' finds matches" \
-    "$PROMPTSTASH_BIN search commit" \
+    "$PROMPTSTASH_BIN" search commit \
     0 \
     ".md"
 
 # Test 4: Search is case-insensitive
 run_test "Search is case-insensitive (uppercase)" \
-    "$PROMPTSTASH_BIN search COMMIT" \
+    "$PROMPTSTASH_BIN" search COMMIT \
     0 \
     ".md"
 
 # Test 5: Search name without query shows error
 run_test "Search name without query shows error" \
-    "$PROMPTSTASH_BIN search name" \
+    "$PROMPTSTASH_BIN" search name \
     1 \
     "Error: search command requires a query"
 
 # Test 6: Search content without query shows error
 run_test "Search content without query shows error" \
-    "$PROMPTSTASH_BIN search content" \
+    "$PROMPTSTASH_BIN" search content \
     1 \
     "Error: search command requires a query"
 
 # Test 7: Search path without query shows error
 run_test "Search path without query shows error" \
-    "$PROMPTSTASH_BIN search path" \
+    "$PROMPTSTASH_BIN" search path \
     1 \
     "Error: search command requires a query"
 
 # Test 8: Search handles special regex characters safely (literal matching)
 run_test "Search handles brackets literally" \
-    "$PROMPTSTASH_BIN search '[test]'" \
+    "$PROMPTSTASH_BIN" search "[test]" \
     0 \
     ""  # Just check it doesn't crash
 
 # Test 9: Search handles asterisk literally
 run_test "Search handles asterisk literally" \
-    "$PROMPTSTASH_BIN search '*'" \
+    "$PROMPTSTASH_BIN" search "*" \
     0 \
     ""  # Just check it doesn't crash
 
 # Test 10: Search handles backslash literally
 run_test "Search handles backslash literally" \
-    "$PROMPTSTASH_BIN search '\\'" \
+    "$PROMPTSTASH_BIN" search "\\" \
     0 \
     ""  # Just check it doesn't crash
 
