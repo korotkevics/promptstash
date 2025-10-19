@@ -152,9 +152,7 @@ Interactive search that picks from matching prompts and copies the absolute file
 
 ---
 
-**Note:** For all `search` commands (`search`, `search name`, `search content`, and `search path`), if no matches are found, displays:
----
-
+**Note:** For all `search` commands (`search`, `search name`, `search content`, and `search path`), if no matches are found, it displays:
 ### `promptstash self-update`
 
 Updates PromptStash to the latest version.
