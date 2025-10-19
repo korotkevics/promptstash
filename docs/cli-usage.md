@@ -150,17 +150,9 @@ Works the same as `search name` but copies the file contents instead of the file
 
 Interactive search that picks from matching prompts and copies the absolute file path to the clipboard.
 
-```bash
-promptstash search path foo
-```
+---
 
-Works the same as `search name` but copies the absolute path instead of the filename.
-
-**Note:** If no matches are found, displays:
-```
-No matches found
-```
-
+**Note:** For all `search` commands (`search`, `search name`, `search content`, and `search path`), if no matches are found, displays:
 ---
 
 ### `promptstash self-update`
