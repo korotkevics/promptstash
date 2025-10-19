@@ -134,7 +134,7 @@ Please select a prompt number to save into clipboard (or 'q' to quit): 1
 
 ### `promptstash search content <query>`
 
-Interactive search that picks from matching prompts and copies the file contents to clipboard.
+Interactive search that picks from matching prompts and copies the file contents to the clipboard.
 
 ```bash
 promptstash search content foo
