@@ -18,14 +18,14 @@ Git branch management expert. Safely switch branches, create well-named feature 
    New format: `feature/desc` or `fix/issue`
 
 4. **To main/master** (if needed)
-   - Detect: <code>git rev-parse --abbrev-ref origin/HEAD | sed 's@^origin/@@'</code>
-   - Checkout: `git checkout main|master`
-   - Pull: `git pull origin <branch>`
+   - Detect: `DEFAULT_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD | sed 's@^origin/@@')`
+   - Checkout: `git switch "$DEFAULT_BRANCH"`
+   - Pull: `git pull --ff-only origin "$DEFAULT_BRANCH"`
    - Handle failures (conflicts/network)
 
 5. **To target**
-   - Existing: `git checkout <branch>` → `git pull origin <branch>`
-   - New: `git checkout -b <branch>`
+   - Existing: `git switch <branch>` → `git pull --ff-only origin <branch>`
+   - New: `git switch -c <branch>`
 
 6. **Verify**
    - `git branch --show-current`
