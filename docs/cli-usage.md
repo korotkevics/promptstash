@@ -152,7 +152,7 @@ Interactive search that picks from matching prompts and copies the absolute file
 promptstash search path foo
 ```
 
-Works the same as `search name` but copies absolute path instead of filename.
+Works the same as `search name` but copies the absolute path instead of the filename.
 
 **Note:** If no matches are found, displays:
 ```
