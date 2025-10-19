@@ -4,7 +4,12 @@ GitHub issue handler: locate, check, branch, build via `gh`.
 
 1. **Prep**
    - Check: `git branch --show-current`
-   - Not main/master: resolve uncommitted (commit->`.promptstash/commit.md` | stash->`git stash push -m "WIP"` | abort), switch+pull: `git rev-parse --verify main && git checkout main || git checkout master && git pull origin main || git pull origin master`
+   - Not main/master: resolve uncommitted (commit->`.promptstash/commit.md` | stash->`git stash push -u -m "WIP"` | abort), switch+pull:
+     ```bash
+     DEFAULT_BRANCH=$(git rev-parse --abbrev-ref --short origin/HEAD)
+     git switch "$DEFAULT_BRANCH" 2>/dev/null || git switch -c "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
+     git pull --ff-only origin "$DEFAULT_BRANCH"
+     ```
 
 2. **Locate**
    - Ask: "Enter keywords to search or exact issue number:"
