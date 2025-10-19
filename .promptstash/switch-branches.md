@@ -9,7 +9,7 @@ Git branch management expert. Safely switch branches, create well-named feature 
 2. **Handle uncommitted** (if exist)
    Ask user:
    a. Commit (→`.promptstash/commit.md`)
-   b. Stash: `git stash push -m "WIP: [desc]"`
+   b. Stash: `git stash push -u -m "WIP: [desc]"`
    c. Discard (confirm first)
    d. Abort
 
