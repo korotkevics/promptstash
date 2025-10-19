@@ -89,6 +89,78 @@ Select a prompt number (or 'q' to quit): 1
 
 ---
 
+### `promptstash search <query>`
+
+Searches prompts by filename and content, listing all matches (non-interactive).
+
+```bash
+promptstash search foo
+```
+
+**Output:**
+```
+- `foo-this.md`
+  ...when foo then..
+
+- `bar.md`
+  ...when foo then..
+```
+
+Searches are case-insensitive and support simple patterns/regex. Matches are highlighted in bold red.
+
+---
+
+### `promptstash search name <query>`
+
+Interactive search that picks from matching prompts and copies the filename to clipboard.
+
+```bash
+promptstash search name foo
+```
+
+**Example:**
+```bash
+1 - `foo-this.md`
+  ...when foo then..
+
+2 - `bar.md`
+  ...when foo then..
+
+Please select a prompt number to save into clipboard (or 'q' to quit): 1
+✓ Saved to clipboard: foo-this.md
+```
+
+---
+
+### `promptstash search content <query>`
+
+Interactive search that picks from matching prompts and copies the file contents to clipboard.
+
+```bash
+promptstash search content foo
+```
+
+Works the same as `search name` but copies file contents instead of filename.
+
+---
+
+### `promptstash search path <query>`
+
+Interactive search that picks from matching prompts and copies the absolute file path to clipboard.
+
+```bash
+promptstash search path foo
+```
+
+Works the same as `search name` but copies absolute path instead of filename.
+
+**Note:** If no matches are found, displays:
+```
+No matches found in file names or file contents for `xyz`.
+```
+
+---
+
 ### `promptstash self-update`
 
 Updates PromptStash to the latest version.
