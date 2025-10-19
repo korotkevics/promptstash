@@ -509,29 +509,29 @@ pick_prompts() {
         # Copy based on mode
         case "$mode" in
             name)
-                if echo -n "$selected_prompt" | $clipboard_cmd 2>/dev/null; then
+                if echo -n "$selected_prompt" | "${clipboard_cmd[@]}" 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
                 else
                     echo -e "${RED}✗ Error: Failed to copy to clipboard: $selected_prompt${NC}"
-                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
             content)
-                if cat "$prompt_path" | $clipboard_cmd 2>/dev/null; then
+                if cat "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
                 else
                     echo -e "${RED}✗ Error: Failed to copy to clipboard: contents of $selected_prompt${NC}"
-                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
             path)
-                if echo -n "$prompt_path" | $clipboard_cmd 2>/dev/null; then
+                if echo -n "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
                 else
                     echo -e "${RED}✗ Error: Failed to copy to clipboard: $prompt_path${NC}"
-                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
@@ -546,6 +546,19 @@ pick_prompts() {
     done
 }
 
+# Show search usage helper
+show_search_usage() {
+    echo -e "${RED}✗ Error: search command requires a query${NC}"
+    echo ""
+    echo "Usage: promptstash search [name|content|path] <query>"
+    echo ""
+    echo "  search <query>          - List matching prompts (non-interactive)"
+    echo "  search name <query>     - Pick from matches and copy filename"
+    echo "  search content <query>  - Pick from matches and copy file contents"
+    echo "  search path <query>     - Pick from matches and copy file path"
+    exit 1
+}
+
 # Search prompts by filename and/or content
 search_prompts() {
     local mode="$1"
@@ -558,15 +571,13 @@ search_prompts() {
     fi
 
     if [ -z "$query" ]; then
-        echo -e "${RED}✗ Error: search command requires a query${NC}"
-        echo ""
-        echo "Usage: promptstash search [name|content|path] <query>"
-        echo ""
-        echo "  search <query>          - List matching prompts (non-interactive)"
-        echo "  search name <query>     - Pick from matches and copy filename"
-        echo "  search content <query>  - Pick from matches and copy file contents"
-        echo "  search path <query>     - Pick from matches and copy file path"
-        exit 1
+        show_search_usage
+    fi
+
+    # Detect color support (check if terminal supports colors)
+    local color_flag="never"
+    if [ -t 1 ] && command -v tput &>/dev/null && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
+        color_flag="always"
     fi
 
     # Store matches: filename, matching line (for display)
@@ -579,19 +590,19 @@ search_prompts() {
         local found_match=false
         local match_context=""
 
-        # Check if filename matches (case-insensitive)
-        if echo "$filename" | grep -iq "$query"; then
+        # Check if filename matches (case-insensitive, literal string)
+        if echo "$filename" | grep -Fiq "$query"; then
             found_match=true
             # Highlight match in filename using grep color (portable approach)
             # Use GREP_COLORS to set bold red for matches
-            match_context=$(echo "$filename" | GREP_COLORS='ms=01;31' grep -i --color=always "$query" || echo "$filename")
+            match_context=$(echo "$filename" | GREP_COLORS='ms=01;31' grep -Fi --color="$color_flag" "$query" || echo "$filename")
         fi
 
-        # Search file contents (case-insensitive)
-        if grep -iq "$query" "$filepath"; then
+        # Search file contents (case-insensitive, literal string)
+        if grep -Fiq "$query" "$filepath"; then
             found_match=true
             # Get first matching line with context and highlight using grep color
-            local matching_line=$(GREP_COLORS='ms=01;31' grep -i -m 1 --color=always "$query" "$filepath" | sed 's/^[[:space:]]*//' | cut -c1-100)
+            local matching_line=$(GREP_COLORS='ms=01;31' grep -Fi -m 1 --color="$color_flag" "$query" "$filepath" | sed 's/^[[:space:]]*//' | cut -c1-100)
             if [ -n "$matching_line" ]; then
                 if [ -z "$match_context" ]; then
                     match_context="$matching_line"
@@ -606,6 +617,16 @@ search_prompts() {
             match_contexts+=("$match_context")
         fi
     done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f | sort)
+
+    # Check if prompts directory has any .md files
+    if [ ${#match_files[@]} -eq 0 ]; then
+        # Check if directory is empty
+        local file_count=$(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f | wc -l)
+        if [ "$file_count" -eq 0 ]; then
+            echo -e "${RED}✗ Error: No .md files found in prompts directory: $prompts_dir${NC}"
+            exit 1
+        fi
+    fi
 
     # Check if any matches found
     if [ ${#match_files[@]} -eq 0 ]; then
@@ -625,14 +646,14 @@ search_prompts() {
     fi
 
     # Interactive mode: numbered list
-    # Detect clipboard command
-    local clipboard_cmd=""
+    # Detect clipboard command (use array for proper handling of multi-word commands)
+    local -a clipboard_cmd=()
     if command -v pbcopy &> /dev/null; then
-        clipboard_cmd="pbcopy"
+        clipboard_cmd=("pbcopy")
     elif command -v xclip &> /dev/null; then
-        clipboard_cmd="xclip -selection clipboard"
+        clipboard_cmd=("xclip" "-selection" "clipboard")
     elif command -v wl-copy &> /dev/null; then
-        clipboard_cmd="wl-copy"
+        clipboard_cmd=("wl-copy")
     else
         echo -e "${RED}✗ Error: No clipboard command found${NC}"
         echo ""
@@ -685,29 +706,29 @@ search_prompts() {
         # Copy based on mode
         case "$mode" in
             name)
-                if echo -n "$selected_prompt" | $clipboard_cmd 2>/dev/null; then
+                if echo -n "$selected_prompt" | "${clipboard_cmd[@]}" 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: $selected_prompt${NC}"
                 else
                     echo -e "${RED}✗ Error: Failed to copy to clipboard: $selected_prompt${NC}"
-                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
             content)
-                if cat "$prompt_path" | $clipboard_cmd 2>/dev/null; then
+                if cat "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: contents of $selected_prompt${NC}"
                 else
                     echo -e "${RED}✗ Error: Failed to copy to clipboard: contents of $selected_prompt${NC}"
-                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
             path)
-                if echo -n "$prompt_path" | $clipboard_cmd 2>/dev/null; then
+                if echo -n "$prompt_path" | "${clipboard_cmd[@]}" 2>/dev/null; then
                     echo -e "${GREEN}✓ Saved to clipboard: $prompt_path${NC}"
                 else
                     echo -e "${RED}✗ Error: Failed to copy to clipboard: $prompt_path${NC}"
-                    echo "The clipboard command ($clipboard_cmd) failed. Please ensure it's properly configured."
+                    echo "The clipboard command (${clipboard_cmd[*]}) failed. Please ensure it's properly configured."
                     exit 1
                 fi
                 ;;
@@ -748,17 +769,11 @@ Environment Variables:
   PROMPTSTASH_NO_UPDATE_CHECK  Set to '1' to disable update checks
 
 Examples:
-  promptstash list                    # List all prompts
-  promptstash pick name               # Pick a prompt and copy its filename
-  promptstash pick content            # Pick a prompt and copy its contents
-  promptstash pick path               # Pick a prompt and copy its absolute path
-  promptstash search commit           # Search for "commit" and list matches
-  promptstash search name debug       # Search for "debug" and pick - copy filename
-  promptstash search content ship     # Search for "ship" and pick - copy contents
-  promptstash search path pr          # Search for "pr" and pick - copy path
-  promptstash self-update             # Update to the latest version
-  promptstash cleanup                 # Check for unnecessary files
-  promptstash version                 # Show current version
+  promptstash list                # List all prompts
+  promptstash pick content        # Interactive picker
+  promptstash search commit       # Search and list matches
+  promptstash search name debug   # Search and pick interactively
+  promptstash self-update         # Update to latest version
 
 Prompts are located in: \$PROMPTSTASH_DIR
 Learn more: https://github.com/korotkevics/promptstash
@@ -804,15 +819,7 @@ main() {
                     ;;
                 "")
                     # No query provided
-                    echo -e "${RED}✗ Error: search command requires a query${NC}"
-                    echo ""
-                    echo "Usage: promptstash search [name|content|path] <query>"
-                    echo ""
-                    echo "  search <query>          - List matching prompts (non-interactive)"
-                    echo "  search name <query>     - Pick from matches and copy filename"
-                    echo "  search content <query>  - Pick from matches and copy file contents"
-                    echo "  search path <query>     - Pick from matches and copy file path"
-                    exit 1
+                    show_search_usage
                     ;;
                 *)
                     # Non-interactive search (query provided directly)

@@ -100,13 +100,15 @@ promptstash search foo
 **Output:**
 ```
 - `foo-this.md`
-  ...when foo then..
+  when foo is enabled then...
 
 - `bar.md`
-  ...when foo then..
+  process foo before continuing...
 ```
 
-Searches are case-insensitive and support simple patterns/regex. Matches are highlighted in bold red.
+*Note: The ellipsis (...) in examples indicates truncated content from matching lines.*
+
+Searches are case-insensitive and match literal strings (not regex). Matches are highlighted in bold red on color-capable terminals.
 
 ---
 
@@ -121,12 +123,12 @@ promptstash search name foo
 **Example:**
 ```bash
 1 - `foo-this.md`
-  ...when foo then..
+  when foo is enabled then...
 
 2 - `bar.md`
-  ...when foo then..
+  process foo before continuing...
 
-Please select a prompt number to copy to the clipboard (or 'q' to quit): 1
+Please select a prompt number to save into clipboard (or 'q' to quit): 1
 ✓ Saved to clipboard: foo-this.md
 ```
 
