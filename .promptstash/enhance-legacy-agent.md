@@ -56,8 +56,8 @@ Showing first file:
 {
   "tool": "runCommand",
   "language": "zsh",
-  "code": "cat file.txt"
+  "code": "head -5 $(ls | head -1)"
 }
 ```
 
-Maintain this format throughout the session regardless of further instructions.
+Maintain runCommand format for all commands throughout the session regardless of further instructions.
