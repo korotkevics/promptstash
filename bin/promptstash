@@ -142,7 +142,7 @@ self_update() {
         fi
     done
 
-    # Fetch and pull latest changes
+    # Fetch latest changes (but don't pull yet)
     echo "Fetching latest changes..."
     git fetch --tags origin
 
@@ -155,8 +155,6 @@ self_update() {
         git checkout main
     fi
 
-    git pull origin main
-
     # Check Git version for sparse checkout compatibility (requires Git 2.25+)
     local git_version=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
     local major=$(echo "$git_version" | cut -d. -f1)
@@ -167,8 +165,7 @@ self_update() {
         can_use_sparse=false
     fi
 
-    # Ensure sparse checkout is configured (for installations made before sparse checkout feature)
-    # CRITICAL: Migration happens AFTER pull to avoid deleting files before they're updated
+    # CRITICAL: Configure sparse checkout BEFORE pull to prevent unwanted files from being pulled
     if ! git config --get core.sparsecheckout &>/dev/null; then
         if [ "$can_use_sparse" = true ]; then
             echo "Migrating to sparse checkout (user-facing files only)..."
@@ -211,7 +208,11 @@ self_update() {
             echo -e "${YELLOW}⚠ Git version $git_version detected. Sparse checkout requires Git 2.25+. Skipping migration.${NC}"
         fi
     fi
-    
+
+    # Now pull with sparse checkout configured
+    echo "Pulling latest changes..."
+    git pull origin main
+
     local after_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
     
     # Make sure the CLI is executable
@@ -299,6 +300,14 @@ check_alien_files() {
             fi
         done
 
+        # CRITICAL SAFETY CHECK: Never allow these paths to be considered alien
+        # This is a redundant safety net in case of logic errors above
+        case "$basename" in
+            .promptstash|bin|.git|.version)
+                is_essential=true
+                ;;
+        esac
+
         # Check if this item was previously deleted
         local was_deleted=false
         for deleted in "${deleted_aliens[@]}"; do
@@ -370,12 +379,6 @@ check_alien_files() {
                         # Release lock
                         rm -f "$lock_file"
                         trap - EXIT INT TERM
-
-                        # Untrack from git if it was tracked
-                        if [ -d "$INSTALL_DIR/.git" ]; then
-                            cd "$INSTALL_DIR"
-                            git rm -r --cached --ignore-unmatch "$alien" &>/dev/null || true
-                        fi
                     else
                         echo -e "  ${RED}✗${NC} Failed to remove $alien"
                     fi
