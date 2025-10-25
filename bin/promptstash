@@ -620,11 +620,12 @@ fuzzy_match_score() {
 
     # Convert to lowercase for case-insensitive matching
     # Note: Using `tr` with command substitution instead of bash 4.0+ parameter
-    # expansion (${pattern,,}) for compatibility with older bash versions.
-    # This creates subshells and is less efficient than built-ins, but prioritizes
-    # bash 3.x compatibility over performance. For typical prompt counts (<100 files),
-    # the performance impact is negligible (microseconds vs nanoseconds per match).
-    # tr handles UTF-8 correctly in modern systems with proper locale
+    # expansion (${pattern,,}) for wider bash compatibility (bash 3.2+).
+    # While other parts of this script require bash 4.x (read -d ''), this keeps
+    # the fuzzy matching function itself more portable for potential reuse.
+    # This creates subshells and is less efficient than built-ins, but for typical
+    # prompt counts (<100 files), the performance impact is negligible (microseconds
+    # vs nanoseconds per match). tr handles UTF-8 correctly in modern systems with proper locale
     pattern=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
     candidate=$(echo "$candidate" | tr '[:upper:]' '[:lower:]')
 
@@ -667,7 +668,11 @@ fuzzy_match_score() {
 
         # Character not found, add penalty
         # Penalty of 100 ensures missing characters heavily penalize the score,
-        # making matches with all characters present rank much higher
+        # making matches with all characters present rank much higher.
+        # Note: This penalty value is tied to MATCH_THRESHOLD (default 50).
+        # Since penalty=100, patterns missing even 1 character will score >100,
+        # which exceeds the threshold and fails to match. This is intentional:
+        # we want exact or near-exact character matches, not partial matches.
         #
         # Greedy left-to-right matching without backtracking: When a character is
         # not found in the remaining candidate string, we add a penalty but don't
@@ -689,6 +694,12 @@ fuzzy_match_score() {
         # though "bca" contains all characters in subsequence order while "cab" does
         # not. This is acceptable for fuzzy filename matching where we prioritize
         # simplicity and performance over optimal subsequence detection.
+        #
+        # Real-world example: pattern="deb" scores identically for:
+        #   - "debug.md" (score ~100) - has 'd','e','b' in order
+        #   - "embed.md" (score ~100) - has 'd','e','b' but 'd' comes after 'e'
+        # Both would fail the threshold (>50) anyway, so this limitation rarely
+        # affects practical usage for typical prompt name matching.
         if [ "$found" = false ]; then
             score=$((score + 100))
         fi
@@ -749,31 +760,37 @@ match_prompt() {
 
     # Check if we have a reasonable match (score threshold = 50)
     # With the scoring algorithm:
-    # - Missing character penalty = 100 (so 1 missing char fails threshold)
+    # - Missing character penalty = 100 (defined in fuzzy_match_score)
+    # - Threshold of 50 is intentionally set to penalty/2, ensuring any pattern
+    #   missing even 1 character (score ≥100) will fail the threshold
     # - Distance penalties accumulate based on character positions
     # - Threshold of 50 allows ~2 character position variance but rejects patterns
     #   with missing characters or excessive positional distance
     # - Example: "commt" → "commit" scores ~1 (substring match with length diff)
-    # - Example: "cmmt" → "commit" scores 100+ (missing 'o' character)
-    # - Rationale: 50 is chosen to accept minor typos and abbreviations while
-    #   rejecting patterns that are missing characters or too dissimilar
+    # - Example: "cmmt" → "commit" scores 100+ (missing 'o' character, fails threshold)
+    # - Rationale: Threshold is half the penalty to accept minor typos/abbreviations
+    #   while rejecting patterns missing characters or too dissimilar
+    # - IMPORTANT: If you change the penalty value (100), adjust this threshold proportionally
     # Can be overridden via PROMPTSTASH_MATCH_THRESHOLD environment variable
     local MATCH_THRESHOLD="${PROMPTSTASH_MATCH_THRESHOLD:-50}"
     if [ "$best_score" -gt "$MATCH_THRESHOLD" ]; then
         echo -e "${RED}✗ Error: No matching prompt found for pattern '$pattern'${NC}" >&2
-        echo "Closest match was '${best_match%.md}' with score $best_score (threshold: $MATCH_THRESHOLD)" >&2
-        echo "Try using 'promptstash search $pattern' to see available prompts." >&2
+        echo "" >&2
+        echo "Top 3 closest matches (threshold: $MATCH_THRESHOLD):" >&2
+        printf '%s\n' "${scored_prompts[@]}" | sort -t: -k1,1n -k2 | head -3 | while IFS=: read -r score prompt; do
+            echo "  - ${prompt%.md} (score: $score)" >&2
+        done
+        echo "" >&2
+        echo "Try using 'promptstash search $pattern' to see all available prompts." >&2
         exit 1
     fi
 
     # Return based on mode
     local prompt_path="$prompts_dir/$best_match"
 
-    # Verify file still exists (TOCTOU protection)
-    if [ ! -f "$prompt_path" ]; then
-        echo -e "${RED}✗ Error: Matched file disappeared: $best_match${NC}" >&2
-        exit 1
-    fi
+    # Note: We don't check file existence here because cat/echo will fail with
+    # appropriate error messages if the file is deleted between matching and reading.
+    # Adding a check would create a TOCTOU race condition without preventing the issue.
 
     case "$mode" in
         name)

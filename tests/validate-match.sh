@@ -248,6 +248,38 @@ run_test "Match empty.md returns empty content" \
     "" \
     "$PROMPTSTASH_BIN" match content empty
 
+# Test 18: Unicode/emoji in filenames (if locale supports it)
+# Create a test fixture with Unicode characters
+cat > "$TEST_FIXTURES_DIR/.promptstash/café.md" <<'EOF'
+Coffee-themed prompts.
+EOF
+
+run_test "Match with Unicode filename 'café' works correctly" \
+    0 \
+    "Coffee-themed prompts" \
+    "$PROMPTSTASH_BIN" match content café
+
+# Test 19: Symlinks in prompts directory
+ln -s "$TEST_FIXTURES_DIR/.promptstash/commit.md" "$TEST_FIXTURES_DIR/.promptstash/symlink.md"
+run_test "Match follows symlinks correctly" \
+    0 \
+    "Git commit helper" \
+    "$PROMPTSTASH_BIN" match content symlink
+
+# Test 20: Invalid PROMPTSTASH_DIR handling
+echo -n "Testing: Invalid PROMPTSTASH_DIR shows error ... "
+INVALID_DIR="/nonexistent/directory/that/does/not/exist"
+output=$(PROMPTSTASH_DIR="$INVALID_DIR" "$PROMPTSTASH_BIN" match name commit 2>&1 || true)
+if echo "$output" | grep -q "Prompts directory not found"; then
+    echo -e "${GREEN}PASS${NC}"
+    ((TESTS_PASSED++))
+else
+    echo -e "${RED}FAIL${NC}"
+    echo "  Expected error about directory not found"
+    echo "  Got: $output"
+    ((TESTS_FAILED++))
+fi
+
 echo ""
 echo "================================"
 echo "Test Results:"
