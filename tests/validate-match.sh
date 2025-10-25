@@ -69,15 +69,24 @@ echo ""
 
 # Verify test fixtures exist
 echo "Verifying test fixtures..."
+MISSING_FIXTURES=false
 if [ ! -f "$HOME/.promptstash/.promptstash/commit.md" ]; then
-    echo -e "${RED}WARNING: commit.md not found. Some tests may fail.${NC}"
+    echo -e "${RED}ERROR: commit.md not found. Required for tests.${NC}"
+    MISSING_FIXTURES=true
 fi
 if [ ! -f "$HOME/.promptstash/.promptstash/debug.md" ]; then
-    echo -e "${RED}WARNING: debug.md not found. Some tests may fail.${NC}"
+    echo -e "${RED}ERROR: debug.md not found. Required for tests.${NC}"
+    MISSING_FIXTURES=true
 fi
 if [ ! -f "$HOME/.promptstash/.promptstash/ship.md" ]; then
-    echo -e "${RED}WARNING: ship.md not found. Some tests may fail.${NC}"
+    echo -e "${RED}ERROR: ship.md not found. Required for tests.${NC}"
+    MISSING_FIXTURES=true
 fi
+if [ "$MISSING_FIXTURES" = true ]; then
+    echo -e "${RED}FATAL: Missing required test fixtures. Cannot continue.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}All test fixtures found.${NC}"
 echo ""
 
 # Test 1: Match without mode shows error
@@ -152,8 +161,8 @@ run_test "Match with short pattern 'sh'" \
     ".md" \
     "$PROMPTSTASH_BIN" match name sh
 
-# Test 12: Match with substring pattern
-run_test "Match substring 'rev'" \
+# Test 12: Match finds prompt containing substring pattern
+run_test "Match finds prompt containing substring 'rev'" \
     0 \
     ".md" \
     "$PROMPTSTASH_BIN" match name rev
