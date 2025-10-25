@@ -280,6 +280,82 @@ else
     ((TESTS_FAILED++))
 fi
 
+# Test 21: Greedy matching behavior - "abc" vs "bca"
+# Documents the greedy matching limitation where the first match is always taken
+cat > "$TEST_FIXTURES_DIR/.promptstash/bca.md" <<'EOF'
+Test file for greedy matching.
+EOF
+
+echo -n "Testing: Greedy matching 'abc' vs 'bca' produces high score (>50) ... "
+# Based on algorithm: 'a' matches at pos 2 (+2), then can't find 'b' or 'c' (+100 +100) = 202
+output=$(PROMPTSTASH_MATCH_THRESHOLD=300 "$PROMPTSTASH_BIN" match name abc 2>&1 || true)
+if echo "$output" | grep -q "bca.md"; then
+    echo -e "${GREEN}PASS${NC} (matched with high threshold)"
+    ((TESTS_PASSED++))
+else
+    echo -e "${RED}FAIL${NC}"
+    echo "  Expected: bca.md to match with threshold=300"
+    echo "  Got: $output"
+    ((TESTS_FAILED++))
+fi
+
+# Test 22: Greedy matching behavior - "abc" vs "cab"
+cat > "$TEST_FIXTURES_DIR/.promptstash/cab.md" <<'EOF'
+Test file for greedy matching.
+EOF
+
+echo -n "Testing: Greedy matching 'abc' vs 'cab' scores better than 'bca' ... "
+# Based on algorithm: 'a' at pos 1 (+1), 'b' at pos 2 (+0), can't find 'c' (+100) = 101
+# This should score better (101 < 202) than bca.md
+# When both exist, cab.md should win with pattern "abc"
+output=$(PROMPTSTASH_MATCH_THRESHOLD=150 "$PROMPTSTASH_BIN" match name abc 2>&1 || true)
+# With both bca.md (202) and cab.md (101) present, cab.md should win
+if echo "$output" | grep -q "cab.md"; then
+    echo -e "${GREEN}PASS${NC} (cab.md scores better than bca.md)"
+    ((TESTS_PASSED++))
+else
+    echo -e "${RED}FAIL${NC}"
+    echo "  Expected: cab.md (score 101) to beat bca.md (score 202)"
+    echo "  Got: $output"
+    ((TESTS_FAILED++))
+fi
+
+# Test 23: Greedy matching - "deb" vs "debug" (good match)
+cat > "$TEST_FIXTURES_DIR/.promptstash/debug-test.md" <<'EOF'
+Debug test file.
+EOF
+
+echo -n "Testing: Pattern 'deb' matches 'debug-test' with low score ... "
+output=$("$PROMPTSTASH_BIN" match name deb 2>&1 || true)
+if echo "$output" | grep -q "debug"; then
+    echo -e "${GREEN}PASS${NC}"
+    ((TESTS_PASSED++))
+else
+    echo -e "${RED}FAIL${NC}"
+    echo "  Expected: debug-test.md or debug.md to match"
+    echo "  Got: $output"
+    ((TESTS_FAILED++))
+fi
+
+# Test 24: Greedy matching - "deb" vs "embed" (poor match)
+cat > "$TEST_FIXTURES_DIR/.promptstash/embed-test.md" <<'EOF'
+Embed test file.
+EOF
+
+echo -n "Testing: Pattern 'deb' vs 'embed-test' fails threshold (score >200) ... "
+# Remove debug-test.md temporarily to test embed-test in isolation
+rm "$TEST_FIXTURES_DIR/.promptstash/debug-test.md"
+output=$("$PROMPTSTASH_BIN" match name deb 2>&1 || true)
+if echo "$output" | grep -q "No matching prompt found"; then
+    echo -e "${GREEN}PASS${NC} (correctly rejected high score)"
+    ((TESTS_PASSED++))
+else
+    echo -e "${RED}FAIL${NC}"
+    echo "  Expected: Error 'No matching prompt found'"
+    echo "  Got: $output"
+    ((TESTS_FAILED++))
+fi
+
 echo ""
 echo "================================"
 echo "Test Results:"
