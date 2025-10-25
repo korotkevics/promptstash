@@ -620,7 +620,10 @@ fuzzy_match_score() {
 
     # Convert to lowercase for case-insensitive matching
     # Note: Using `tr` with command substitution instead of bash 4.0+ parameter
-    # expansion (${pattern,,}) for compatibility with older bash versions
+    # expansion (${pattern,,}) for compatibility with older bash versions.
+    # This creates subshells and is less efficient than built-ins, but prioritizes
+    # bash 3.x compatibility over performance. For typical prompt counts (<100 files),
+    # the performance impact is negligible (microseconds vs nanoseconds per match).
     # tr handles UTF-8 correctly in modern systems with proper locale
     pattern=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
     candidate=$(echo "$candidate" | tr '[:upper:]' '[:lower:]')
@@ -666,19 +669,26 @@ fuzzy_match_score() {
         # Penalty of 100 ensures missing characters heavily penalize the score,
         # making matches with all characters present rank much higher
         #
-        # No backtracking on failed matches: When a character is not found in the
-        # remaining candidate string, we add a penalty but don't advance pattern_idx.
-        # This means the next pattern character will search from the same position.
-        # Once a match succeeds, pattern_idx advances past that position, so earlier
-        # candidate positions cannot be revisited even if later pattern chars fail.
+        # Greedy left-to-right matching without backtracking: When a character is
+        # not found in the remaining candidate string, we add a penalty but don't
+        # advance pattern_idx. This means the next pattern character will search
+        # from the same position. Once a match succeeds, pattern_idx advances past
+        # that position, so earlier candidate positions cannot be revisited even if
+        # later pattern chars fail.
         #
         # Example: pattern="abc", candidate="bca"
         #   - 'a' searches from pos 0, not found (candidate[0]='b'), penalty +100, pattern_idx stays 0
         #   - 'b' searches from pos 0, matches at pos 0, score +0, pattern_idx→1
-        #   - 'c' searches from pos 1, matches at pos 1, score +0, pattern_idx→2
-        #   Final score: 100 (one missing character penalty)
+        #   - 'c' searches from pos 1, matches candidate[1]='c', score +0, pattern_idx→2
+        #   Final score: 100 (one missing character penalty) + 0 (length diff)
         #   Note: The 'a' at candidate[2] is never matched because pattern_idx
         #   advanced to 1 when 'b' matched, preventing searching positions 0-0 again.
+        #
+        # Limitation: This greedy approach means pattern="abc" scores identically
+        # against candidate="bca" (score 100) and candidate="cab" (score 100), even
+        # though "bca" contains all characters in subsequence order while "cab" does
+        # not. This is acceptable for fuzzy filename matching where we prioritize
+        # simplicity and performance over optimal subsequence detection.
         if [ "$found" = false ]; then
             score=$((score + 100))
         fi

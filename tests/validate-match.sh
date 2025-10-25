@@ -72,6 +72,9 @@ echo "Setting up test fixtures..."
 TEST_FIXTURES_DIR=$(mktemp -d)
 export PROMPTSTASH_DIR="$TEST_FIXTURES_DIR"
 
+# Create .promptstash directory
+mkdir -p "$TEST_FIXTURES_DIR/.promptstash"
+
 # Create test prompts with known content
 cat > "$TEST_FIXTURES_DIR/.promptstash/commit.md" <<'EOF'
 Git commit helper for creating well-formatted commit messages.
@@ -96,6 +99,16 @@ EOF
 
 # Empty file for testing
 touch "$TEST_FIXTURES_DIR/.promptstash/empty.md"
+
+# Create fixtures for tiebreaker test - prompts that score identically for pattern "x"
+# Both "a.md" and "b.md" will score the same (100 penalty for missing 'x' + length diff)
+cat > "$TEST_FIXTURES_DIR/.promptstash/a.md" <<'EOF'
+First alphabetically.
+EOF
+
+cat > "$TEST_FIXTURES_DIR/.promptstash/b.md" <<'EOF'
+Second alphabetically.
+EOF
 
 # Cleanup function
 cleanup_fixtures() {
@@ -200,28 +213,20 @@ else
 fi
 
 # Test 14: Alphanumeric tiebreaker test
-# For this test, we look for prompts that would score identically
-# In the standard promptstash, if we search for a pattern that matches multiple
-# prompts with identical scores, the tiebreaker should choose alphabetically first
-# Example: searching for "e" might match multiple prompts; we verify consistency
-# by checking that the result is the alphabetically first of equally-scored matches
-#
-# This is a behavioral test - we can't easily create test fixtures without
-# modifying the match_prompt function to accept a custom directory, so we
-# verify the tiebreaker works by confirming deterministic alphabetical ordering
-# when multiple prompts could match with the same score.
-echo -n "Testing: Alphanumeric tiebreaker works correctly ... "
-# Run match twice with a common pattern that likely matches multiple prompts
-result1=$("$PROMPTSTASH_BIN" match name e 2>&1 || true)
-result2=$("$PROMPTSTASH_BIN" match name e 2>&1 || true)
-# Results should be identical (deterministic) and alphanumerically sorted
-if [ "$result1" = "$result2" ] && [ -n "$result1" ]; then
-    echo -e "${GREEN}PASS${NC} (deterministic: $result1)"
+# Verifies that when multiple prompts score identically, the alphabetically
+# first prompt is selected. Test fixtures a.md and b.md both score the same
+# for pattern "x" (both missing the character 'x', same length), so the
+# tiebreaker should consistently choose a.md over b.md.
+echo -n "Testing: Alphanumeric tiebreaker selects alphabetically first ... "
+result=$("$PROMPTSTASH_BIN" match name x 2>&1 || true)
+# Should match a.md (alphabetically before b.md) when both score identically
+if echo "$result" | grep -q "a.md"; then
+    echo -e "${GREEN}PASS${NC} (selected: $result)"
     ((TESTS_PASSED++))
 else
     echo -e "${RED}FAIL${NC}"
-    echo "  First run:  $result1"
-    echo "  Second run: $result2"
+    echo "  Expected: a.md (alphabetically first)"
+    echo "  Got: $result"
     ((TESTS_FAILED++))
 fi
 
