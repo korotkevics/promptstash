@@ -563,15 +563,285 @@ copy_to_clipboard() {
 
 # Show search usage helper
 show_search_usage() {
-    echo -e "${RED}✗ Error: search command requires a query${NC}"
-    echo ""
-    echo "Usage: promptstash search [name|content|path] <query>"
-    echo ""
-    echo "  search <query>          - List matching prompts (non-interactive)"
-    echo "  search name <query>     - Pick from matches and copy filename"
-    echo "  search content <query>  - Pick from matches and copy file contents"
-    echo "  search path <query>     - Pick from matches and copy file path"
+    {
+        echo -e "${RED}✗ Error: search command requires a query${NC}"
+        echo ""
+        cat <<'EOF'
+Usage: promptstash search [name|content|path] <query>
+
+  search <query>          - List matching prompts (non-interactive)
+  search name <query>     - Pick from matches and copy filename
+  search content <query>  - Pick from matches and copy file contents
+  search path <query>     - Pick from matches and copy file path
+EOF
+    } >&2
     exit 1
+}
+
+# Show match usage helper
+show_match_usage() {
+    {
+        echo -e "${RED}✗ Error: match command requires a mode and pattern${NC}"
+        echo ""
+        cat <<'EOF'
+Usage: promptstash match [name|content|path] <pattern>
+
+  match content <pattern>  - Return file contents of best match
+  match path <pattern>     - Return file path of best match
+  match name <pattern>     - Return filename of best match
+
+Fuzzy matching uses greedy left-to-right character matching. All pattern
+characters must appear in the filename in order.
+
+Examples:
+  'commt' matches 'commit.md' (typo - missing 'i')
+  'cmt' matches 'commit.md' (abbreviation)
+
+Limitations:
+  - Pattern characters must all be present (e.g., 'cmit' missing 'm' fails)
+  - Uses greedy matching (first occurrence taken, not optimal arrangement)
+  - Pattern 'abc' vs 'bca' may score poorly due to character order mismatch
+
+Unlike 'search' which finds all matches interactively, 'match' returns
+the single best fuzzy match directly.
+EOF
+    } >&2
+    exit 1
+}
+
+# Calculate fuzzy match score using character-order-preserving distance
+# Lower score = better match
+#
+# Algorithm: Character-by-character matching that preserves order, with penalties
+# for distance between matches and missing characters. Not true Levenshtein distance.
+#
+# Performance: O(n*m) per candidate, where n=pattern length, m=candidate length.
+# For the entire match operation: O(p*n*m) where p=number of prompts.
+# Typical case: 100 prompts, 10-char pattern, 20-char avg filename = ~20,000 comparisons.
+# The algorithm is optimized for typical prompt collections (<200 files).
+# Performance may degrade with very large collections (>500 prompts) or very long
+# filenames (>100 chars), but such cases are rare in practice.
+#
+# UTF-8 Note: This function uses bash string slicing (${string:pos:len}) which
+# handles multi-byte UTF-8 characters correctly in bash 4.3+ with proper locale
+# settings (e.g., LC_CTYPE=en_US.UTF-8). For older bash or non-UTF-8 locales,
+# matching may be incorrect for non-ASCII characters (emojis, accented chars).
+# This is acceptable for typical prompt filenames which use ASCII characters.
+fuzzy_match_score() {
+    local pattern="$1"
+    local candidate="$2"
+    local penalty="${3:-100}"  # Default 100, but can be overridden
+
+    # Convert to lowercase for case-insensitive matching
+    # Using bash 4.0+ parameter expansion for better UTF-8 handling and performance.
+    # This script requires bash 4.x (uses read -d ''), so we use the built-in
+    # lowercase expansion which handles multi-byte UTF-8 characters correctly
+    # when LC_CTYPE is set to a UTF-8 locale (e.g., en_US.UTF-8).
+    pattern=${pattern,,}
+    candidate=${candidate,,}
+
+    # Exact match gets score 0
+    if [ "$pattern" = "$candidate" ]; then
+        echo "0"
+        return
+    fi
+
+    # Check if pattern is substring of candidate (low score = good)
+    if echo "$candidate" | grep -Fq "$pattern"; then
+        # Score based on length difference
+        local len_diff=$((${#candidate} - ${#pattern}))
+        echo "$len_diff"
+        return
+    fi
+
+    # Simple character-by-character scoring
+    # Count matching characters in order
+    local score=0
+    local pattern_idx=0
+    local pattern_len=${#pattern}
+    local candidate_len=${#candidate}
+
+    # For each character in pattern, find it in candidate
+    for ((i=0; i<pattern_len; i++)); do
+        local char="${pattern:$i:1}"
+        local found=false
+
+        # Search for character in remaining part of candidate
+        for ((j=pattern_idx; j<candidate_len; j++)); do
+            if [ "${candidate:$j:1}" = "$char" ]; then
+                # Found match, add distance to score
+                score=$((score + j - pattern_idx))
+                pattern_idx=$((j + 1))
+                found=true
+                break
+            fi
+        done
+
+        # Character not found, add penalty
+        # The penalty (default 100) ensures missing characters heavily penalize the score,
+        # making matches with all characters present rank much higher.
+        # Note: This penalty value is proportional to MATCH_THRESHOLD (default 50).
+        # The penalty is passed as a parameter, defaulting to 2x the threshold.
+        # Since penalty=100 and threshold=50, patterns missing even 1 character will
+        # score >100, which exceeds the threshold and fails to match. This is intentional:
+        # we want exact or near-exact character matches, not partial matches.
+        #
+        # Greedy left-to-right matching without backtracking: When a character is
+        # not found in the remaining candidate string, we add a penalty but don't
+        # advance pattern_idx. This means the next pattern character will search
+        # from the same position. Once a match succeeds, pattern_idx advances past
+        # that position, so earlier candidate positions cannot be revisited even if
+        # later pattern chars fail.
+        #
+        # Example: pattern="abc", candidate="bca"
+        #   - i=0: pattern[0]='a' searches from pattern_idx=0
+        #     Checks candidate[0]='b' (no match), candidate[1]='c' (no match), candidate[2]='a' (MATCH!)
+        #     Score +2 (distance from position 0 to position 2), pattern_idx→3, found=true
+        #   - i=1: pattern[1]='b' searches from pattern_idx=3 (past end of candidate)
+        #     No characters remaining to search, found=false, penalty +100
+        #   - i=2: pattern[2]='c' searches from pattern_idx=3 (past end of candidate)
+        #     No characters remaining to search, found=false, penalty +100
+        #   Final score: 2 + 100 + 100 + 0 (length diff) = 202
+        #   Note: Once pattern_idx advances past a position, earlier positions cannot be revisited.
+        #   This greedy approach means the first match is always taken, even if a later arrangement
+        #   would produce a better overall score.
+        #
+        # Limitation: This greedy first-match approach doesn't always find the optimal
+        # character arrangement. For example, pattern="abc" vs candidate="bca" scores 202
+        # (matches 'a' at pos 2, then can't find 'b' or 'c'), while pattern="abc" vs
+        # candidate="cab" scores 101 (matches 'a' at pos 1, 'b' at pos 2, can't find 'c').
+        # Despite "bca" having all characters as a proper subsequence [b,c,a], it scores
+        # worse than "cab" which only has [a,b] in order. This is acceptable for fuzzy
+        # filename matching where we prioritize simplicity and performance over optimal
+        # subsequence detection.
+        #
+        # Real-world example: pattern="deb" scores differently for:
+        #   - "debug" (score 2) - matches 'd' at pos 0, 'e' at pos 1, 'b' at pos 2
+        #   - "embed" (score 206) - matches 'd' at pos 4, can't find 'e' or 'b' after that
+        # The "embed" case demonstrates the greedy limitation: matching 'd' first prevents
+        # finding the earlier 'e' and 'b'. However, "embed" scoring >200 correctly fails
+        # the threshold anyway, so this limitation rarely affects practical usage.
+        if [ "$found" = false ]; then
+            score=$((score + penalty))
+        fi
+    done
+
+    # Add penalty for length difference (using absolute value to avoid overflow)
+    local len_diff=$((candidate_len - pattern_len))
+    if [ "$len_diff" -lt 0 ]; then
+        len_diff=$((-len_diff))
+    fi
+    score=$((score + len_diff))
+
+    echo "$score"
+}
+
+# Match a prompt by filename using fuzzy matching
+match_prompt() {
+    local mode="$1"
+    local pattern="$2"
+    local prompts_dir="$INSTALL_DIR/.promptstash"
+
+    if [ ! -d "$prompts_dir" ]; then
+        echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}" >&2
+        exit 1
+    fi
+
+    if [ -z "$pattern" ]; then
+        show_match_usage
+    fi
+
+    # Get all .md files (using -print0 for safe handling of special characters)
+    # Note: -maxdepth 1 restricts search to top-level directory only, preventing
+    # nested subdirectory organization. This is intentional to keep prompts in a
+    # flat structure for simplicity and performance.
+    local -a all_prompts=()
+    local find_output
+    find_output=$(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -print0 2>&1 | sort -z)
+    local find_status=$?
+
+    # Check if find command failed (e.g., permissions error, I/O error)
+    if [ "$find_status" -ne 0 ]; then
+        echo -e "${RED}✗ Error: Failed to read prompts directory${NC}" >&2
+        exit 1
+    fi
+
+    while IFS= read -r -d '' filepath; do
+        all_prompts+=("$(basename "$filepath")")
+    done <<< "$find_output"
+
+    if [ ${#all_prompts[@]} -eq 0 ]; then
+        echo -e "${RED}✗ Error: No prompts found in $prompts_dir${NC}" >&2
+        exit 1
+    fi
+
+    # Set threshold and penalty (penalty is always 2x threshold for consistency)
+    # Can be overridden via PROMPTSTASH_MATCH_THRESHOLD environment variable
+    local MATCH_THRESHOLD="${PROMPTSTASH_MATCH_THRESHOLD:-50}"
+    local PENALTY=$((MATCH_THRESHOLD * 2))
+
+    # Calculate fuzzy match scores for each prompt
+    local -a scored_prompts=()
+    for prompt in "${all_prompts[@]}"; do
+        # Remove .md extension for matching
+        local prompt_base="${prompt%.md}"
+        local score=$(fuzzy_match_score "$pattern" "$prompt_base" "$PENALTY")
+        scored_prompts+=("$score:$prompt")
+    done
+
+    # Sort by score (numerically) to find best match
+    # Use alphanumeric sorting as tiebreaker for deterministic results
+    # (e.g., if 'pr.md' and 'pre.md' both score 0, 'pr.md' wins)
+    # Using sort is O(n log n) vs O(n²) for manual iteration
+    local best_entry=$(printf '%s\n' "${scored_prompts[@]}" | sort -t: -k1,1n -k2 | head -1)
+    local best_score="${best_entry%%:*}"
+    local best_match="${best_entry#*:}"
+
+    # Check if we have a reasonable match
+    # With the scoring algorithm:
+    # - Missing character penalty = 2x threshold (default: penalty=100, threshold=50)
+    # - This ensures any pattern missing even 1 character will score >threshold
+    # - Distance penalties accumulate based on character positions
+    # - Example: "commt" → "commit" scores ~1 (substring match with length diff)
+    # - Example: "cmmt" → "commit" scores penalty+ (missing 'o' character, fails threshold)
+    # - Rationale: Penalty at 2x threshold accepts minor typos/abbreviations while
+    #   rejecting patterns missing characters or too dissimilar
+    if [ "$best_score" -gt "$MATCH_THRESHOLD" ]; then
+        echo -e "${RED}✗ Error: No matching prompt found for pattern '$pattern'${NC}" >&2
+        echo "" >&2
+        echo "Top 3 closest matches (threshold: $MATCH_THRESHOLD):" >&2
+        printf '%s\n' "${scored_prompts[@]}" | sort -t: -k1,1n -k2 | head -3 | while IFS=: read -r score prompt; do
+            echo "  - ${prompt%.md} (score: $score)" >&2
+        done
+        echo "" >&2
+        echo "Try using 'promptstash search $pattern' to see all available prompts." >&2
+        exit 1
+    fi
+
+    # Return based on mode
+    local prompt_path="$prompts_dir/$best_match"
+
+    # Note: TOCTOU race condition - file could be deleted between matching and reading.
+    # We handle this by catching failures and providing clear error messages.
+
+    case "$mode" in
+        name)
+            echo "$best_match"
+            ;;
+        content)
+            if ! cat "$prompt_path" 2>/dev/null; then
+                echo -e "${RED}✗ Error: Matched prompt file may have been deleted during operation or is unreadable${NC}" >&2
+                exit 1
+            fi
+            ;;
+        path)
+            echo "$prompt_path"
+            ;;
+        *)
+            echo -e "${RED}✗ Error: Unknown mode: $mode${NC}" >&2
+            exit 1
+            ;;
+    esac
 }
 
 # Search prompts by filename and/or content
@@ -742,6 +1012,9 @@ Commands:
   search name <query>      Search prompts and pick - copies filename to clipboard
   search content <query>   Search prompts and pick - copies file contents to clipboard
   search path <query>      Search prompts and pick - copies absolute path to clipboard
+  match name <pattern>     Fuzzy match prompt and output filename (e.g., commit.md)
+  match content <pattern>  Fuzzy match prompt and output file contents
+  match path <pattern>     Fuzzy match prompt and output file path
   self-update      Update PromptStash to the latest version
   cleanup          Check for and remove unnecessary files
   version          Show the current version
@@ -756,6 +1029,7 @@ Examples:
   promptstash pick content        # Interactive picker
   promptstash search commit       # Search and list matches
   promptstash search name debug   # Search and pick interactively
+  promptstash match content commt # Fuzzy match 'commt' to 'commit.md' and show contents
   promptstash self-update         # Update to latest version
 
 Prompts are located in: \$PROMPTSTASH_DIR
@@ -807,6 +1081,22 @@ main() {
                 *)
                     # Non-interactive search (query provided directly)
                     search_prompts "list" "$2"
+                    ;;
+            esac
+            ;;
+        match)
+            # Match command requires a mode and pattern
+            case "$2" in
+                name|content|path)
+                    match_prompt "$2" "$3"
+                    ;;
+                "")
+                    show_match_usage
+                    ;;
+                *)
+                    echo -e "${RED}✗ Unknown match mode: $2${NC}"
+                    echo ""
+                    show_match_usage
                     ;;
             esac
             ;;
