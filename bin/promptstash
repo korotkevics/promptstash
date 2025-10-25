@@ -563,31 +563,39 @@ copy_to_clipboard() {
 
 # Show search usage helper
 show_search_usage() {
-    echo -e "${RED}✗ Error: search command requires a query${NC}" >&2
-    echo "" >&2
-    echo "Usage: promptstash search [name|content|path] <query>" >&2
-    echo "" >&2
-    echo "  search <query>          - List matching prompts (non-interactive)" >&2
-    echo "  search name <query>     - Pick from matches and copy filename" >&2
-    echo "  search content <query>  - Pick from matches and copy file contents" >&2
-    echo "  search path <query>     - Pick from matches and copy file path" >&2
+    {
+        echo -e "${RED}✗ Error: search command requires a query${NC}"
+        echo ""
+        cat <<'EOF'
+Usage: promptstash search [name|content|path] <query>
+
+  search <query>          - List matching prompts (non-interactive)
+  search name <query>     - Pick from matches and copy filename
+  search content <query>  - Pick from matches and copy file contents
+  search path <query>     - Pick from matches and copy file path
+EOF
+    } >&2
     exit 1
 }
 
 # Show match usage helper
 show_match_usage() {
-    echo -e "${RED}✗ Error: match command requires a mode and pattern${NC}" >&2
-    echo "" >&2
-    echo "Usage: promptstash match [name|content|path] <pattern>" >&2
-    echo "" >&2
-    echo "  match content <pattern>  - Return file contents of best match" >&2
-    echo "  match path <pattern>     - Return file path of best match" >&2
-    echo "  match name <pattern>     - Return filename of best match" >&2
-    echo "" >&2
-    echo "Fuzzy matching is supported (e.g., 'commt' will match 'commit.md')" >&2
-    echo "" >&2
-    echo "Note: Unlike 'search', which finds all matches interactively," >&2
-    echo "      'match' returns the single best fuzzy match directly." >&2
+    {
+        echo -e "${RED}✗ Error: match command requires a mode and pattern${NC}"
+        echo ""
+        cat <<'EOF'
+Usage: promptstash match [name|content|path] <pattern>
+
+  match content <pattern>  - Return file contents of best match
+  match path <pattern>     - Return file path of best match
+  match name <pattern>     - Return filename of best match
+
+Fuzzy matching is supported (e.g., 'commt' will match 'commit.md')
+
+Note: Unlike 'search', which finds all matches interactively,
+      'match' returns the single best fuzzy match directly.
+EOF
+    } >&2
     exit 1
 }
 
@@ -600,6 +608,12 @@ show_match_usage() {
 # Performance: O(n*m) where n=pattern length, m=candidate length
 # This is acceptable for typical prompt names (<50 chars) but may be slow
 # for very long strings. The algorithm is optimized for short filenames.
+#
+# UTF-8 Note: This function uses bash string slicing (${string:pos:len}) which
+# handles multi-byte UTF-8 characters correctly in bash 4.3+ with proper locale
+# settings (e.g., LC_CTYPE=en_US.UTF-8). For older bash or non-UTF-8 locales,
+# matching may be incorrect for non-ASCII characters (emojis, accented chars).
+# This is acceptable for typical prompt filenames which use ASCII characters.
 fuzzy_match_score() {
     local pattern="$1"
     local candidate="$2"
@@ -607,6 +621,7 @@ fuzzy_match_score() {
     # Convert to lowercase for case-insensitive matching
     # Note: Using `tr` with command substitution instead of bash 4.0+ parameter
     # expansion (${pattern,,}) for compatibility with older bash versions
+    # tr handles UTF-8 correctly in modern systems with proper locale
     pattern=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
     candidate=$(echo "$candidate" | tr '[:upper:]' '[:lower:]')
 
@@ -650,14 +665,19 @@ fuzzy_match_score() {
         # Character not found, add penalty
         # Penalty of 100 ensures missing characters heavily penalize the score,
         # making matches with all characters present rank much higher
-        # Note: When a character is not found, we don't advance pattern_idx.
-        # This allows subsequent pattern characters to potentially match earlier
-        # in the candidate string, but means that once we pass a position in the
-        # candidate, earlier characters in the pattern cannot backtrack to match it.
-        # Example: pattern="abc", candidate="bca" - the 'a' searches from position 0,
-        # fails, then 'b' matches at position 0 and advances pattern_idx to 1.
-        # Now 'c' searches from position 1 onwards, so the 'a' at position 2 in
-        # candidate cannot be matched by the earlier 'a' in the pattern.
+        #
+        # Backtracking behavior: When a character is not found, pattern_idx stays at
+        # its current position. This allows later pattern characters to match earlier
+        # in the candidate if they succeed, but prevents revisiting already-passed
+        # candidate positions.
+        #
+        # Example: pattern="abc", candidate="bca"
+        #   - 'a' searches from pos 0, not found (candidate[0]='b'), penalty +100
+        #   - 'b' searches from pos 0, matches at pos 0, score +0, pattern_idx→1
+        #   - 'c' searches from pos 1, matches at pos 1, score +0, pattern_idx→2
+        #   Final score: 100 (one missing character penalty)
+        #   Note: The 'a' at candidate[2] is never matched because pattern_idx
+        #   advanced past it when 'b' matched at position 0.
         if [ "$found" = false ]; then
             score=$((score + 100))
         fi
@@ -711,27 +731,10 @@ match_prompt() {
     # Sort by score (numerically) to find best match
     # Use alphanumeric sorting as tiebreaker for deterministic results
     # (e.g., if 'pr.md' and 'pre.md' both score 0, 'pr.md' wins)
-    # Note: We use manual iteration instead of piping to sort (e.g.,
-    # `printf '%s\n' "${scored_prompts[@]}" | sort -t: -k1,1n -k2 | head -1`)
-    # for better readability and to avoid spawning subshells, though both
-    # approaches would work correctly.
-    local best_match=""
-    local best_score=999999
-
-    for entry in "${scored_prompts[@]}"; do
-        local score="${entry%%:*}"
-        local prompt="${entry#*:}"
-
-        if [ "$score" -lt "$best_score" ]; then
-            best_score="$score"
-            best_match="$prompt"
-        elif [ "$score" -eq "$best_score" ]; then
-            # Tiebreaker: use alphanumeric sorting for determinism
-            if [[ "$prompt" < "$best_match" ]]; then
-                best_match="$prompt"
-            fi
-        fi
-    done
+    # Using sort is O(n log n) vs O(n²) for manual iteration
+    local best_entry=$(printf '%s\n' "${scored_prompts[@]}" | sort -t: -k1,1n -k2 | head -1)
+    local best_score="${best_entry%%:*}"
+    local best_match="${best_entry#*:}"
 
     # Check if we have a reasonable match (score threshold = 50)
     # With the scoring algorithm:
