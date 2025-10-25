@@ -249,15 +249,45 @@ run_test "Match empty.md returns empty content" \
     "$PROMPTSTASH_BIN" match content empty
 
 # Test 18: Unicode/emoji in filenames (if locale supports it)
-# Create a test fixture with Unicode characters
+# Create test fixtures with various Unicode characters
 cat > "$TEST_FIXTURES_DIR/.promptstash/café.md" <<'EOF'
 Coffee-themed prompts.
+EOF
+
+cat > "$TEST_FIXTURES_DIR/.promptstash/日本語.md" <<'EOF'
+Japanese test file.
+EOF
+
+cat > "$TEST_FIXTURES_DIR/.promptstash/emoji😀.md" <<'EOF'
+Emoji test file.
+EOF
+
+cat > "$TEST_FIXTURES_DIR/.promptstash/mixed-café-日本語.md" <<'EOF'
+Mixed Unicode test file.
 EOF
 
 run_test "Match with Unicode filename 'café' works correctly" \
     0 \
     "Coffee-themed prompts" \
     "$PROMPTSTASH_BIN" match content café
+
+# Test 18a: Unicode pattern matching
+run_test "Match with Unicode pattern '日本' matches Japanese filename" \
+    0 \
+    "Japanese test file" \
+    "$PROMPTSTASH_BIN" match content 日本
+
+# Test 18b: Emoji in filename
+run_test "Match with emoji pattern 'emoji' matches emoji filename" \
+    0 \
+    "Emoji test file" \
+    "$PROMPTSTASH_BIN" match content emoji
+
+# Test 18c: Mixed ASCII/Unicode
+run_test "Match with mixed pattern 'mixed' matches mixed Unicode filename" \
+    0 \
+    "Mixed Unicode test file" \
+    "$PROMPTSTASH_BIN" match content mixed
 
 # Test 19: Symlinks in prompts directory
 ln -s "$TEST_FIXTURES_DIR/.promptstash/commit.md" "$TEST_FIXTURES_DIR/.promptstash/symlink.md"

@@ -590,14 +590,17 @@ Usage: promptstash match [name|content|path] <pattern>
   match path <pattern>     - Return file path of best match
   match name <pattern>     - Return filename of best match
 
-Fuzzy matching is supported for typos and abbreviations.
+Fuzzy matching uses greedy left-to-right character matching. All pattern
+characters must appear in the filename in order.
 
 Examples:
-  'commt' matches 'commit.md' (missing character in substring)
-  'cmt' matches 'commit.md' (abbreviation as substring)
+  'commt' matches 'commit.md' (typo - missing 'i')
+  'cmt' matches 'commit.md' (abbreviation)
 
-Note: All pattern characters must appear in the filename. Patterns with
-      missing characters (e.g., 'cmit' missing 'm') will fail to match.
+Limitations:
+  - Pattern characters must all be present (e.g., 'cmit' missing 'm' fails)
+  - Uses greedy matching (first occurrence taken, not optimal arrangement)
+  - Pattern 'abc' vs 'bca' may score poorly due to character order mismatch
 
 Unlike 'search' which finds all matches interactively, 'match' returns
 the single best fuzzy match directly.
@@ -615,9 +618,9 @@ EOF
 # Performance: O(n*m) per candidate, where n=pattern length, m=candidate length.
 # For the entire match operation: O(p*n*m) where p=number of prompts.
 # Typical case: 100 prompts, 10-char pattern, 20-char avg filename = ~20,000 comparisons.
-# This completes in <10ms on modern hardware. The algorithm is optimized for typical
-# prompt collections (<200 files). Performance degrades with very large collections
-# (>500 prompts) or very long filenames (>100 chars), but such cases are rare.
+# The algorithm is optimized for typical prompt collections (<200 files).
+# Performance may degrade with very large collections (>500 prompts) or very long
+# filenames (>100 chars), but such cases are rare in practice.
 #
 # UTF-8 Note: This function uses bash string slicing (${string:pos:len}) which
 # handles multi-byte UTF-8 characters correctly in bash 4.3+ with proper locale
@@ -627,17 +630,15 @@ EOF
 fuzzy_match_score() {
     local pattern="$1"
     local candidate="$2"
+    local penalty="${3:-100}"  # Default 100, but can be overridden
 
     # Convert to lowercase for case-insensitive matching
-    # Note: Using `tr` with command substitution instead of bash 4.0+ parameter
-    # expansion (${pattern,,}) for wider bash compatibility (bash 3.2+).
-    # While other parts of this script require bash 4.x (read -d ''), this keeps
-    # the fuzzy matching function itself more portable for potential reuse.
-    # This creates subshells and is less efficient than built-ins, but for typical
-    # prompt counts (<100 files), the performance impact is negligible (microseconds
-    # vs nanoseconds per match). tr handles UTF-8 correctly in modern systems with proper locale
-    pattern=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
-    candidate=$(echo "$candidate" | tr '[:upper:]' '[:lower:]')
+    # Using bash 4.0+ parameter expansion for better UTF-8 handling and performance.
+    # This script requires bash 4.x (uses read -d ''), so we use the built-in
+    # lowercase expansion which handles multi-byte UTF-8 characters correctly
+    # when LC_CTYPE is set to a UTF-8 locale (e.g., en_US.UTF-8).
+    pattern=${pattern,,}
+    candidate=${candidate,,}
 
     # Exact match gets score 0
     if [ "$pattern" = "$candidate" ]; then
@@ -677,11 +678,12 @@ fuzzy_match_score() {
         done
 
         # Character not found, add penalty
-        # Penalty of 100 ensures missing characters heavily penalize the score,
+        # The penalty (default 100) ensures missing characters heavily penalize the score,
         # making matches with all characters present rank much higher.
-        # Note: This penalty value is tied to MATCH_THRESHOLD (default 50).
-        # Since penalty=100, patterns missing even 1 character will score >100,
-        # which exceeds the threshold and fails to match. This is intentional:
+        # Note: This penalty value is proportional to MATCH_THRESHOLD (default 50).
+        # The penalty is passed as a parameter, defaulting to 2x the threshold.
+        # Since penalty=100 and threshold=50, patterns missing even 1 character will
+        # score >100, which exceeds the threshold and fails to match. This is intentional:
         # we want exact or near-exact character matches, not partial matches.
         #
         # Greedy left-to-right matching without backtracking: When a character is
@@ -720,7 +722,7 @@ fuzzy_match_score() {
         # finding the earlier 'e' and 'b'. However, "embed" scoring >200 correctly fails
         # the threshold anyway, so this limitation rarely affects practical usage.
         if [ "$found" = false ]; then
-            score=$((score + 100))
+            score=$((score + penalty))
         fi
     done
 
@@ -750,6 +752,9 @@ match_prompt() {
     fi
 
     # Get all .md files (using -print0 for safe handling of special characters)
+    # Note: -maxdepth 1 restricts search to top-level directory only, preventing
+    # nested subdirectory organization. This is intentional to keep prompts in a
+    # flat structure for simplicity and performance.
     local -a all_prompts=()
     local find_output
     find_output=$(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -print0 2>&1 | sort -z)
@@ -770,12 +775,17 @@ match_prompt() {
         exit 1
     fi
 
+    # Set threshold and penalty (penalty is always 2x threshold for consistency)
+    # Can be overridden via PROMPTSTASH_MATCH_THRESHOLD environment variable
+    local MATCH_THRESHOLD="${PROMPTSTASH_MATCH_THRESHOLD:-50}"
+    local PENALTY=$((MATCH_THRESHOLD * 2))
+
     # Calculate fuzzy match scores for each prompt
     local -a scored_prompts=()
     for prompt in "${all_prompts[@]}"; do
         # Remove .md extension for matching
         local prompt_base="${prompt%.md}"
-        local score=$(fuzzy_match_score "$pattern" "$prompt_base")
+        local score=$(fuzzy_match_score "$pattern" "$prompt_base" "$PENALTY")
         scored_prompts+=("$score:$prompt")
     done
 
@@ -787,21 +797,15 @@ match_prompt() {
     local best_score="${best_entry%%:*}"
     local best_match="${best_entry#*:}"
 
-    # Check if we have a reasonable match (score threshold = 50)
+    # Check if we have a reasonable match
     # With the scoring algorithm:
-    # - Missing character penalty = 100 (defined in fuzzy_match_score)
-    # - Threshold of 50 is intentionally set to penalty/2, ensuring any pattern
-    #   missing even 1 character (score ≥100) will fail the threshold
+    # - Missing character penalty = 2x threshold (default: penalty=100, threshold=50)
+    # - This ensures any pattern missing even 1 character will score >threshold
     # - Distance penalties accumulate based on character positions
-    # - Threshold of 50 allows ~2 character position variance but rejects patterns
-    #   with missing characters or excessive positional distance
     # - Example: "commt" → "commit" scores ~1 (substring match with length diff)
-    # - Example: "cmmt" → "commit" scores 100+ (missing 'o' character, fails threshold)
-    # - Rationale: Threshold is half the penalty to accept minor typos/abbreviations
-    #   while rejecting patterns missing characters or too dissimilar
-    # - IMPORTANT: If you change the penalty value (100), adjust this threshold proportionally
-    # Can be overridden via PROMPTSTASH_MATCH_THRESHOLD environment variable
-    local MATCH_THRESHOLD="${PROMPTSTASH_MATCH_THRESHOLD:-50}"
+    # - Example: "cmmt" → "commit" scores penalty+ (missing 'o' character, fails threshold)
+    # - Rationale: Penalty at 2x threshold accepts minor typos/abbreviations while
+    #   rejecting patterns missing characters or too dissimilar
     if [ "$best_score" -gt "$MATCH_THRESHOLD" ]; then
         echo -e "${RED}✗ Error: No matching prompt found for pattern '$pattern'${NC}" >&2
         echo "" >&2
@@ -826,7 +830,7 @@ match_prompt() {
             ;;
         content)
             if ! cat "$prompt_path" 2>/dev/null; then
-                echo -e "${RED}✗ Error: Matched prompt file was deleted or is unreadable${NC}" >&2
+                echo -e "${RED}✗ Error: Matched prompt file may have been deleted during operation or is unreadable${NC}" >&2
                 exit 1
             fi
             ;;
