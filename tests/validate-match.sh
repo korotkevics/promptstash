@@ -168,6 +168,12 @@ run_test "Match finds prompt containing substring 'rev'" \
     "$PROMPTSTASH_BIN" match name rev
 
 # Test 13: Deterministic results - same pattern always gives same result
+# Note: This test validates consistency across multiple runs with the same pattern.
+# It also implicitly tests the alphanumeric tiebreaker when multiple prompts have
+# identical scores (e.g., if both "pr.md" and "rp.md" existed and scored 0 for
+# pattern "pr", the tiebreaker would choose "pr.md" alphabetically).
+# To explicitly test tiebreaker logic, create test fixtures like "pr.md" and "rp.md"
+# and verify that pattern "pr" consistently returns "pr.md" (alphabetically first).
 first_result=$("$PROMPTSTASH_BIN" match name pr 2>&1 || true)
 second_result=$("$PROMPTSTASH_BIN" match name pr 2>&1 || true)
 if [ "$first_result" = "$second_result" ]; then

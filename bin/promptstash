@@ -605,6 +605,8 @@ fuzzy_match_score() {
     local candidate="$2"
 
     # Convert to lowercase for case-insensitive matching
+    # Note: Using `tr` with command substitution instead of bash 4.0+ parameter
+    # expansion (${pattern,,}) for compatibility with older bash versions
     pattern=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
     candidate=$(echo "$candidate" | tr '[:upper:]' '[:lower:]')
 
@@ -648,8 +650,14 @@ fuzzy_match_score() {
         # Character not found, add penalty
         # Penalty of 100 ensures missing characters heavily penalize the score,
         # making matches with all characters present rank much higher
-        # Note: We don't advance pattern_idx when character is not found, so
-        # subsequent pattern characters can still match earlier in the candidate
+        # Note: When a character is not found, we don't advance pattern_idx.
+        # This allows subsequent pattern characters to potentially match earlier
+        # in the candidate string, but means that once we pass a position in the
+        # candidate, earlier characters in the pattern cannot backtrack to match it.
+        # Example: pattern="abc", candidate="bca" - the 'a' searches from position 0,
+        # fails, then 'b' matches at position 0 and advances pattern_idx to 1.
+        # Now 'c' searches from position 1 onwards, so the 'a' at position 2 in
+        # candidate cannot be matched by the earlier 'a' in the pattern.
         if [ "$found" = false ]; then
             score=$((score + 100))
         fi
@@ -703,6 +711,10 @@ match_prompt() {
     # Sort by score (numerically) to find best match
     # Use alphanumeric sorting as tiebreaker for deterministic results
     # (e.g., if 'pr.md' and 'pre.md' both score 0, 'pr.md' wins)
+    # Note: We use manual iteration instead of piping to sort (e.g.,
+    # `printf '%s\n' "${scored_prompts[@]}" | sort -t: -k1,1n -k2 | head -1`)
+    # for better readability and to avoid spawning subshells, though both
+    # approaches would work correctly.
     local best_match=""
     local best_score=999999
 
@@ -727,7 +739,8 @@ match_prompt() {
     # - Distance penalties accumulate based on character positions
     # - Threshold of 50 allows matches with positional variance but rejects
     #   patterns with missing characters or excessive distance
-    local MATCH_THRESHOLD=50
+    # Can be overridden via PROMPTSTASH_MATCH_THRESHOLD environment variable
+    local MATCH_THRESHOLD="${PROMPTSTASH_MATCH_THRESHOLD:-50}"
     if [ "$best_score" -gt "$MATCH_THRESHOLD" ]; then
         echo -e "${RED}✗ Error: No matching prompt found for pattern '$pattern'${NC}" >&2
         echo "Closest match was '${best_match%.md}' with score $best_score (threshold: $MATCH_THRESHOLD)" >&2
