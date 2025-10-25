@@ -67,26 +67,43 @@ run_test() {
 echo "Running promptstash match integration tests..."
 echo ""
 
-# Verify test fixtures exist
-echo "Verifying test fixtures..."
-MISSING_FIXTURES=false
-if [ ! -f "$HOME/.promptstash/.promptstash/commit.md" ]; then
-    echo -e "${RED}ERROR: commit.md not found. Required for tests.${NC}"
-    MISSING_FIXTURES=true
-fi
-if [ ! -f "$HOME/.promptstash/.promptstash/debug.md" ]; then
-    echo -e "${RED}ERROR: debug.md not found. Required for tests.${NC}"
-    MISSING_FIXTURES=true
-fi
-if [ ! -f "$HOME/.promptstash/.promptstash/ship.md" ]; then
-    echo -e "${RED}ERROR: ship.md not found. Required for tests.${NC}"
-    MISSING_FIXTURES=true
-fi
-if [ "$MISSING_FIXTURES" = true ]; then
-    echo -e "${RED}FATAL: Missing required test fixtures. Cannot continue.${NC}"
-    exit 1
-fi
-echo -e "${GREEN}All test fixtures found.${NC}"
+# Create temporary test fixtures
+echo "Setting up test fixtures..."
+TEST_FIXTURES_DIR=$(mktemp -d)
+export PROMPTSTASH_DIR="$TEST_FIXTURES_DIR"
+
+# Create test prompts with known content
+cat > "$TEST_FIXTURES_DIR/.promptstash/commit.md" <<'EOF'
+Git commit helper for creating well-formatted commit messages.
+EOF
+
+cat > "$TEST_FIXTURES_DIR/.promptstash/debug.md" <<'EOF'
+Debug assistant for troubleshooting issues.
+EOF
+
+cat > "$TEST_FIXTURES_DIR/.promptstash/ship.md" <<'EOF'
+Ship features via TDD workflow assistant.
+EOF
+
+# Create additional fixtures for edge case testing
+cat > "$TEST_FIXTURES_DIR/.promptstash/review-pr.md" <<'EOF'
+PR review assistant providing constructive feedback.
+EOF
+
+cat > "$TEST_FIXTURES_DIR/.promptstash/create-pr.md" <<'EOF'
+PR creation helper.
+EOF
+
+# Empty file for testing
+touch "$TEST_FIXTURES_DIR/.promptstash/empty.md"
+
+# Cleanup function
+cleanup_fixtures() {
+    rm -rf "$TEST_FIXTURES_DIR"
+}
+trap cleanup_fixtures EXIT
+
+echo -e "${GREEN}Test fixtures created in $TEST_FIXTURES_DIR${NC}"
 echo ""
 
 # Test 1: Match without mode shows error
@@ -156,15 +173,15 @@ run_test "Match is case-insensitive (mixed case)" \
     "$PROMPTSTASH_BIN" match name CoMmIt
 
 # Test 11: Match with short pattern
-run_test "Match with short pattern 'sh'" \
+run_test "Match with short pattern 'sh' returns ship.md" \
     0 \
-    ".md" \
+    "ship.md" \
     "$PROMPTSTASH_BIN" match name sh
 
 # Test 12: Match finds prompt containing substring pattern
-run_test "Match finds prompt containing substring 'rev'" \
+run_test "Match finds prompt containing substring 'rev' returns review-pr.md" \
     0 \
-    ".md" \
+    "review-pr.md" \
     "$PROMPTSTASH_BIN" match name rev
 
 # Test 13: Deterministic results - same pattern always gives same result
@@ -207,6 +224,24 @@ else
     echo "  Second run: $result2"
     ((TESTS_FAILED++))
 fi
+
+# Test 15: Pattern with special characters (should be treated literally)
+run_test "Match with special chars pattern treats them literally" \
+    1 \
+    "No matching prompt found" \
+    "$PROMPTSTASH_BIN" match name "commit*"
+
+# Test 16: Very long pattern (should fail gracefully)
+run_test "Match with very long pattern fails gracefully" \
+    1 \
+    "No matching prompt found" \
+    "$PROMPTSTASH_BIN" match name "this-is-a-very-long-pattern-that-should-not-match-anything-at-all-because-it-is-way-too-long"
+
+# Test 17: Empty file handling
+run_test "Match empty.md returns empty content" \
+    0 \
+    "" \
+    "$PROMPTSTASH_BIN" match content empty
 
 echo ""
 echo "================================"

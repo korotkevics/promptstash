@@ -666,18 +666,19 @@ fuzzy_match_score() {
         # Penalty of 100 ensures missing characters heavily penalize the score,
         # making matches with all characters present rank much higher
         #
-        # Backtracking behavior: When a character is not found, pattern_idx stays at
-        # its current position. This allows later pattern characters to match earlier
-        # in the candidate if they succeed, but prevents revisiting already-passed
-        # candidate positions.
+        # No backtracking on failed matches: When a character is not found in the
+        # remaining candidate string, we add a penalty but don't advance pattern_idx.
+        # This means the next pattern character will search from the same position.
+        # Once a match succeeds, pattern_idx advances past that position, so earlier
+        # candidate positions cannot be revisited even if later pattern chars fail.
         #
         # Example: pattern="abc", candidate="bca"
-        #   - 'a' searches from pos 0, not found (candidate[0]='b'), penalty +100
+        #   - 'a' searches from pos 0, not found (candidate[0]='b'), penalty +100, pattern_idx stays 0
         #   - 'b' searches from pos 0, matches at pos 0, score +0, pattern_idx→1
         #   - 'c' searches from pos 1, matches at pos 1, score +0, pattern_idx→2
         #   Final score: 100 (one missing character penalty)
         #   Note: The 'a' at candidate[2] is never matched because pattern_idx
-        #   advanced past it when 'b' matched at position 0.
+        #   advanced to 1 when 'b' matched, preventing searching positions 0-0 again.
         if [ "$found" = false ]; then
             score=$((score + 100))
         fi
@@ -740,8 +741,12 @@ match_prompt() {
     # With the scoring algorithm:
     # - Missing character penalty = 100 (so 1 missing char fails threshold)
     # - Distance penalties accumulate based on character positions
-    # - Threshold of 50 allows matches with positional variance but rejects
-    #   patterns with missing characters or excessive distance
+    # - Threshold of 50 allows ~2 character position variance but rejects patterns
+    #   with missing characters or excessive positional distance
+    # - Example: "commt" → "commit" scores ~1 (substring match with length diff)
+    # - Example: "cmmt" → "commit" scores 100+ (missing 'o' character)
+    # - Rationale: 50 is chosen to accept minor typos and abbreviations while
+    #   rejecting patterns that are missing characters or too dissimilar
     # Can be overridden via PROMPTSTASH_MATCH_THRESHOLD environment variable
     local MATCH_THRESHOLD="${PROMPTSTASH_MATCH_THRESHOLD:-50}"
     if [ "$best_score" -gt "$MATCH_THRESHOLD" ]; then
@@ -753,6 +758,12 @@ match_prompt() {
 
     # Return based on mode
     local prompt_path="$prompts_dir/$best_match"
+
+    # Verify file still exists (TOCTOU protection)
+    if [ ! -f "$prompt_path" ]; then
+        echo -e "${RED}✗ Error: Matched file disappeared: $best_match${NC}" >&2
+        exit 1
+    fi
 
     case "$mode" in
         name)
