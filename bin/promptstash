@@ -408,7 +408,7 @@ check_alien_files() {
 
 # List all prompts (non-interactive)
 list_prompts() {
-    local prompts_dir="$INSTALL_DIR/.promptstash"
+    local prompts_dir="${PROMPTSTASH_DIR:-$INSTALL_DIR}/.promptstash"
 
     if [ ! -d "$prompts_dir" ]; then
         echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}"
@@ -435,7 +435,7 @@ list_prompts() {
 # Pick a prompt interactively
 pick_prompts() {
     local mode="$1"
-    local prompts_dir="$INSTALL_DIR/.promptstash"
+    local prompts_dir="${PROMPTSTASH_DIR:-$INSTALL_DIR}/.promptstash"
 
     if [ ! -d "$prompts_dir" ]; then
         echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}"
@@ -740,7 +740,7 @@ fuzzy_match_score() {
 match_prompt() {
     local mode="$1"
     local pattern="$2"
-    local prompts_dir="$INSTALL_DIR/.promptstash"
+    local prompts_dir="${PROMPTSTASH_DIR:-$INSTALL_DIR}/.promptstash"
 
     if [ ! -d "$prompts_dir" ]; then
         echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}" >&2
@@ -756,19 +756,12 @@ match_prompt() {
     # nested subdirectory organization. This is intentional to keep prompts in a
     # flat structure for simplicity and performance.
     local -a all_prompts=()
-    local find_output
-    find_output=$(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -print0 2>&1 | sort -z)
-    local find_status=$?
 
-    # Check if find command failed (e.g., permissions error, I/O error)
-    if [ "$find_status" -ne 0 ]; then
-        echo -e "${RED}✗ Error: Failed to read prompts directory${NC}" >&2
-        exit 1
-    fi
-
+    # Process find output directly (can't use command substitution with -print0)
+    # because bash strips null bytes from $(...) output
     while IFS= read -r -d '' filepath; do
         all_prompts+=("$(basename "$filepath")")
-    done <<< "$find_output"
+    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -print0 2>/dev/null | sort -z)
 
     if [ ${#all_prompts[@]} -eq 0 ]; then
         echo -e "${RED}✗ Error: No prompts found in $prompts_dir${NC}" >&2
@@ -848,7 +841,7 @@ match_prompt() {
 search_prompts() {
     local mode="$1"
     local query="$2"
-    local prompts_dir="$INSTALL_DIR/.promptstash"
+    local prompts_dir="${PROMPTSTASH_DIR:-$INSTALL_DIR}/.promptstash"
 
     if [ ! -d "$prompts_dir" ]; then
         echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}"
