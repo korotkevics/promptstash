@@ -415,11 +415,18 @@ list_prompts() {
         exit 1
     fi
 
+    # Check if directory is readable to distinguish permission errors from empty directory
+    if [ ! -r "$prompts_dir" ]; then
+        echo -e "${RED}✗ Error: Failed to read prompts directory (permission denied): $prompts_dir${NC}"
+        exit 1
+    fi
+
     # Get all .md files and sort them alphabetically
+    # Use -print0 for safe handling of special characters in filenames
     local prompts=()
-    while IFS= read -r prompt; do
-        prompts+=("$prompt")
-    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort)
+    while IFS= read -r -d '' filepath; do
+        prompts+=("$(basename "$filepath")")
+    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -print0 2>/dev/null | sort -z)
 
     if [ ${#prompts[@]} -eq 0 ]; then
         echo -e "${YELLOW}No prompts found in $prompts_dir${NC}"
@@ -442,11 +449,18 @@ pick_prompts() {
         exit 1
     fi
 
+    # Check if directory is readable to distinguish permission errors from empty directory
+    if [ ! -r "$prompts_dir" ]; then
+        echo -e "${RED}✗ Error: Failed to read prompts directory (permission denied): $prompts_dir${NC}"
+        exit 1
+    fi
+
     # Get all .md files and sort them alphabetically
+    # Use -print0 for safe handling of special characters in filenames
     local prompts=()
-    while IFS= read -r prompt; do
-        prompts+=("$prompt")
-    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -exec basename {} \; | sort)
+    while IFS= read -r -d '' filepath; do
+        prompts+=("$(basename "$filepath")")
+    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -print0 2>/dev/null | sort -z)
 
     if [ ${#prompts[@]} -eq 0 ]; then
         echo -e "${YELLOW}No prompts found in $prompts_dir${NC}"
@@ -744,6 +758,12 @@ match_prompt() {
 
     if [ ! -d "$prompts_dir" ]; then
         echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}" >&2
+        exit 1
+    fi
+
+    # Check if directory is readable to distinguish permission errors from empty directory
+    if [ ! -r "$prompts_dir" ]; then
+        echo -e "${RED}✗ Error: Failed to read prompts directory (permission denied): $prompts_dir${NC}" >&2
         exit 1
     fi
 
