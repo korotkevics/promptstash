@@ -574,6 +574,162 @@ show_search_usage() {
     exit 1
 }
 
+# Show match usage helper
+show_match_usage() {
+    echo -e "${RED}✗ Error: match command requires a mode and pattern${NC}"
+    echo ""
+    echo "Usage: promptstash match [name|content|path] <pattern>"
+    echo ""
+    echo "  match content <pattern>  - Return file contents of best match"
+    echo "  match path <pattern>     - Return file path of best match"
+    echo "  match name <pattern>     - Return filename of best match"
+    echo ""
+    echo "Fuzzy matching is supported (e.g., 'commt' will match 'commit.md')"
+    exit 1
+}
+
+# Calculate simple fuzzy match score (Levenshtein-like distance)
+# Lower score = better match
+fuzzy_match_score() {
+    local pattern="$1"
+    local candidate="$2"
+
+    # Convert to lowercase for case-insensitive matching
+    pattern=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
+    candidate=$(echo "$candidate" | tr '[:upper:]' '[:lower:]')
+
+    # Exact match gets score 0
+    if [ "$pattern" = "$candidate" ]; then
+        echo "0"
+        return
+    fi
+
+    # Check if pattern is substring of candidate (low score = good)
+    if echo "$candidate" | grep -Fq "$pattern"; then
+        # Score based on length difference
+        local len_diff=$((${#candidate} - ${#pattern}))
+        echo "$len_diff"
+        return
+    fi
+
+    # Simple character-by-character scoring
+    # Count matching characters in order
+    local score=0
+    local pattern_idx=0
+    local pattern_len=${#pattern}
+    local candidate_len=${#candidate}
+
+    # For each character in pattern, find it in candidate
+    for ((i=0; i<pattern_len; i++)); do
+        local char="${pattern:$i:1}"
+        local found=false
+
+        # Search for character in remaining part of candidate
+        for ((j=pattern_idx; j<candidate_len; j++)); do
+            if [ "${candidate:$j:1}" = "$char" ]; then
+                # Found match, add distance to score
+                score=$((score + j - pattern_idx))
+                pattern_idx=$((j + 1))
+                found=true
+                break
+            fi
+        done
+
+        # Character not found, add penalty
+        if [ "$found" = false ]; then
+            score=$((score + 100))
+        fi
+    done
+
+    # Add penalty for length difference
+    score=$((score + candidate_len - pattern_len))
+
+    echo "$score"
+}
+
+# Match a prompt by filename using fuzzy matching
+match_prompt() {
+    local mode="$1"
+    local pattern="$2"
+    local prompts_dir="$INSTALL_DIR/.promptstash"
+
+    if [ ! -d "$prompts_dir" ]; then
+        echo -e "${RED}✗ Error: Prompts directory not found: $prompts_dir${NC}" >&2
+        exit 1
+    fi
+
+    if [ -z "$pattern" ]; then
+        show_match_usage
+    fi
+
+    # Get all .md files
+    local -a all_prompts=()
+    while IFS= read -r filepath; do
+        all_prompts+=("$(basename "$filepath")")
+    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f | sort)
+
+    if [ ${#all_prompts[@]} -eq 0 ]; then
+        echo -e "${RED}✗ Error: No prompts found in $prompts_dir${NC}" >&2
+        exit 1
+    fi
+
+    # Calculate fuzzy match scores for each prompt
+    local -a scored_prompts=()
+    for prompt in "${all_prompts[@]}"; do
+        # Remove .md extension for matching
+        local prompt_base="${prompt%.md}"
+        local score=$(fuzzy_match_score "$pattern" "$prompt_base")
+        scored_prompts+=("$score:$prompt")
+    done
+
+    # Sort by score (numerically) to find best match
+    # Use alphanumeric sorting as tiebreaker for deterministic results
+    local best_match=""
+    local best_score=999999
+
+    for entry in "${scored_prompts[@]}"; do
+        local score="${entry%%:*}"
+        local prompt="${entry#*:}"
+
+        if [ "$score" -lt "$best_score" ]; then
+            best_score="$score"
+            best_match="$prompt"
+        elif [ "$score" -eq "$best_score" ]; then
+            # Tiebreaker: use alphanumeric sorting
+            if [[ "$prompt" < "$best_match" ]]; then
+                best_match="$prompt"
+            fi
+        fi
+    done
+
+    # Check if we have a reasonable match (score threshold)
+    # Scores above 50 are likely too poor to be useful
+    if [ "$best_score" -gt 50 ]; then
+        echo -e "${RED}✗ Error: No matching prompt found for pattern '$pattern'${NC}" >&2
+        echo "Try using 'promptstash search $pattern' to see available prompts." >&2
+        exit 1
+    fi
+
+    # Return based on mode
+    local prompt_path="$prompts_dir/$best_match"
+
+    case "$mode" in
+        name)
+            echo "$best_match"
+            ;;
+        content)
+            cat "$prompt_path"
+            ;;
+        path)
+            echo "$prompt_path"
+            ;;
+        *)
+            echo -e "${RED}✗ Error: Unknown mode: $mode${NC}" >&2
+            exit 1
+            ;;
+    esac
+}
+
 # Search prompts by filename and/or content
 search_prompts() {
     local mode="$1"
@@ -742,6 +898,9 @@ Commands:
   search name <query>      Search prompts and pick - copies filename to clipboard
   search content <query>   Search prompts and pick - copies file contents to clipboard
   search path <query>      Search prompts and pick - copies absolute path to clipboard
+  match name <pattern>     Fuzzy match prompt and output filename
+  match content <pattern>  Fuzzy match prompt and output file contents
+  match path <pattern>     Fuzzy match prompt and output file path
   self-update      Update PromptStash to the latest version
   cleanup          Check for and remove unnecessary files
   version          Show the current version
@@ -756,6 +915,7 @@ Examples:
   promptstash pick content        # Interactive picker
   promptstash search commit       # Search and list matches
   promptstash search name debug   # Search and pick interactively
+  promptstash match content commt # Fuzzy match 'commt' to 'commit.md' and show contents
   promptstash self-update         # Update to latest version
 
 Prompts are located in: \$PROMPTSTASH_DIR
@@ -807,6 +967,22 @@ main() {
                 *)
                     # Non-interactive search (query provided directly)
                     search_prompts "list" "$2"
+                    ;;
+            esac
+            ;;
+        match)
+            # Match command requires a mode and pattern
+            case "$2" in
+                name|content|path)
+                    match_prompt "$2" "$3"
+                    ;;
+                "")
+                    show_match_usage
+                    ;;
+                *)
+                    echo -e "${RED}✗ Unknown match mode: $2${NC}"
+                    echo ""
+                    show_match_usage
                     ;;
             esac
             ;;
