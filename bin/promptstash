@@ -585,11 +585,18 @@ show_match_usage() {
     echo "  match name <pattern>     - Return filename of best match"
     echo ""
     echo "Fuzzy matching is supported (e.g., 'commt' will match 'commit.md')"
+    echo ""
+    echo "Note: Unlike 'search', which finds all matches interactively,"
+    echo "      'match' returns the single best fuzzy match directly."
     exit 1
 }
 
 # Calculate simple fuzzy match score (Levenshtein-like distance)
 # Lower score = better match
+#
+# Performance: O(n*m) where n=pattern length, m=candidate length
+# This is acceptable for typical prompt names (<50 chars) but may be slow
+# for very long strings. The algorithm is optimized for short filenames.
 fuzzy_match_score() {
     local pattern="$1"
     local candidate="$2"
@@ -636,6 +643,8 @@ fuzzy_match_score() {
         done
 
         # Character not found, add penalty
+        # Penalty of 100 ensures missing characters heavily penalize the score,
+        # making matches with all characters present rank much higher
         if [ "$found" = false ]; then
             score=$((score + 100))
         fi
@@ -662,11 +671,11 @@ match_prompt() {
         show_match_usage
     fi
 
-    # Get all .md files
+    # Get all .md files (using -print0 for safe handling of special characters)
     local -a all_prompts=()
-    while IFS= read -r filepath; do
+    while IFS= read -r -d '' filepath; do
         all_prompts+=("$(basename "$filepath")")
-    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f | sort)
+    done < <(find "$prompts_dir" -maxdepth 1 -name "*.md" -type f -print0 | sort -z)
 
     if [ ${#all_prompts[@]} -eq 0 ]; then
         echo -e "${RED}✗ Error: No prompts found in $prompts_dir${NC}" >&2
@@ -684,6 +693,7 @@ match_prompt() {
 
     # Sort by score (numerically) to find best match
     # Use alphanumeric sorting as tiebreaker for deterministic results
+    # (e.g., if 'pr.md' and 'pre.md' both score 0, 'pr.md' wins)
     local best_match=""
     local best_score=999999
 
@@ -695,18 +705,22 @@ match_prompt() {
             best_score="$score"
             best_match="$prompt"
         elif [ "$score" -eq "$best_score" ]; then
-            # Tiebreaker: use alphanumeric sorting
+            # Tiebreaker: use alphanumeric sorting for determinism
             if [[ "$prompt" < "$best_match" ]]; then
                 best_match="$prompt"
             fi
         fi
     done
 
-    # Check if we have a reasonable match (score threshold)
-    # Scores above 50 are likely too poor to be useful
+    # Check if we have a reasonable match (score threshold = 50)
+    # With the scoring algorithm:
+    # - Missing character penalty = 100 (so 1 missing char fails threshold)
+    # - Distance penalties accumulate based on character positions
+    # - Threshold of 50 allows matches with positional variance but rejects
+    #   patterns with missing characters or excessive distance
     if [ "$best_score" -gt 50 ]; then
         echo -e "${RED}✗ Error: No matching prompt found for pattern '$pattern'${NC}" >&2
-        echo "Try using 'promptstash search $pattern' to see available prompts." >&2
+        echo "Try using 'promptstash search $pattern' to see available prompts."
         exit 1
     fi
 

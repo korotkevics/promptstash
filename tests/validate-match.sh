@@ -67,6 +67,19 @@ run_test() {
 echo "Running promptstash match integration tests..."
 echo ""
 
+# Verify test fixtures exist
+echo "Verifying test fixtures..."
+if [ ! -f "$HOME/.promptstash/.promptstash/commit.md" ]; then
+    echo -e "${RED}WARNING: commit.md not found. Some tests may fail.${NC}"
+fi
+if [ ! -f "$HOME/.promptstash/.promptstash/debug.md" ]; then
+    echo -e "${RED}WARNING: debug.md not found. Some tests may fail.${NC}"
+fi
+if [ ! -f "$HOME/.promptstash/.promptstash/ship.md" ]; then
+    echo -e "${RED}WARNING: ship.md not found. Some tests may fail.${NC}"
+fi
+echo ""
+
 # Test 1: Match without mode shows error
 run_test "Match without mode shows error" \
     1 \
@@ -78,6 +91,12 @@ run_test "Match name without pattern shows error" \
     1 \
     "Error: match command requires a mode and pattern" \
     "$PROMPTSTASH_BIN" match name
+
+# Test 2a: Match with empty string pattern shows error
+run_test "Match name with empty string pattern shows error" \
+    1 \
+    "Error: match command requires a mode and pattern" \
+    "$PROMPTSTASH_BIN" match name ""
 
 # Test 3: Match with invalid mode shows error
 run_test "Match with invalid mode shows error" \
