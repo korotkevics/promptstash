@@ -164,6 +164,74 @@ No matches found in file names or file contents for `<query>`.
 ```
 
 ---
+
+### `promptstash match name <pattern>`
+
+Fuzzy matches prompts by filename and returns the single best match filename directly (non-interactive).
+
+```bash
+promptstash match name cmt
+```
+
+**Output:**
+```
+commit.md
+```
+
+Unlike `search` which finds all matches interactively, `match` returns the single best fuzzy match directly based on a scoring algorithm.
+
+---
+
+### `promptstash match content <pattern>`
+
+Fuzzy matches prompts by filename and returns the file contents of the best match directly (non-interactive).
+
+```bash
+promptstash match content ship
+```
+
+**Output:**
+```
+Ship features via TDD: select ad-hoc, load plan, or create plan.
+...
+```
+
+Works the same as `match name` but outputs the file contents instead of the filename.
+
+---
+
+### `promptstash match path <pattern>`
+
+Fuzzy matches prompts by filename and returns the absolute file path of the best match directly (non-interactive).
+
+```bash
+promptstash match path dbg
+```
+
+**Output:**
+```
+/Users/username/.promptstash/.promptstash/debug.md
+```
+
+Works the same as `match name` but outputs the absolute file path instead of the filename.
+
+---
+
+**Fuzzy Matching Algorithm:**
+
+The `match` commands use greedy left-to-right character matching. All pattern characters must appear in the filename in order.
+
+**Examples:**
+- `'commt'` matches `'commit.md'` (typo - missing 'i')
+- `'cmt'` matches `'commit.md'` (abbreviation)
+- `'dbg'` matches `'debug.md'` (abbreviation)
+
+**Limitations:**
+- Pattern characters must all be present (e.g., `'cmit'` missing 'm' fails)
+- Uses greedy matching (first occurrence taken, not optimal arrangement)
+- Pattern `'abc'` vs `'bca'` may score poorly due to character order mismatch
+
+---
 ### `promptstash self-update`
 
 Updates PromptStash to the latest version.

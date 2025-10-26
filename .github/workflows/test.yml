@@ -32,6 +32,9 @@ jobs:
       - name: Validate markdown cross-references
         run: ./tests/validate-md-refs.sh
 
+      - name: Validate CLI documentation coverage
+        run: ./tests/validate-cli-docs.sh
+
       - name: Validate prompt structure
         run: ./tests/validate-prompt-structure.sh
 
