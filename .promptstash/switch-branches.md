@@ -15,7 +15,10 @@ Git branch management expert. Safely switch branches, create well-named feature 
    d. Abort
 
 3. **Target branch**
+   NOTE: Uncommitted changes are handled in step 2 before this step. "Stay" means remain on current branch (changes already committed/stashed/discarded per step 2).
+
    a. Check current branch type: `git branch --show-current | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore)/'`
+      (Git prevents malformed branch names; pattern assumes standard naming conventions)
    b. If short-lived branch (grep matches):
       Ask: "Stay on current branch or switch/create new?"
       - Stay → skip to step 6 (verify and done)
@@ -51,23 +54,33 @@ Result: Successfully switched to '<branch-name>'
 
 **Examples:**
 
-*Ex1: stay on current feature branch*
+*Ex1: stay on current feature branch (clean)*
 - Current: `feature/add-login`, clean
 - Ask: "Stay on current branch or switch/create new?"
 - User: Stay
 - Action: verify current branch → done
 
-*Ex2: feature→main with uncommitted*
-- Current: `feature/add-login`, 3 modified
-- Ask: "Stay on current branch or switch/create new?"
-- User: Switch
-- Action: commit/stash → main → pull
+*Ex2: stay on current feature branch (with uncommitted)*
+- Current: `feature/add-login`, 2 modified
+- Ask (1st): "Commit/Stash/Discard/Abort?" (step 2)
+- User: Commit
+- Ask (2nd): "Stay on current branch or switch/create new?" (step 3b)
+- User: Stay
+- Action: commit (done) → verify → done
 
-*Ex3: new feature from main*
+*Ex3: feature→main with uncommitted*
+- Current: `feature/add-login`, 3 modified
+- Ask (1st): "Commit/Stash/Discard/Abort?" (step 2)
+- User: Stash
+- Ask (2nd): "Stay on current branch or switch/create new?" (step 3b)
+- User: Switch
+- Action: stash (done) → main → pull
+
+*Ex4: new feature from main*
 - Current: `main`
 - Action: create → `feature/add-oauth-authentication`
 
-*Ex4: new feature from another feature*
+*Ex5: new feature from another feature*
 - Current: `feature/old-work`
 - Ask (1st): "Stay on current branch or switch/create new?"
 - User: Switch/create
