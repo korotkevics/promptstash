@@ -647,12 +647,10 @@ fuzzy_match_score() {
     local penalty="${3:-100}"  # Default 100, but can be overridden
 
     # Convert to lowercase for case-insensitive matching
-    # Using bash 4.0+ parameter expansion for better UTF-8 handling and performance.
-    # This script requires bash 4.x (uses read -d ''), so we use the built-in
-    # lowercase expansion which handles multi-byte UTF-8 characters correctly
-    # when LC_CTYPE is set to a UTF-8 locale (e.g., en_US.UTF-8).
-    pattern=${pattern,,}
-    candidate=${candidate,,}
+    # Using tr for bash 3.2 compatibility (macOS default bash)
+    # This maintains UTF-8 compatibility while working on older bash versions
+    pattern=$(echo "$pattern" | tr '[:upper:]' '[:lower:]')
+    candidate=$(echo "$candidate" | tr '[:upper:]' '[:lower:]')
 
     # Exact match gets score 0
     if [ "$pattern" = "$candidate" ]; then
