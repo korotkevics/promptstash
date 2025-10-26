@@ -24,6 +24,7 @@ PR improvement assistant addressing AI-generated review feedback. Implements app
 7. Commit via `.promptstash/commit.md`: "Address PR feedback\n\nImplemented:\n- [list]\n\nRef: PR #<n>"
 
 8. Post follow-up comment: `gh pr comment <PR_NUMBER> --body "<message>"`
+   Get short SHA: `git rev-parse --short HEAD`
    Format:
    ```text
    All feedback addressed in commit <short-sha>:

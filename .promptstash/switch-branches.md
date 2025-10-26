@@ -15,7 +15,7 @@ Git branch management expert. Safely switch branches, create well-named feature 
    d. Abort
 
 3. **Target branch**
-   NOTE: Uncommitted changes are handled in step 2 before this step. "Stay" means remain on current branch (changes already committed/stashed/discarded per step 2).
+   NOTE: Uncommitted changes are handled in step 2 before this step. "Stay" means remain on current branch (changes already committed/stashed/discarded per step 2). If changes were stashed in step 2 and user chooses "Stay", the stash remains in place - the user can manually pop it with `git stash pop` if needed. This is intentional to allow users to stay on the branch with a clean working tree.
 
    a. Check current branch type:
       ```bash
@@ -24,15 +24,18 @@ Git branch management expert. Safely switch branches, create well-named feature 
         echo "ERROR: detached HEAD (already warned in step 1)"
         exit 1
       fi
-      echo "$CURRENT" | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore|test|docs|style|perf)/'
+      echo "$CURRENT" | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore|test|docs|style|perf)(/|$)'
       ```
-      Note: Git prevents malformed branch names. Pattern covers standard short-lived branch types. Grep exits 0 (match), 1 (no match), or 2 (error).
+      Note: Git prevents malformed branch names. Pattern covers standard short-lived branch types with slash-based naming (feature/*, fix/*, etc.) and handles edge cases like "feature" (no slash) or "feature-foo" (hyphen instead of slash) by requiring either a slash or end-of-string after the prefix. Grep exits 0 (match), 1 (no match), or 2 (error).
+
+      Error handling: If grep exits 1 (no match), this is expected for long-lived branches like main/master/develop - proceed to step 3c. If grep exits 2 (error, e.g., invalid regex), this indicates a system issue - report error and abort.
 
    b. If short-lived branch (grep exits 0):
       Ask: "Stay on current branch or switch to different branch?"
       Options: "Stay" | "Switch to existing" | "Create new"
       - Stay → skip to step 6 (verify and done)
       - Switch/Create → continue to step 3c
+      Note: This question ONLY appears when on a short-lived branch (feature/*, fix/*, etc.). For long-lived branches (main, master, develop), skip directly to step 3c.
 
    c. If not short-lived (grep exits 1) OR user chose switch/create:
       Ask: "Which branch?" or "Create new?"
@@ -80,6 +83,7 @@ Result: Successfully switched to '<branch-name>'
 - Options: Stay | Switch to existing | Create new
 - User: Stay
 - Action: commit (done) → verify → done
+- Result: Remaining on feature/add-login, ready to continue work
 
 *Ex3: feature→main with uncommitted*
 - Current: `feature/add-login`, 3 modified
