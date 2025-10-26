@@ -15,20 +15,34 @@ Git branch management expert. Safely switch branches, create well-named feature 
    d. Abort
 
 3. **Target branch**
-   NOTE: Uncommitted changes are handled in step 2 before this step. "Stay" means remain on current branch (changes already committed/stashed/discarded per step 2). If changes were stashed in step 2 and user chooses "Stay", the stash remains in place - the user can manually pop it with `git stash pop` if needed. This is intentional to allow users to stay on the branch with a clean working tree.
+   NOTE: Uncommitted changes are handled in step 2 before this step. "Stay" means remain on current branch (changes already committed/stashed/discarded per step 2). If changes were stashed in step 2 and user chooses "Stay", the stash remains in place intentionally to keep a clean working tree. REMINDER: Inform the user "Note: Run 'git stash pop' to restore your stashed changes when ready to continue working."
 
    a. Check current branch type:
       ```bash
       CURRENT=$(git branch --show-current)
       if [ -z "$CURRENT" ]; then
-        echo "ERROR: detached HEAD (already warned in step 1)"
+        echo "ERROR: detached HEAD (user was warned in step 1 via 'git symbolic-ref -q HEAD')"
         exit 1
       fi
       echo "$CURRENT" | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore|test|docs|style|perf)(/|$)'
       ```
-      Note: Git prevents malformed branch names. Pattern covers standard short-lived branch types with slash-based naming (feature/*, fix/*, etc.) and handles edge cases like "feature" (no slash) or "feature-foo" (hyphen instead of slash) by requiring either a slash or end-of-string after the prefix. Grep exits 0 (match), 1 (no match), or 2 (error).
+      Note: Git prevents malformed branch names. Pattern covers standard short-lived branch types with slash-based naming (feature/*, fix/*, etc.) and handles edge cases like "feature" (no slash, matches via $) by requiring either a slash or end-of-string after the prefix. Branches like "feature-foo" (hyphen instead of slash) will NOT match and will be treated as long-lived branches. Grep exits 0 (match), 1 (no match), or 2 (error).
 
       Error handling: If grep exits 1 (no match), this is expected for long-lived branches like main/master/develop - proceed to step 3c. If grep exits 2 (error, e.g., invalid regex), this indicates a system issue - report error and abort.
+
+      Example implementation:
+      ```bash
+      echo "$CURRENT" | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore|test|docs|style|perf)(/|$)'
+      EXIT=$?
+      if [ $EXIT -eq 2 ]; then
+        echo "ERROR: grep command failed (invalid regex or system error)"
+        exit 1
+      elif [ $EXIT -eq 0 ]; then
+        # Short-lived branch - proceed to step 3b
+      else
+        # Long-lived branch (EXIT=1) - proceed to step 3c
+      fi
+      ```
 
    b. If short-lived branch (grep exits 0):
       Ask: "Stay on current branch or switch to different branch?"
