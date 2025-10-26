@@ -41,6 +41,7 @@ Git branch management expert. Safely switch branches, create well-named feature 
         exit 1
       elif [ $EXIT -eq 0 ]; then
         # Short-lived branch - proceed to step 3b
+        :
       else
         # Long-lived branch (EXIT=1) - proceed to step 3c
       fi
