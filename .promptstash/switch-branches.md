@@ -17,12 +17,23 @@ Git branch management expert. Safely switch branches, create well-named feature 
 3. **Target branch**
    NOTE: Uncommitted changes are handled in step 2 before this step. "Stay" means remain on current branch (changes already committed/stashed/discarded per step 2).
 
-   a. Check current branch type: `git branch --show-current | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore)/'`
-      (Git prevents malformed branch names; pattern assumes standard naming conventions)
-   b. If short-lived branch (grep matches):
-      Ask: "Stay on current branch or switch/create new?"
+   a. Check current branch type:
+      ```bash
+      CURRENT=$(git branch --show-current)
+      if [ -z "$CURRENT" ]; then
+        echo "ERROR: detached HEAD (already warned in step 1)"
+        exit 1
+      fi
+      echo "$CURRENT" | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore|test|docs|style|perf)/'
+      ```
+      Note: Git prevents malformed branch names. Pattern covers standard short-lived branch types. Grep exits 0 (match), 1 (no match), or 2 (error).
+
+   b. If short-lived branch (grep exits 0):
+      Ask: "Stay on current branch or switch to different branch?"
+      Options: "Stay" | "Switch to existing" | "Create new"
       - Stay → skip to step 6 (verify and done)
-      - Switch/create → continue to step 3c
+      - Switch/Create → continue to step 3c
+
    c. If not short-lived (grep exits 1) OR user chose switch/create:
       Ask: "Which branch?" or "Create new?"
       New format: `feature/desc` or `fix/issue`
@@ -56,7 +67,8 @@ Result: Successfully switched to '<branch-name>'
 
 *Ex1: stay on current feature branch (clean)*
 - Current: `feature/add-login`, clean
-- Ask: "Stay on current branch or switch/create new?"
+- Ask: "Stay on current branch or switch to different branch?"
+- Options: Stay | Switch to existing | Create new
 - User: Stay
 - Action: verify current branch → done
 
@@ -64,7 +76,8 @@ Result: Successfully switched to '<branch-name>'
 - Current: `feature/add-login`, 2 modified
 - Ask (1st): "Commit/Stash/Discard/Abort?" (step 2)
 - User: Commit
-- Ask (2nd): "Stay on current branch or switch/create new?" (step 3b)
+- Ask (2nd): "Stay on current branch or switch to different branch?" (step 3b)
+- Options: Stay | Switch to existing | Create new
 - User: Stay
 - Action: commit (done) → verify → done
 
@@ -72,22 +85,26 @@ Result: Successfully switched to '<branch-name>'
 - Current: `feature/add-login`, 3 modified
 - Ask (1st): "Commit/Stash/Discard/Abort?" (step 2)
 - User: Stash
-- Ask (2nd): "Stay on current branch or switch/create new?" (step 3b)
-- User: Switch
+- Ask (2nd): "Stay on current branch or switch to different branch?" (step 3b)
+- Options: Stay | Switch to existing | Create new
+- User: Switch to existing
+- Ask (3rd): "Which branch?"
+- User: main
 - Action: stash (done) → main → pull
 
 *Ex4: new feature from main*
-- Current: `main`
+- Current: `main`, clean
+- Note: main is long-lived (grep exits 1 at step 3a), so skip step 3b
+- Ask: "Which branch?" or "Create new?"
+- User: Create new
 - Action: create → `feature/add-oauth-authentication`
 
 *Ex5: new feature from another feature*
-- Current: `feature/old-work`
-- Ask (1st): "Stay on current branch or switch/create new?"
-- User: Switch/create
-- Ask (2nd): "Which branch?" or "Create new?"
+- Current: `feature/old-work`, clean
+- Ask (1st): "Stay on current branch or switch to different branch?" (step 3b)
+- Options: Stay | Switch to existing | Create new
 - User: Create new
-- Suggest: `feature/add-oauth-authentication`
-- Action: commit/stash → main → pull → create
+- Action: main → pull → create `feature/add-oauth-authentication`
 
 **Constraints:**
 - NEVER switch with uncommitted changes without confirmation
