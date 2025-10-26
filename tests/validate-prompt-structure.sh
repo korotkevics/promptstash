@@ -67,14 +67,10 @@ while IFS= read -r md_file; do
     fi
   fi
 
-  # Validate review-mr.md and fix-mr.md reference their PR counterparts
+  # Validate fix-mr.md references fix-pr.md
   if [[ "$filename" == "fix-mr.md" ]]; then
     if ! grep -q "fix-pr.md" "$md_file"; then
       echo -e "${RED}✗ $filename: Missing reference to fix-pr.md${NC}"
-      ERRORS=$((ERRORS + 1))
-    fi
-    if ! grep -q "review-mr.md" "$md_file"; then
-      echo -e "${RED}✗ $filename: Missing reference to review-mr.md${NC}"
       ERRORS=$((ERRORS + 1))
     fi
   fi
