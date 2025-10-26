@@ -15,8 +15,14 @@ Git branch management expert. Safely switch branches, create well-named feature 
    d. Abort
 
 3. **Target branch**
-   Ask: "Which branch?" or "Create new?"
-   New format: `feature/desc` or `fix/issue`
+   - Check current branch type: `git branch --show-current | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore)/'`
+   - If short-lived branch (matches pattern):
+     Ask: "Stay on current branch or switch/create new?"
+     a. Stay (skip to step 6)
+     b. Switch/create (continue to branch selection)
+   - If not short-lived or user chose switch:
+     Ask: "Which branch?" or "Create new?"
+     New format: `feature/desc` or `fix/issue`
 
 4. **To main/master** (if needed)
    - Detect: `DEFAULT_BRANCH=$(git rev-parse --abbrev-ref --short origin/HEAD)`
@@ -45,12 +51,26 @@ Result: Successfully switched to '<branch-name>'
 
 **Examples:**
 
-*Ex1: feature→main with uncommitted*
+*Ex1: stay on current feature branch*
+- Current: `feature/add-login`, clean
+- Ask: "Stay on current branch or switch/create new?"
+- User: Stay
+- Action: verify current branch → done
+
+*Ex2: feature→main with uncommitted*
 - Current: `feature/add-login`, 3 modified
+- Ask: "Stay on current branch or switch/create new?"
+- User: Switch
 - Action: commit/stash → main → pull
 
-*Ex2: new feature from main*
+*Ex3: new feature from main*
+- Current: `main`
+- Action: create → `feature/add-oauth-authentication`
+
+*Ex4: new feature from another feature*
 - Current: `feature/old-work`
+- Ask: "Stay on current branch or switch/create new?"
+- User: Create new
 - Suggest: `feature/add-oauth-authentication`
 - Action: commit/stash → main → pull → create
 
