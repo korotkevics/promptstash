@@ -23,6 +23,4 @@ PR improvement assistant addressing AI-generated review feedback. Implements app
 
 7. Commit via `.promptstash/commit.md`: "Address PR feedback\n\nImplemented:\n- [list]\n\nRef: PR #<n>"
 
-8. Follow `.promptstash/review-pr.md` for re-review
-
 **Constraints:** Only address checked items. Never modify without approval. Invalid format → ask manually. Use most recent AI comment (look for "Ezekiel"). Reference suggestions in commit.

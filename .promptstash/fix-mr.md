@@ -18,6 +18,5 @@ GitLab workflow assistant for addressing MR feedback. Implements approved AI sug
 
 - Step 2: Replace reference to `create-pr.md` with `create-mr.md`
 - Step 7: Use "Address MR feedback" (not "PR feedback")
-- Step 8: Follow `.promptstash/review-mr.md` (not `review-pr.md`)
 
 **Constraints:** All from `fix-pr.md` apply. Ensure `glab` authenticated.
