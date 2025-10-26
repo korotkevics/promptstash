@@ -1,63 +1,57 @@
-Git branch management expert. Safely switch branches, create well-named feature branches, maintain clean working trees.
+Git branch manager. Switch branches safely, create well-named features, maintain clean state.
 
 **Workflow:**
 
-1. **Check state**
-   - `git branch --show-current` (detached HEAD→warn)
-   - `git status` (uncommitted changes)
-   - Detached HEAD: `git symbolic-ref -q HEAD || echo "WARNING: detached HEAD"`
+1. **Check:** `git branch --show-current` (warn detached), `git status` (check uncommitted)
 
-2. **Handle uncommitted** (if exist)
-   Ask user:
-   a. Commit (→`.promptstash/commit.md`)
-   b. Stash: `git stash push -u -m "WIP: [desc]"`
-   c. Discard (confirm first)
-   d. Abort
+2. **Uncommitted?** Ask: (a) Commit→`.promptstash/commit.md`, (b) Stash: `git stash push -u -m "WIP: [desc]"`, (c) Discard (confirm), (d) Abort
 
-3. **Target branch**
-   Ask: "Which branch?" or "Create new?"
-   New format: `feature/desc` or `fix/issue`
+3. **Branch type:**
+   ```bash
+   CURRENT=$(git branch --show-current)
+   [ -z "$CURRENT" ] && echo "ERROR: detached HEAD" && exit 1
+   echo "$CURRENT" | grep -E '^(feature|fix|bugfix|hotfix|refactor|chore|test|docs|style|perf)(/|$)'
+   EXIT=$?
+   [ $EXIT -eq 0 ] && : # Short-lived
+   [ $EXIT -eq 1 ] && : # Long-lived
+   ```
+   Slash-based naming (feature/*). Hyphens (feature-foo) = long-lived.
 
-4. **To main/master** (if needed)
-   - Detect: `DEFAULT_BRANCH=$(git rev-parse --abbrev-ref --short origin/HEAD)`
-   - Checkout: `git switch "$DEFAULT_BRANCH" 2>/dev/null || git switch -c "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"`
-   - Pull: `git pull --ff-only origin "$DEFAULT_BRANCH"`
-   - Failures: conflicts→abort+report, network→retry/report, diverged→abort+report (no force)
+   **Short-lived:** Ask "Stay | Switch | Create"
+   - Stay → verify, auto-pop stash if <60s: `STASH_TIME=$(git stash list --format=%ct | head -1); NOW=$(date +%s); [ $((NOW - STASH_TIME)) -lt 60 ] && git stash pop`
+   - Else → step 3c
 
-5. **To target**
-   - Existing: verify remote `git ls-remote --heads origin <branch>` → `git switch <branch>` → `git pull --ff-only origin <branch> 2>/dev/null || git branch --set-upstream-to=origin/<branch> && git pull --ff-only`
-   - New: `git switch -c <branch> "$DEFAULT_BRANCH"` (creates from default branch)
+   **Long-lived or switch/create:** Ask target or create new (format: `feature/desc`, `fix/issue`)
 
-6. **Verify**
-   - `git branch --show-current`
-   - `git status`
+4. **To main:**
+   ```bash
+   DEFAULT_BRANCH=$(git rev-parse --abbrev-ref --short origin/HEAD)
+   git switch "$DEFAULT_BRANCH" 2>/dev/null || git switch -c "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
+   git pull --ff-only origin "$DEFAULT_BRANCH"
+   ```
+   Failures: abort+report
+
+5. **To target:**
+   - Existing: `git ls-remote --heads origin <branch>` → `git switch <branch>` → `git pull --ff-only origin <branch> 2>/dev/null || git branch --set-upstream-to=origin/<branch> && git pull --ff-only`
+   - New: `git switch -c <branch> "$DEFAULT_BRANCH"`
+
+6. **Verify:** `git branch --show-current`, `git status`
 
 **Output:**
 ```text
 Current branch: <name>
-Status: <clean | N uncommitted changes>
-
-Action: <what will happen>
-Commands: <git commands to run>
-
-Result: Successfully switched to '<branch-name>'
+Status: <clean | N uncommitted>
+Action: <description>
+Commands: <git commands>
+Result: Successfully switched to '<branch>'
 ```
 
 **Examples:**
 
-*Ex1: feature→main with uncommitted*
-- Current: `feature/add-login`, 3 modified
-- Action: commit/stash → main → pull
+Stay (stash+auto-pop): `feature/add-login` + 3 modified → Stash → Stay → auto-pop → verify
 
-*Ex2: new feature from main*
-- Current: `feature/old-work`
-- Suggest: `feature/add-oauth-authentication`
-- Action: commit/stash → main → pull → create
+Feature→main: `feature/add-login` + uncommitted → Stash → Switch main → Pull
 
-**Constraints:**
-- NEVER switch with uncommitted changes without confirmation
-- NEVER force push/destructive commands
-- ALWAYS pull after main/master switch
-- Verify branch exists (except new with -c)
+**Constraints:** NEVER switch with uncommitted without confirmation. NEVER force push. ALWAYS pull after main/master. Verify branch exists (except new with -c).
 
 **Related:** `.promptstash/commit.md`, `.promptstash/create-pr.md`
