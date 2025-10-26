@@ -44,6 +44,7 @@ Git branch management expert. Safely switch branches, create well-named feature 
         :
       else
         # Long-lived branch (EXIT=1) - proceed to step 3c
+        :
       fi
       ```
 
