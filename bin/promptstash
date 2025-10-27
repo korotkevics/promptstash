@@ -769,6 +769,26 @@ match_prompt() {
         show_match_usage
     fi
 
+    # Detect clipboard command (use array for proper handling of multi-word commands)
+    local -a clipboard_cmd=()
+    if command -v pbcopy &> /dev/null; then
+        clipboard_cmd=("pbcopy")
+    elif command -v xclip &> /dev/null; then
+        clipboard_cmd=("xclip" "-selection" "clipboard")
+    elif command -v wl-copy &> /dev/null; then
+        clipboard_cmd=("wl-copy")
+    else
+        echo -e "${RED}✗ Error: No clipboard command found${NC}" >&2
+        echo "" >&2
+        echo "The match command requires a clipboard utility. Please install one:" >&2
+        echo "" >&2
+        echo "  macOS:        pbcopy (pre-installed)" >&2
+        echo "  Linux (X11):  sudo apt install xclip" >&2
+        echo "  Linux (Wayland): sudo apt install wl-clipboard" >&2
+        echo "" >&2
+        exit 1
+    fi
+
     # Get all .md files (using -print0 for safe handling of special characters)
     # Note: -maxdepth 1 restricts search to top-level directory only, preventing
     # nested subdirectory organization. This is intentional to keep prompts in a
@@ -829,30 +849,20 @@ match_prompt() {
         exit 1
     fi
 
-    # Return based on mode
+    # Copy to clipboard based on mode
     local prompt_path="$prompts_dir/$best_match"
 
     # Note: TOCTOU race condition - file could be deleted between matching and reading.
     # We handle this by catching failures and providing clear error messages.
 
-    case "$mode" in
-        name)
-            echo "$best_match"
-            ;;
-        content)
-            if ! cat "$prompt_path" 2>/dev/null; then
-                echo -e "${RED}✗ Error: Matched prompt file may have been deleted during operation or is unreadable${NC}" >&2
-                exit 1
-            fi
-            ;;
-        path)
-            echo "$prompt_path"
-            ;;
-        *)
-            echo -e "${RED}✗ Error: Unknown mode: $mode${NC}" >&2
-            exit 1
-            ;;
-    esac
+    # Verify file still exists and is readable before attempting clipboard copy
+    if [ ! -r "$prompt_path" ]; then
+        echo -e "${RED}✗ Error: Matched prompt file may have been deleted during operation or is unreadable${NC}" >&2
+        exit 1
+    fi
+
+    # Use copy_to_clipboard function to handle all modes
+    copy_to_clipboard "$mode" "$best_match" "$prompt_path" "${clipboard_cmd[@]}"
 }
 
 # Search prompts by filename and/or content

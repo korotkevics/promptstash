@@ -167,7 +167,7 @@ No matches found in file names or file contents for `<query>`.
 
 ### `promptstash match name <pattern>`
 
-Fuzzy matches prompts by filename and returns the single best match filename directly (non-interactive).
+Fuzzy matches prompts by filename and copies the best match filename to clipboard (non-interactive).
 
 ```bash
 promptstash match name cmt
@@ -175,16 +175,16 @@ promptstash match name cmt
 
 **Output:**
 ```
-commit.md
+✓ Saved to clipboard: commit.md
 ```
 
-Unlike `search` which finds all matches interactively, `match` returns the single best fuzzy match directly based on a scoring algorithm.
+Unlike `search` which finds all matches interactively, `match` returns the single best fuzzy match directly based on a scoring algorithm and copies it to clipboard.
 
 ---
 
 ### `promptstash match content <pattern>`
 
-Fuzzy matches prompts by filename and returns the file contents of the best match directly (non-interactive).
+Fuzzy matches prompts by filename and copies the file contents of the best match to clipboard (non-interactive).
 
 ```bash
 promptstash match content ship
@@ -192,17 +192,16 @@ promptstash match content ship
 
 **Output:**
 ```
-Ship features via TDD: select ad-hoc, load plan, or create plan.
-...
+✓ Saved to clipboard: contents of ship.md
 ```
 
-Works the same as `match name` but outputs the file contents instead of the filename.
+Works the same as `match name` but copies the file contents to clipboard instead of the filename.
 
 ---
 
 ### `promptstash match path <pattern>`
 
-Fuzzy matches prompts by filename and returns the absolute file path of the best match directly (non-interactive).
+Fuzzy matches prompts by filename and copies the absolute file path of the best match to clipboard (non-interactive).
 
 ```bash
 promptstash match path dbg
@@ -210,10 +209,10 @@ promptstash match path dbg
 
 **Output:**
 ```
-/Users/username/.promptstash/.promptstash/debug.md
+✓ Saved to clipboard: /Users/username/.promptstash/.promptstash/debug.md
 ```
 
-Works the same as `match name` but outputs the absolute file path instead of the filename.
+Works the same as `match name` but copies the absolute file path to clipboard instead of the filename.
 
 ---
 
