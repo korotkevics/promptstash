@@ -143,28 +143,28 @@ run_test "Match with invalid mode shows error" \
     "Unknown match mode" \
     "$PROMPTSTASH_BIN" match invalid commit
 
-# Test 4: Match name with exact pattern
-run_test "Match name 'commit' returns commit.md" \
+# Test 4: Match name with exact pattern (clipboard message)
+run_test "Match name 'commit' shows clipboard success" \
     0 \
-    "commit.md" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match name commit
 
 # Test 5: Match name with fuzzy pattern (typo)
-run_test "Match name 'commt' fuzzy matches to commit.md" \
+run_test "Match name 'commt' fuzzy matches and saves to clipboard" \
     0 \
-    "commit.md" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match name commt
 
-# Test 6: Match path returns full path
-run_test "Match path 'debug' returns full path" \
+# Test 6: Match path saves to clipboard
+run_test "Match path 'debug' saves to clipboard" \
     0 \
-    ".promptstash/debug.md" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match path debug
 
-# Test 7: Match content returns file contents
-run_test "Match content 'ship' returns ship.md contents" \
+# Test 7: Match content saves to clipboard
+run_test "Match content 'ship' saves to clipboard" \
     0 \
-    "Ship features via TDD" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match content ship
 
 # Test 8: Match with non-existent pattern shows error
@@ -176,25 +176,25 @@ run_test "Match with non-existent pattern shows error" \
 # Test 9: Match is case-insensitive
 run_test "Match is case-insensitive (uppercase)" \
     0 \
-    "commit.md" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match name COMMIT
 
 # Test 10: Match is case-insensitive (mixed case)
 run_test "Match is case-insensitive (mixed case)" \
     0 \
-    "commit.md" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match name CoMmIt
 
 # Test 11: Match with short pattern
-run_test "Match with short pattern 'sh' returns ship.md" \
+run_test "Match with short pattern 'sh' saves to clipboard" \
     0 \
-    "ship.md" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match name sh
 
 # Test 12: Match finds prompt containing substring pattern
-run_test "Match finds prompt containing substring 'rev' returns review-pr.md" \
+run_test "Match finds prompt containing substring 'rev' saves to clipboard" \
     0 \
-    "review-pr.md" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match name rev
 
 # Test 13: Deterministic results - same pattern always gives same result
@@ -243,9 +243,9 @@ run_test "Match with very long pattern fails gracefully" \
     "$PROMPTSTASH_BIN" match name "this-is-a-very-long-pattern-that-should-not-match-anything-at-all-because-it-is-way-too-long"
 
 # Test 17: Empty file handling
-run_test "Match empty.md returns empty content" \
+run_test "Match empty.md saves empty content to clipboard" \
     0 \
-    "" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match content empty
 
 # Test 18: Unicode/emoji in filenames (if locale supports it)
@@ -268,32 +268,32 @@ EOF
 
 run_test "Match with Unicode filename 'café' works correctly" \
     0 \
-    "Coffee-themed prompts" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match content café
 
 # Test 18a: Unicode pattern matching
 run_test "Match with Unicode pattern '日本' matches Japanese filename" \
     0 \
-    "Japanese test file" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match content 日本
 
 # Test 18b: Emoji in filename
 run_test "Match with emoji pattern 'emoji' matches emoji filename" \
     0 \
-    "Emoji test file" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match content emoji
 
 # Test 18c: Mixed ASCII/Unicode
 run_test "Match with mixed pattern 'mixed' matches mixed Unicode filename" \
     0 \
-    "Mixed Unicode test file" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match content mixed
 
 # Test 19: Symlinks in prompts directory
 ln -s "$TEST_FIXTURES_DIR/.promptstash/commit.md" "$TEST_FIXTURES_DIR/.promptstash/symlink.md"
 run_test "Match follows symlinks correctly" \
     0 \
-    "Git commit helper" \
+    "Saved to clipboard" \
     "$PROMPTSTASH_BIN" match content symlink
 
 # Test 20: Invalid PROMPTSTASH_DIR handling
