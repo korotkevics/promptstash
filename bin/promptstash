@@ -119,6 +119,7 @@ self_update() {
 
     # Check for uncommitted changes to essential files only
     # We only care about changes to files users need, not alien files (tests/, .github/, etc.)
+    # Note: .context is excluded as it contains transient/generated content
     local essential_paths=(
         ".promptstash"
         "bin"
@@ -129,7 +130,6 @@ self_update() {
         "install.sh"
         "docs"
         "static"
-        ".context"
     )
 
     # Check each essential path for uncommitted changes

@@ -24,7 +24,7 @@ git stash --include-untracked > /dev/null 2>&1 || true
 
 # Test 1: Verify self-update check passes with no changes
 TESTS=$((TESTS + 1))
-if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' 2>/dev/null; then
+if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
   echo -e "${GREEN}✓ Test 1: self-update check passes with no changes${NC}"
 else
   echo -e "${RED}✗ Test 1: self-update check failed with no changes${NC}"
@@ -34,7 +34,7 @@ fi
 # Test 2: Modify README.md (generated file) and verify check still passes
 TESTS=$((TESTS + 1))
 echo "# Test modification" >> README.md
-if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' 2>/dev/null; then
+if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
   echo -e "${GREEN}✓ Test 2: self-update check passes with README.md modified${NC}"
 else
   echo -e "${RED}✗ Test 2: self-update check failed with README.md modified${NC}"
@@ -45,7 +45,7 @@ git checkout README.md > /dev/null 2>&1
 # Test 3: Modify .benchmark/data.json and verify check still passes
 TESTS=$((TESTS + 1))
 echo '{"test": true}' > .benchmark/data.json
-if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' 2>/dev/null; then
+if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
   echo -e "${GREEN}✓ Test 3: self-update check passes with .benchmark/data.json modified${NC}"
 else
   echo -e "${RED}✗ Test 3: self-update check failed with .benchmark/data.json modified${NC}"
@@ -57,7 +57,7 @@ git checkout .benchmark/data.json > /dev/null 2>&1
 TESTS=$((TESTS + 1))
 if [ -f static/prompt-graph.svg ]; then
   echo "<!-- test -->" >> static/prompt-graph.svg
-  if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' 2>/dev/null; then
+  if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
     echo -e "${GREEN}✓ Test 4: self-update check passes with static/prompt-graph.svg modified${NC}"
   else
     echo -e "${RED}✗ Test 4: self-update check failed with static/prompt-graph.svg modified${NC}"
@@ -68,12 +68,29 @@ else
   echo -e "${YELLOW}⚠ Test 4: static/prompt-graph.svg not found, skipping${NC}"
 fi
 
+# Test 4.5: Modify .context files and verify check still passes
+TESTS=$((TESTS + 1))
+if [ -d .context ]; then
+  echo "# Test modification" >> .context/test-file.md
+  if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
+    echo -e "${GREEN}✓ Test 4.5: self-update check passes with .context files modified${NC}"
+  else
+    echo -e "${RED}✗ Test 4.5: self-update check failed with .context files modified${NC}"
+    ERRORS=$((ERRORS + 1))
+  fi
+  rm -f .context/test-file.md
+  git checkout .context/ > /dev/null 2>&1 || true
+else
+  echo -e "${YELLOW}⚠ Test 4.5: .context directory not found, skipping${NC}"
+fi
+
 # Test 5: Modify ALL generated files and verify check still passes
 TESTS=$((TESTS + 1))
 echo "# Test" >> README.md
 echo '{"test": true}' > .benchmark/data.json
 [ -f static/prompt-graph.svg ] && echo "<!-- test -->" >> static/prompt-graph.svg
-if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' 2>/dev/null; then
+[ -d .context ] && echo "# Test" >> .context/test-file.md
+if git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
   echo -e "${GREEN}✓ Test 5: self-update check passes with ALL generated files modified${NC}"
 else
   echo -e "${RED}✗ Test 5: self-update check failed with ALL generated files modified${NC}"
@@ -81,11 +98,12 @@ else
 fi
 git checkout README.md .benchmark/data.json > /dev/null 2>&1
 [ -f static/prompt-graph.svg ] && git checkout static/prompt-graph.svg > /dev/null 2>&1
+[ -d .context ] && rm -f .context/test-file.md && git checkout .context/ > /dev/null 2>&1 || true
 
 # Test 6: Modify a non-generated file and verify check FAILS
 TESTS=$((TESTS + 1))
 echo "# Test" >> CONTRIBUTING.md
-if ! git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' 2>/dev/null; then
+if ! git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
   echo -e "${GREEN}✓ Test 6: self-update check correctly detects non-generated file changes${NC}"
 else
   echo -e "${RED}✗ Test 6: self-update check failed to detect non-generated file changes${NC}"
@@ -97,7 +115,7 @@ git checkout CONTRIBUTING.md > /dev/null 2>&1
 TESTS=$((TESTS + 1))
 echo "# Test" >> README.md
 echo "# Test" >> CONTRIBUTING.md
-if ! git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' 2>/dev/null; then
+if ! git diff-index --quiet HEAD -- ':!.benchmark/' ':!README.md' ':!static/prompt-graph.svg' ':!static/prompt-graph.dot' ':!.context/' 2>/dev/null; then
   echo -e "${GREEN}✓ Test 7: self-update check correctly detects mixed file changes${NC}"
 else
   echo -e "${RED}✗ Test 7: self-update check failed to detect mixed file changes${NC}"
