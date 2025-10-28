@@ -170,6 +170,14 @@ self_update() {
         if [ "$can_use_sparse" = true ]; then
             echo "Migrating to sparse checkout (user-facing files only)..."
 
+            # Untrack .context if it exists (migration for existing installations)
+            # This is safe for both new and existing installs, and prevents conflicts
+            # when pulling updates that remove .context from version control
+            if git ls-files --error-unmatch .context >/dev/null 2>&1; then
+                echo "Untracking transient .context directory..."
+                git rm -r --cached .context 2>/dev/null || true
+            fi
+
             if ! git sparse-checkout init --cone 2>/dev/null; then
                 echo -e "${YELLOW}⚠ Warning: Failed to initialize sparse checkout. Continuing with full checkout.${NC}"
             elif ! git sparse-checkout set \
@@ -212,12 +220,25 @@ self_update() {
     echo "Pulling latest changes..."
     if ! git pull origin main; then
         echo -e "${RED}✗ Failed to pull latest changes${NC}"
-        echo "This can happen if:"
-        echo "  - You have uncommitted changes that would be overwritten"
-        echo "  - There are merge conflicts"
-        echo ""
-        echo "Run 'git status' in $INSTALL_DIR to see what's wrong."
-        echo "You may need to stash your changes with 'git stash' and try again."
+
+        # Check if .context is causing the issue
+        if git ls-files --error-unmatch .context >/dev/null 2>&1; then
+            echo ""
+            echo "The .context directory is still tracked in git and may be blocking the update."
+            echo "This can happen if the migration step failed or was interrupted."
+            echo ""
+            echo "To fix this, run the following commands in $INSTALL_DIR:"
+            echo "  git rm -r --cached .context"
+            echo "  git pull origin main"
+            echo ""
+        else
+            echo "This can happen if:"
+            echo "  - You have uncommitted changes that would be overwritten"
+            echo "  - There are merge conflicts"
+            echo ""
+            echo "Run 'git status' in $INSTALL_DIR to see what's wrong."
+            echo "You may need to stash your changes with 'git stash' and try again."
+        fi
         exit 1
     fi
 

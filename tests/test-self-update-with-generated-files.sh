@@ -84,6 +84,45 @@ else
   echo -e "${YELLOW}⚠ Test 4.5: .context directory not found, skipping${NC}"
 fi
 
+# Test 4.6: Simulate migration scenario - untracking .context that's tracked+modified
+TESTS=$((TESTS + 1))
+echo "Testing migration: untracking modified .context directory..."
+
+# Create a test .context directory and track it (simulating old installations)
+mkdir -p .context.test
+echo "# Tracked content" > .context.test/tracked-file.md
+git add -f .context.test > /dev/null 2>&1
+git commit -m "Test: track .context.test" > /dev/null 2>&1
+
+# Modify the tracked .context directory (simulating user changes)
+echo "# User modification" >> .context.test/tracked-file.md
+
+# Verify it's tracked and modified
+if git ls-files --error-unmatch .context.test >/dev/null 2>&1 && \
+   ! git diff-index --quiet HEAD -- .context.test 2>/dev/null; then
+
+  # Run the migration logic (same as in self_update function)
+  if git rm -r --cached .context.test 2>/dev/null; then
+    # Verify .context.test is now untracked
+    if ! git ls-files --error-unmatch .context.test >/dev/null 2>&1; then
+      echo -e "${GREEN}✓ Test 4.6: migration successfully untracks modified .context${NC}"
+    else
+      echo -e "${RED}✗ Test 4.6: .context.test still tracked after migration${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+  else
+    echo -e "${RED}✗ Test 4.6: migration command failed${NC}"
+    ERRORS=$((ERRORS + 1))
+  fi
+else
+  echo -e "${RED}✗ Test 4.6: failed to setup tracked+modified .context.test${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Cleanup test files
+rm -rf .context.test > /dev/null 2>&1
+git reset HEAD~1 --soft > /dev/null 2>&1  # Undo test commit
+
 # Test 5: Modify ALL generated files and verify check still passes
 TESTS=$((TESTS + 1))
 echo "# Test" >> README.md
