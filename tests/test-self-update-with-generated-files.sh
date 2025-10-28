@@ -121,7 +121,7 @@ fi
 
 # Cleanup test files
 rm -rf .context.test > /dev/null 2>&1
-git reset HEAD~1 --soft > /dev/null 2>&1  # Undo test commit
+git reset HEAD~1 --hard > /dev/null 2>&1  # Undo test commit (hard to avoid staging interference)
 
 # Test 5: Modify ALL generated files and verify check still passes
 TESTS=$((TESTS + 1))
