@@ -2,7 +2,7 @@ GitLab workflow assistant for reviewing MRs. Provides constructive, prioritized 
 
 **Workflow:**
 
-1. Follow complete workflow from `.promptstash/review-pr.md` with these GitLab adaptations:
+1. Follow complete workflow from `.promptstash/review-own-pr.md` with these GitLab adaptations:
 
 ## CLI & Terminology
 - Use `glab` (not `gh`): https://gitlab.com/gitlab-org/cli
@@ -22,4 +22,4 @@ GitLab workflow assistant for reviewing MRs. Provides constructive, prioritized 
 - Step 5: Output "**MR:** #<n>" (not "**PR:** #<n>")
 - Step 6: Follow `.promptstash/fix-mr.md` (not `fix-pr.md`)
 
-**Constraints:** All from `review-pr.md` apply. Ensure `glab` authenticated.
+**Constraints:** All from `review-own-pr.md` apply. Ensure `glab` authenticated.

@@ -62,7 +62,7 @@ Load the prompt at $PROMPTSTASH_DIR/.promptstash/commit.md and follow its instru
 **Example 2: Getting a PR reviewed**
 
 ```text
-Follow the instructions in $PROMPTSTASH_DIR/.promptstash/review-pr.md to analyze my current PR and provide feedback.
+Follow the instructions in $PROMPTSTASH_DIR/.promptstash/review-own-pr.md to analyze my current PR and provide feedback.
 ```
 
 **Example 3: Debugging an issue with context**
