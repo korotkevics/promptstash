@@ -72,6 +72,55 @@ The script updates two files in your `~/.claude` directory:
 
 With this integration, Claude Code will automatically have access to your PromptStash workflows and documentation.
 
+## Local Project Integration
+
+You can link PromptStash to individual projects instead of (or in addition to) global integration. This is useful when:
+- You want project-specific PromptStash configurations
+- Multiple team members use different LLMs
+- You want to version control the LLM configuration with your project
+
+### Link to Claude Code
+
+From your project root directory:
+
+```bash
+cd /path/to/your/project
+promptstash link claude
+```
+
+This creates a local `.claude/CLAUDE.md` file that references your PromptStash workflows. The command will:
+1. Confirm the current directory is your project root
+2. Create `.claude/CLAUDE.md` with PromptStash workflow references
+3. Optionally add `.claude` to `.gitignore`
+
+**Content created:**
+```md
+# User Memory
+
+## Global Workflow Instructions
+
+Always reference all workflow documentation from the prompt stash directory:
+
+@$PROMPTSTASH_DIR/.promptstash
+```
+
+### Link to GitHub Copilot
+
+From your project root directory:
+
+```bash
+cd /path/to/your/project
+promptstash link copilot
+```
+
+This creates a local `.copilot/copilot-instructions.md` file with the same content structure as Claude.
+
+### Behavior Details
+
+- **Existing files without PromptStash entry**: The command appends the reference
+- **Existing files with PromptStash entry**: The command aborts with a warning
+- **New files**: Creates the file with PromptStash references
+
 ## Dry Run
 
 To preview what the installer would do without making any changes, use the `--dry-run` flag:
