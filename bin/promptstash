@@ -119,6 +119,7 @@ self_update() {
 
     # Check for uncommitted changes to essential files only
     # We only care about changes to files users need, not alien files (tests/, .github/, etc.)
+    # Note: .context is excluded as it contains transient/generated content
     local essential_paths=(
         ".promptstash"
         "bin"
@@ -129,7 +130,6 @@ self_update() {
         "install.sh"
         "docs"
         "static"
-        ".context"
     )
 
     # Check each essential path for uncommitted changes
@@ -165,6 +165,23 @@ self_update() {
         can_use_sparse=false
     fi
 
+    # Untrack .context if it exists (migration for all installations)
+    # This runs unconditionally to handle both new sparse checkout setups and existing
+    # sparse checkout installations, preventing conflicts during git pull
+    if git ls-files --error-unmatch .context >/dev/null 2>&1; then
+        echo "Untracking transient .context directory..."
+        if ! git rm -r --cached .context 2>/dev/null; then
+            echo -e "${RED}✗ Failed to untrack .context directory${NC}"
+            echo ""
+            echo "This is required for the update to proceed. Please manually run:"
+            echo "  cd $INSTALL_DIR"
+            echo "  git rm -r --cached .context"
+            echo "  promptstash self-update"
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Successfully untracked .context${NC}"
+    fi
+
     # CRITICAL: Configure sparse checkout BEFORE pull to prevent unwanted files from being pulled
     if ! git config --get core.sparsecheckout &>/dev/null; then
         if [ "$can_use_sparse" = true ]; then
@@ -177,7 +194,6 @@ self_update() {
                 bin \
                 docs \
                 static \
-                .context \
                 .gitignore \
                 .version \
                 LICENSE \
@@ -211,7 +227,32 @@ self_update() {
 
     # Now pull with sparse checkout configured
     echo "Pulling latest changes..."
-    git pull origin main
+    if ! git pull origin main; then
+        echo -e "${RED}✗ Failed to pull latest changes${NC}"
+
+        # Check if .context is causing the issue
+        # Note: If we reach here with .context tracked, something unexpected happened
+        # since the migration step (line 171) runs unconditionally and fails fast on errors.
+        # This might occur if .context was re-tracked after migration or git state is corrupted.
+        if git ls-files --error-unmatch .context >/dev/null 2>&1; then
+            echo ""
+            echo "The .context directory is still tracked in git and is blocking the update."
+            echo "This is unexpected since automatic migration should have untracked it."
+            echo ""
+            echo "To fix this, run the following commands in $INSTALL_DIR:"
+            echo "  git rm -r --cached .context"
+            echo "  git pull origin main"
+            echo ""
+        else
+            echo "This can happen if:"
+            echo "  - You have uncommitted changes that would be overwritten"
+            echo "  - There are merge conflicts"
+            echo ""
+            echo "Run 'git status' in $INSTALL_DIR to see what's wrong."
+            echo "You may need to stash your changes with 'git stash' and try again."
+        fi
+        exit 1
+    fi
 
     local after_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
     
