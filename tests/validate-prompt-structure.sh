@@ -59,8 +59,8 @@ while IFS= read -r md_file; do
     ERRORS=$((ERRORS + 1))
   fi
 
-  # Validate review-pr.md and fix-pr.md specific requirements
-  if [[ "$filename" == "review-pr.md" ]] || [[ "$filename" == "fix-pr.md" ]]; then
+  # Validate review-own-pr.md, review-some-pr.md, review-some-mr.md, and fix-pr.md specific requirements
+  if [[ "$filename" == "review-own-pr.md" ]] || [[ "$filename" == "review-some-pr.md" ]] || [[ "$filename" == "review-some-mr.md" ]] || [[ "$filename" == "fix-pr.md" ]]; then
     if ! grep -q "Ezekiel" "$md_file"; then
       echo -e "${RED}✗ $filename: Missing 'Ezekiel' agent identity${NC}"
       ERRORS=$((ERRORS + 1))
@@ -75,9 +75,9 @@ while IFS= read -r md_file; do
     fi
   fi
 
-  if [[ "$filename" == "review-mr.md" ]]; then
-    if ! grep -q "review-pr.md" "$md_file"; then
-      echo -e "${RED}✗ $filename: Missing reference to review-pr.md${NC}"
+  if [[ "$filename" == "review-own-mr.md" ]]; then
+    if ! grep -q "review-own-pr.md" "$md_file"; then
+      echo -e "${RED}✗ $filename: Missing reference to review-own-pr.md${NC}"
       ERRORS=$((ERRORS + 1))
     fi
     if ! grep -q "fix-mr.md" "$md_file"; then
@@ -86,8 +86,8 @@ while IFS= read -r md_file; do
     fi
   fi
 
-  # Validate review-pr.md has checkbox template
-  if [[ "$filename" == "review-pr.md" ]]; then
+  # Validate review-own-pr.md, review-some-pr.md, and review-some-mr.md have checkbox template
+  if [[ "$filename" == "review-own-pr.md" ]] || [[ "$filename" == "review-some-pr.md" ]] || [[ "$filename" == "review-some-mr.md" ]]; then
     if ! grep -q '\- \[ \]' "$md_file"; then
       echo -e "${YELLOW}⚠ $filename: Missing checkbox template for suggestions${NC}"
       WARNINGS=$((WARNINGS + 1))
