@@ -165,27 +165,27 @@ self_update() {
         can_use_sparse=false
     fi
 
+    # Untrack .context if it exists (migration for all installations)
+    # This runs unconditionally to handle both new sparse checkout setups and existing
+    # sparse checkout installations, preventing conflicts during git pull
+    if git ls-files --error-unmatch .context >/dev/null 2>&1; then
+        echo "Untracking transient .context directory..."
+        if ! git rm -r --cached .context 2>/dev/null; then
+            echo -e "${RED}✗ Failed to untrack .context directory${NC}"
+            echo ""
+            echo "This is required for the update to proceed. Please manually run:"
+            echo "  cd $INSTALL_DIR"
+            echo "  git rm -r --cached .context"
+            echo "  promptstash self-update"
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Successfully untracked .context${NC}"
+    fi
+
     # CRITICAL: Configure sparse checkout BEFORE pull to prevent unwanted files from being pulled
     if ! git config --get core.sparsecheckout &>/dev/null; then
         if [ "$can_use_sparse" = true ]; then
             echo "Migrating to sparse checkout (user-facing files only)..."
-
-            # Untrack .context if it exists (migration for existing installations)
-            # This is safe for both new and existing installs, and prevents conflicts
-            # when pulling updates that remove .context from version control
-            if git ls-files --error-unmatch .context >/dev/null 2>&1; then
-                echo "Untracking transient .context directory..."
-                if ! git rm -r --cached .context 2>/dev/null; then
-                    echo -e "${RED}✗ Failed to untrack .context directory${NC}"
-                    echo ""
-                    echo "This is required for the update to proceed. Please manually run:"
-                    echo "  cd $INSTALL_DIR"
-                    echo "  git rm -r --cached .context"
-                    echo "  promptstash self-update"
-                    exit 1
-                fi
-                echo -e "${GREEN}✓ Successfully untracked .context${NC}"
-            fi
 
             if ! git sparse-checkout init --cone 2>/dev/null; then
                 echo -e "${YELLOW}⚠ Warning: Failed to initialize sparse checkout. Continuing with full checkout.${NC}"
@@ -231,15 +231,13 @@ self_update() {
         echo -e "${RED}✗ Failed to pull latest changes${NC}"
 
         # Check if .context is causing the issue
-        # Note: If we reach here with .context tracked, the migration step was
-        # skipped (e.g., old git version, already using sparse checkout, etc.)
-        # If migration had run and failed, we would have exited earlier.
+        # Note: If we reach here with .context tracked, something unexpected happened
+        # since the migration step (line 171) runs unconditionally and fails fast on errors.
+        # This might occur if .context was re-tracked after migration or git state is corrupted.
         if git ls-files --error-unmatch .context >/dev/null 2>&1; then
             echo ""
             echo "The .context directory is still tracked in git and is blocking the update."
-            echo "This can happen if:"
-            echo "  - Your git version doesn't support sparse checkout (requires 2.25+)"
-            echo "  - The automatic migration step was skipped"
+            echo "This is unexpected since automatic migration should have untracked it."
             echo ""
             echo "To fix this, run the following commands in $INSTALL_DIR:"
             echo "  git rm -r --cached .context"
