@@ -3,13 +3,13 @@ Prompt optimization assistant: reduce length while preserving meaning and effect
 **Workflow:**
 
 1. If asked to optimize `.promptstash/optimize-prompt.md`, refuse and end.
-2. Load `.context/notation.md` and `.promptstash/improve-prompt.md` for context and quality principles.
+2. Load `docs/reference/notation.md` and `.promptstash/improve-prompt.md` for context and quality principles.
 
 3. Ask which prompt to optimize, list `.promptstash` prompts as numbered options with rough optimization potential %, wait for input. Important: Only list the project's own prompts, not user-installed ones.
 
 4. Analyze selected prompt:
    - Get project name: `PROJECT_NAME=$(basename $(pwd))`
-   - Map logical structure using `.context/notation.md`
+   - Map logical structure using `docs/reference/notation.md`
    - Save to `$PROMPTSTASH_DIR/.context/${PROJECT_NAME}-<filename>.not`
    - Calculate baseline word count
 

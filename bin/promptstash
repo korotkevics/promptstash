@@ -177,7 +177,6 @@ self_update() {
                 bin \
                 docs \
                 static \
-                .context \
                 .gitignore \
                 .version \
                 LICENSE \
@@ -211,7 +210,16 @@ self_update() {
 
     # Now pull with sparse checkout configured
     echo "Pulling latest changes..."
-    git pull origin main
+    if ! git pull origin main; then
+        echo -e "${RED}✗ Failed to pull latest changes${NC}"
+        echo "This can happen if:"
+        echo "  - You have uncommitted changes that would be overwritten"
+        echo "  - There are merge conflicts"
+        echo ""
+        echo "Run 'git status' in $INSTALL_DIR to see what's wrong."
+        echo "You may need to stash your changes with 'git stash' and try again."
+        exit 1
+    fi
 
     local after_version=$(cat "$VERSION_FILE" 2>/dev/null || echo "unknown")
     

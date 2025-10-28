@@ -136,7 +136,6 @@ else
                 bin \
                 docs \
                 static \
-                .context \
                 .gitignore \
                 .version \
                 LICENSE \

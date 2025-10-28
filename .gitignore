@@ -11,3 +11,4 @@ venv/
 
 # Generated intermediate files
 static/prompt-graph.dot
+.context/
