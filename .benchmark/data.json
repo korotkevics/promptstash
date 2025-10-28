@@ -1226,6 +1226,59 @@
         "suggest-better-function-names.md": 6.9165798652499015,
         "switch-branches.md": 7.52653529907435
       }
+    },
+    {
+      "commit": "f322dea",
+      "version": "0.33.0",
+      "timestamp": "2025-10-28T21:44:12.014071+00:00",
+      "prompts": {
+        "bump-semver-version.md": 422,
+        "commit.md": 365,
+        "create-mr.md": 272,
+        "create-pr.md": 403,
+        "create-source-map.md": 332,
+        "debug.md": 340,
+        "enhance-legacy-agent.md": 327,
+        "fix-mr.md": 179,
+        "fix-pr.md": 340,
+        "improve-prompt.md": 366,
+        "optimize-prompt.md": 1276,
+        "plan-shipping.md": 371,
+        "read-source-map.md": 306,
+        "review-own-mr.md": 232,
+        "review-own-pr.md": 568,
+        "review-some-mr.md": 331,
+        "review-some-pr.md": 319,
+        "ship-gh-issue.md": 528,
+        "ship.md": 258,
+        "squash.md": 180,
+        "suggest-better-function-names.md": 303,
+        "switch-branches.md": 658
+      },
+      "entropy": {
+        "bump-semver-version.md": 7.325051404239735,
+        "commit.md": 6.986556640147105,
+        "create-mr.md": 6.934080983268506,
+        "create-pr.md": 7.181423724985091,
+        "create-source-map.md": 7.060697239902902,
+        "debug.md": 6.9547332504713735,
+        "enhance-legacy-agent.md": 6.5155662873358455,
+        "fix-mr.md": 6.530361640390516,
+        "fix-pr.md": 7.141466555792013,
+        "improve-prompt.md": 6.882890623289002,
+        "optimize-prompt.md": 7.994375950915095,
+        "plan-shipping.md": 6.5308767449479,
+        "read-source-map.md": 7.037030420092649,
+        "review-own-mr.md": 6.6844989876243766,
+        "review-own-pr.md": 7.668984517284332,
+        "review-some-mr.md": 6.938488479207155,
+        "review-some-pr.md": 6.912244984859075,
+        "ship-gh-issue.md": 7.352574396393241,
+        "ship.md": 6.685587134951012,
+        "squash.md": 6.55241179191008,
+        "suggest-better-function-names.md": 6.9165798652499015,
+        "switch-branches.md": 7.52653529907435
+      }
     }
   ]
 }
