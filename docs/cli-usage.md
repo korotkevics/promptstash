@@ -231,6 +231,91 @@ The `match` commands use greedy left-to-right character matching. All pattern ch
 - Pattern `'abc'` vs `'bca'` may score poorly due to character order mismatch
 
 ---
+
+### `promptstash link claude [--yes|-y]`
+
+Links PromptStash to Claude Code in the current project directory. Creates a local `.claude/CLAUDE.md` file that references your PromptStash workflows.
+
+```bash
+promptstash link claude
+
+# Non-interactive mode for automation scripts and CI/CD pipelines
+# (auto-confirm, skip .gitignore prompts)
+promptstash link claude --yes
+promptstash link claude -y
+```
+
+**Example:**
+```bash
+Link PromptStash to claude in current directory:
+  /Users/username/my-project
+
+Is this the project root directory? (y/n): y
+Creating .claude directory...
+✓ Created .claude
+Creating new .claude/CLAUDE.md...
+✓ Created .claude/CLAUDE.md
+
+Add .claude to .gitignore? (y/n): y
+✓ Added .claude to .gitignore
+
+✓ Successfully linked PromptStash to claude!
+
+File configured:
+  • .claude/CLAUDE.md
+```
+
+**Behavior:**
+- Confirms the current directory is the project root before proceeding (skipped with `--yes`)
+- Creates `.claude/CLAUDE.md` with PromptStash workflow references
+- If file exists without PromptStash entry: appends the reference
+- If file exists with PromptStash entry: aborts with warning
+- Optionally adds `.claude` to `.gitignore` (skipped with `--yes`)
+
+**Options:**
+- `--yes` or `-y`: Non-interactive mode. Skips confirmation prompts and .gitignore modifications. Useful for CI/CD environments and automation scripts.
+
+---
+
+### `promptstash link copilot [--yes|-y]`
+
+Links PromptStash to GitHub Copilot in the current project directory. Creates a local `.copilot/copilot-instructions.md` file that references your PromptStash workflows.
+
+```bash
+promptstash link copilot
+
+# Non-interactive mode for automation scripts and CI/CD pipelines
+# (auto-confirm, skip .gitignore prompts)
+promptstash link copilot --yes
+promptstash link copilot -y
+```
+
+**Example:**
+```bash
+Link PromptStash to copilot in current directory:
+  /Users/username/my-project
+
+Is this the project root directory? (y/n): y
+Creating .copilot directory...
+✓ Created .copilot
+Creating new .copilot/copilot-instructions.md...
+✓ Created .copilot/copilot-instructions.md
+
+Add .copilot to .gitignore? (y/n): y
+✓ Added .copilot to .gitignore
+
+✓ Successfully linked PromptStash to copilot!
+
+File configured:
+  • .copilot/copilot-instructions.md
+```
+
+**Behavior:**
+- Same as `link claude` but creates `.copilot/copilot-instructions.md`
+- Content format is identical to Claude, referencing PromptStash workflows
+
+---
+
 ### `promptstash self-update`
 
 Updates PromptStash to the latest version.

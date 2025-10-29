@@ -1058,6 +1058,174 @@ search_prompts() {
     done
 }
 
+# Link PromptStash to an LLM in the current project
+link_llm() {
+    local llm_type="$1"
+    local non_interactive="$2"
+
+    # Validate PROMPTSTASH_DIR is set
+    if [ -z "$PROMPTSTASH_DIR" ]; then
+        echo -e "${RED}✗ Error: PROMPTSTASH_DIR is not set${NC}"
+        echo ""
+        echo "Please configure PromptStash first. See installation documentation."
+        exit 1
+    fi
+
+    # Validate PROMPTSTASH_DIR directory exists
+    if [ ! -d "$PROMPTSTASH_DIR" ]; then
+        echo -e "${RED}✗ Error: PROMPTSTASH_DIR directory does not exist: $PROMPTSTASH_DIR${NC}"
+        echo ""
+        echo "Please verify your PromptStash installation."
+        exit 1
+    fi
+
+    if [ -z "$llm_type" ]; then
+        echo -e "${RED}✗ Error: link command requires an LLM type${NC}"
+        echo ""
+        echo "Usage: promptstash link [claude|copilot] [--yes|-y]"
+        echo ""
+        echo "  claude   - Link to Claude Code (creates .claude/CLAUDE.md)"
+        echo "  copilot  - Link to GitHub Copilot (creates .copilot/copilot-instructions.md)"
+        echo ""
+        echo "Options:"
+        echo "  --yes, -y  Non-interactive mode (auto-confirm prompts, skip .gitignore)"
+        echo ""
+        echo "Note: Requires PROMPTSTASH_DIR to be configured."
+        exit 1
+    fi
+
+    # Validate LLM type
+    if [ "$llm_type" != "claude" ] && [ "$llm_type" != "copilot" ]; then
+        echo -e "${RED}✗ Error: Unknown LLM type: $llm_type${NC}"
+        echo ""
+        echo "Supported types: claude, copilot"
+        exit 1
+    fi
+
+    # Confirm current directory is project root (skip in non-interactive mode)
+    if [ "$non_interactive" != "true" ]; then
+        echo -e "${BLUE}Link PromptStash to $llm_type in current directory:${NC}"
+        echo "  $(pwd)"
+        echo ""
+        read -p "Is this the project root directory? (y/n): " confirm
+
+        if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+            echo "Aborted."
+            exit 0
+        fi
+    fi
+
+    # Set up paths and content based on LLM type
+    local config_dir=""
+    local config_file=""
+    local marker="@${PROMPTSTASH_DIR}/.promptstash"
+
+    case "$llm_type" in
+        claude)
+            config_dir=".claude"
+            config_file="$config_dir/CLAUDE.md"
+            ;;
+        copilot)
+            config_dir=".copilot"
+            config_file="$config_dir/copilot-instructions.md"
+            ;;
+    esac
+
+    # Create config directory if it doesn't exist
+    if [ ! -d "$config_dir" ]; then
+        echo "Creating $config_dir directory..."
+        if ! mkdir -p "$config_dir"; then
+            echo -e "${RED}✗ Error: Failed to create $config_dir${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Created $config_dir${NC}"
+    fi
+
+    # Content to add (same for both LLMs)
+    local content="# User Memory
+
+## Global Workflow Instructions
+
+Always reference all workflow documentation from the prompt stash directory:
+
+${marker}"
+
+    # Check if file exists
+    if [ -f "$config_file" ]; then
+        # Check if file is readable
+        if [ ! -r "$config_file" ]; then
+            echo -e "${RED}✗ Error: Cannot read $config_file (permission denied)${NC}"
+            exit 1
+        fi
+
+        # Check if promptstash entry already exists
+        if grep -Fq "$marker" "$config_file"; then
+            echo -e "${YELLOW}⚠ PromptStash is already linked in $config_file${NC}"
+            echo "Aborted."
+            exit 1
+        fi
+
+        # File exists but no promptstash entry - append
+        echo "Updating existing $config_file..."
+        # Ensure proper spacing: add blank line before new content
+        if ! { echo "" >> "$config_file" && echo "$content" >> "$config_file"; }; then
+            echo -e "${RED}✗ Error: Failed to update $config_file${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Updated $config_file${NC}"
+    else
+        # Create new file
+        echo "Creating new $config_file..."
+        if ! echo "$content" > "$config_file"; then
+            echo -e "${RED}✗ Error: Failed to create $config_file${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}✓ Created $config_file${NC}"
+    fi
+
+    # Handle .gitignore (skip in non-interactive mode)
+    if [ "$non_interactive" != "true" ]; then
+        if [ -f ".gitignore" ]; then
+            # Check if .gitignore is readable
+            if [ ! -r ".gitignore" ]; then
+                echo -e "${RED}✗ Error: Cannot read .gitignore (permission denied)${NC}"
+                exit 1
+            fi
+
+            if ! grep -Fxq "$config_dir" ".gitignore"; then
+                echo ""
+                read -p "Add $config_dir to .gitignore? (y/n): " add_gitignore
+
+                if [ "$add_gitignore" = "y" ] || [ "$add_gitignore" = "Y" ]; then
+                    if ! echo "$config_dir" >> ".gitignore"; then
+                        echo -e "${RED}✗ Error: Failed to update .gitignore${NC}"
+                        exit 1
+                    fi
+                    echo -e "${GREEN}✓ Added $config_dir to .gitignore${NC}"
+                fi
+            fi
+        else
+            echo ""
+            read -p "Create .gitignore with $config_dir? (y/n): " create_gitignore
+
+            if [ "$create_gitignore" = "y" ] || [ "$create_gitignore" = "Y" ]; then
+                # echo adds trailing newline by default, ensuring proper .gitignore format
+                if ! echo "$config_dir" > ".gitignore"; then
+                    echo -e "${RED}✗ Error: Failed to create .gitignore${NC}"
+                    exit 1
+                fi
+                echo -e "${GREEN}✓ Created .gitignore with $config_dir${NC}"
+            fi
+        fi
+    fi
+
+    echo ""
+    echo -e "${GREEN}✓ Successfully linked PromptStash to $llm_type!${NC}"
+    echo ""
+    echo "File configured:"
+    echo "  • $config_file"
+}
+
 # Show help
 show_help() {
     cat << EOF
@@ -1077,6 +1245,8 @@ Commands:
   match name <pattern>     Fuzzy match prompt and output filename (e.g., commit.md)
   match content <pattern>  Fuzzy match prompt and output file contents
   match path <pattern>     Fuzzy match prompt and output file path
+  link claude [--yes|-y]       Link PromptStash to Claude Code in current project
+  link copilot [--yes|-y]      Link PromptStash to GitHub Copilot in current project
   self-update      Update PromptStash to the latest version
   cleanup          Check for and remove unnecessary files
   version          Show the current version
@@ -1092,6 +1262,7 @@ Examples:
   promptstash search commit       # Search and list matches
   promptstash search name debug   # Search and pick interactively
   promptstash match content commt # Fuzzy match 'commt' to 'commit.md' and show contents
+  promptstash link claude         # Link to Claude Code in current project
   promptstash self-update         # Update to latest version
 
 Prompts are located in: \$PROMPTSTASH_DIR
@@ -1161,6 +1332,22 @@ main() {
                     show_match_usage
                     ;;
             esac
+            ;;
+        link)
+            # Parse link command arguments (llm_type and optional --yes/-y flag)
+            local llm_arg=""
+            local non_interactive=false
+
+            # Check both $2 and $3 for LLM type and flag
+            for arg in "$2" "$3"; do
+                if [ "$arg" = "--yes" ] || [ "$arg" = "-y" ]; then
+                    non_interactive=true
+                elif [ "$arg" = "claude" ] || [ "$arg" = "copilot" ]; then
+                    llm_arg="$arg"
+                fi
+            done
+
+            link_llm "$llm_arg" "$non_interactive"
             ;;
         self-update)
             self_update
