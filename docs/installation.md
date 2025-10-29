@@ -104,7 +104,7 @@ Always reference all workflow documentation from the prompt stash directory:
 @$PROMPTSTASH_DIR/.promptstash
 ```
 
-**Note:** The `@$PROMPTSTASH_DIR/.promptstash` reference is expanded to your actual PromptStash directory path when the configuration is created (e.g., `@/Users/username/.promptstash/.promptstash`).
+**Note:** The `@$PROMPTSTASH_DIR/.promptstash` reference is expanded to your actual PromptStash directory path at link-time when the `promptstash link` command runs, not at runtime by the LLM (e.g., it becomes `@/Users/username/.promptstash/.promptstash` in the configuration file).
 
 ### Link to GitHub Copilot
 

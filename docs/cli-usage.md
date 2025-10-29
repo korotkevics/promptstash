@@ -239,7 +239,8 @@ Links PromptStash to Claude Code in the current project directory. Creates a loc
 ```bash
 promptstash link claude
 
-# Non-interactive mode (auto-confirm, skip .gitignore prompts)
+# Non-interactive mode for automation scripts and CI/CD pipelines
+# (auto-confirm, skip .gitignore prompts)
 promptstash link claude --yes
 promptstash link claude -y
 ```
@@ -283,7 +284,8 @@ Links PromptStash to GitHub Copilot in the current project directory. Creates a 
 ```bash
 promptstash link copilot
 
-# Non-interactive mode (auto-confirm, skip .gitignore prompts)
+# Non-interactive mode for automation scripts and CI/CD pipelines
+# (auto-confirm, skip .gitignore prompts)
 promptstash link copilot --yes
 promptstash link copilot -y
 ```

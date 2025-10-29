@@ -144,6 +144,9 @@ cd "$TEMP_TEST_DIR"
 mkdir -p .claude
 echo "@${PROMPTSTASH_DIR}/.promptstash" > .claude/CLAUDE.md
 
+# Store original content
+ORIGINAL_CONTENT=$(cat .claude/CLAUDE.md)
+
 # Try to link again - should abort
 OUTPUT=$(echo "y" | "$OLDPWD/bin/promptstash" link claude 2>&1 || true)
 
@@ -153,6 +156,16 @@ else
   echo -e "${RED}✗ Functional test: link doesn't abort on existing entry${NC}"
   ERRORS=$((ERRORS + 1))
 fi
+
+# Verify content unchanged
+CURRENT_CONTENT=$(cat .claude/CLAUDE.md)
+if [ "$ORIGINAL_CONTENT" = "$CURRENT_CONTENT" ]; then
+  echo -e "${GREEN}✓ Functional test: file content unchanged after abort${NC}"
+else
+  echo -e "${RED}✗ Functional test: file was modified despite abort${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
 cd "$OLDPWD"
 rm -rf "$TEMP_TEST_DIR"
 

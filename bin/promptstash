@@ -1168,7 +1168,7 @@ ${marker}"
         # File exists but no promptstash entry - append
         echo "Updating existing $config_file..."
         # Ensure proper spacing: add blank line before new content
-        if ! { echo "" >> "$config_file" && echo "" >> "$config_file" && echo "$content" >> "$config_file"; }; then
+        if ! { echo "" >> "$config_file" && echo "$content" >> "$config_file"; }; then
             echo -e "${RED}✗ Error: Failed to update $config_file${NC}"
             exit 1
         fi
@@ -1209,6 +1209,7 @@ ${marker}"
             read -p "Create .gitignore with $config_dir? (y/n): " create_gitignore
 
             if [ "$create_gitignore" = "y" ] || [ "$create_gitignore" = "Y" ]; then
+                # echo adds trailing newline by default, ensuring proper .gitignore format
                 if ! echo "$config_dir" > ".gitignore"; then
                     echo -e "${RED}✗ Error: Failed to create .gitignore${NC}"
                     exit 1
