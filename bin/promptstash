@@ -1061,6 +1061,7 @@ search_prompts() {
 # Link PromptStash to an LLM in the current project
 link_llm() {
     local llm_type="$1"
+    local non_interactive="$2"
 
     # Validate PROMPTSTASH_DIR is set
     if [ -z "$PROMPTSTASH_DIR" ]; then
@@ -1070,13 +1071,24 @@ link_llm() {
         exit 1
     fi
 
+    # Validate PROMPTSTASH_DIR directory exists
+    if [ ! -d "$PROMPTSTASH_DIR" ]; then
+        echo -e "${RED}✗ Error: PROMPTSTASH_DIR directory does not exist: $PROMPTSTASH_DIR${NC}"
+        echo ""
+        echo "Please verify your PromptStash installation."
+        exit 1
+    fi
+
     if [ -z "$llm_type" ]; then
         echo -e "${RED}✗ Error: link command requires an LLM type${NC}"
         echo ""
-        echo "Usage: promptstash link [claude|copilot]"
+        echo "Usage: promptstash link [claude|copilot] [--yes|-y]"
         echo ""
         echo "  claude   - Link to Claude Code (creates .claude/CLAUDE.md)"
         echo "  copilot  - Link to GitHub Copilot (creates .copilot/copilot-instructions.md)"
+        echo ""
+        echo "Options:"
+        echo "  --yes, -y  Non-interactive mode (auto-confirm prompts, skip .gitignore)"
         echo ""
         echo "Note: Requires PROMPTSTASH_DIR to be configured."
         exit 1
@@ -1090,15 +1102,17 @@ link_llm() {
         exit 1
     fi
 
-    # Confirm current directory is project root
-    echo -e "${BLUE}Link PromptStash to $llm_type in current directory:${NC}"
-    echo "  $(pwd)"
-    echo ""
-    read -p "Is this the project root directory? (y/n): " confirm
+    # Confirm current directory is project root (skip in non-interactive mode)
+    if [ "$non_interactive" != "true" ]; then
+        echo -e "${BLUE}Link PromptStash to $llm_type in current directory:${NC}"
+        echo "  $(pwd)"
+        echo ""
+        read -p "Is this the project root directory? (y/n): " confirm
 
-    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
-        echo "Aborted."
-        exit 0
+        if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+            echo "Aborted."
+            exit 0
+        fi
     fi
 
     # Set up paths and content based on LLM type
@@ -1138,8 +1152,14 @@ ${marker}"
 
     # Check if file exists
     if [ -f "$config_file" ]; then
+        # Check if file is readable
+        if [ ! -r "$config_file" ]; then
+            echo -e "${RED}✗ Error: Cannot read $config_file (permission denied)${NC}"
+            exit 1
+        fi
+
         # Check if promptstash entry already exists
-        if grep -Fq "$marker" "$config_file" 2>/dev/null; then
+        if grep -Fq "$marker" "$config_file"; then
             echo -e "${YELLOW}⚠ PromptStash is already linked in $config_file${NC}"
             echo "Aborted."
             exit 1
@@ -1147,7 +1167,8 @@ ${marker}"
 
         # File exists but no promptstash entry - append
         echo "Updating existing $config_file..."
-        if ! { echo "" >> "$config_file" && echo "$content" >> "$config_file"; }; then
+        # Ensure proper spacing: add blank line before new content
+        if ! { echo "" >> "$config_file" && echo "" >> "$config_file" && echo "$content" >> "$config_file"; }; then
             echo -e "${RED}✗ Error: Failed to update $config_file${NC}"
             exit 1
         fi
@@ -1162,30 +1183,38 @@ ${marker}"
         echo -e "${GREEN}✓ Created $config_file${NC}"
     fi
 
-    # Handle .gitignore
-    if [ -f ".gitignore" ]; then
-        if ! grep -Fxq "$config_dir" ".gitignore" 2>/dev/null; then
-            echo ""
-            read -p "Add $config_dir to .gitignore? (y/n): " add_gitignore
-
-            if [ "$add_gitignore" = "y" ] || [ "$add_gitignore" = "Y" ]; then
-                if ! echo "$config_dir" >> ".gitignore"; then
-                    echo -e "${RED}✗ Error: Failed to update .gitignore${NC}"
-                    exit 1
-                fi
-                echo -e "${GREEN}✓ Added $config_dir to .gitignore${NC}"
-            fi
-        fi
-    else
-        echo ""
-        read -p "Create .gitignore with $config_dir? (y/n): " create_gitignore
-
-        if [ "$create_gitignore" = "y" ] || [ "$create_gitignore" = "Y" ]; then
-            if ! echo "$config_dir" > ".gitignore"; then
-                echo -e "${RED}✗ Error: Failed to create .gitignore${NC}"
+    # Handle .gitignore (skip in non-interactive mode)
+    if [ "$non_interactive" != "true" ]; then
+        if [ -f ".gitignore" ]; then
+            # Check if .gitignore is readable
+            if [ ! -r ".gitignore" ]; then
+                echo -e "${RED}✗ Error: Cannot read .gitignore (permission denied)${NC}"
                 exit 1
             fi
-            echo -e "${GREEN}✓ Created .gitignore with $config_dir${NC}"
+
+            if ! grep -Fxq "$config_dir" ".gitignore"; then
+                echo ""
+                read -p "Add $config_dir to .gitignore? (y/n): " add_gitignore
+
+                if [ "$add_gitignore" = "y" ] || [ "$add_gitignore" = "Y" ]; then
+                    if ! echo "$config_dir" >> ".gitignore"; then
+                        echo -e "${RED}✗ Error: Failed to update .gitignore${NC}"
+                        exit 1
+                    fi
+                    echo -e "${GREEN}✓ Added $config_dir to .gitignore${NC}"
+                fi
+            fi
+        else
+            echo ""
+            read -p "Create .gitignore with $config_dir? (y/n): " create_gitignore
+
+            if [ "$create_gitignore" = "y" ] || [ "$create_gitignore" = "Y" ]; then
+                if ! echo "$config_dir" > ".gitignore"; then
+                    echo -e "${RED}✗ Error: Failed to create .gitignore${NC}"
+                    exit 1
+                fi
+                echo -e "${GREEN}✓ Created .gitignore with $config_dir${NC}"
+            fi
         fi
     fi
 
@@ -1215,8 +1244,8 @@ Commands:
   match name <pattern>     Fuzzy match prompt and output filename (e.g., commit.md)
   match content <pattern>  Fuzzy match prompt and output file contents
   match path <pattern>     Fuzzy match prompt and output file path
-  link claude      Link PromptStash to Claude Code in current project
-  link copilot     Link PromptStash to GitHub Copilot in current project
+  link claude [--yes|-y]       Link PromptStash to Claude Code in current project
+  link copilot [--yes|-y]      Link PromptStash to GitHub Copilot in current project
   self-update      Update PromptStash to the latest version
   cleanup          Check for and remove unnecessary files
   version          Show the current version
@@ -1304,8 +1333,20 @@ main() {
             esac
             ;;
         link)
-            # Link command requires an LLM type
-            link_llm "$2"
+            # Parse link command arguments (llm_type and optional --yes/-y flag)
+            local llm_arg=""
+            local non_interactive=false
+
+            # Check both $2 and $3 for LLM type and flag
+            for arg in "$2" "$3"; do
+                if [ "$arg" = "--yes" ] || [ "$arg" = "-y" ]; then
+                    non_interactive=true
+                elif [ "$arg" = "claude" ] || [ "$arg" = "copilot" ]; then
+                    llm_arg="$arg"
+                fi
+            done
+
+            link_llm "$llm_arg" "$non_interactive"
             ;;
         self-update)
             self_update

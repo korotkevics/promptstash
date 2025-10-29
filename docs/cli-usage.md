@@ -232,12 +232,16 @@ The `match` commands use greedy left-to-right character matching. All pattern ch
 
 ---
 
-### `promptstash link claude`
+### `promptstash link claude [--yes|-y]`
 
 Links PromptStash to Claude Code in the current project directory. Creates a local `.claude/CLAUDE.md` file that references your PromptStash workflows.
 
 ```bash
 promptstash link claude
+
+# Non-interactive mode (auto-confirm, skip .gitignore prompts)
+promptstash link claude --yes
+promptstash link claude -y
 ```
 
 **Example:**
@@ -261,20 +265,27 @@ File configured:
 ```
 
 **Behavior:**
-- Confirms the current directory is the project root before proceeding
+- Confirms the current directory is the project root before proceeding (skipped with `--yes`)
 - Creates `.claude/CLAUDE.md` with PromptStash workflow references
 - If file exists without PromptStash entry: appends the reference
 - If file exists with PromptStash entry: aborts with warning
-- Optionally adds `.claude` to `.gitignore`
+- Optionally adds `.claude` to `.gitignore` (skipped with `--yes`)
+
+**Options:**
+- `--yes` or `-y`: Non-interactive mode. Skips confirmation prompts and .gitignore modifications. Useful for CI/CD environments and automation scripts.
 
 ---
 
-### `promptstash link copilot`
+### `promptstash link copilot [--yes|-y]`
 
 Links PromptStash to GitHub Copilot in the current project directory. Creates a local `.copilot/copilot-instructions.md` file that references your PromptStash workflows.
 
 ```bash
 promptstash link copilot
+
+# Non-interactive mode (auto-confirm, skip .gitignore prompts)
+promptstash link copilot --yes
+promptstash link copilot -y
 ```
 
 **Example:**

@@ -177,6 +177,104 @@ fi
 cd "$OLDPWD"
 rm -rf "$TEMP_TEST_DIR"
 
+# Test 15: Functional test - verify error on invalid PROMPTSTASH_DIR
+TESTS=$((TESTS + 1))
+TEMP_TEST_DIR=$(mktemp -d)
+cd "$TEMP_TEST_DIR"
+
+# Set PROMPTSTASH_DIR to non-existent directory
+ORIGINAL_PROMPTSTASH_DIR="$PROMPTSTASH_DIR"
+export PROMPTSTASH_DIR="/nonexistent/path/to/promptstash"
+
+# Try to link - should fail with proper error
+OUTPUT=$(echo "y" | "$OLDPWD/bin/promptstash" link claude 2>&1 || true)
+
+if echo "$OUTPUT" | grep -q "PROMPTSTASH_DIR directory does not exist"; then
+  echo -e "${GREEN}✓ Functional test: link fails gracefully with invalid PROMPTSTASH_DIR${NC}"
+else
+  echo -e "${RED}✗ Functional test: link doesn't validate PROMPTSTASH_DIR existence${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Restore original PROMPTSTASH_DIR
+export PROMPTSTASH_DIR="$ORIGINAL_PROMPTSTASH_DIR"
+
+cd "$OLDPWD"
+rm -rf "$TEMP_TEST_DIR"
+
+# Test 16: Functional test - verify abort on declining project root confirmation
+TESTS=$((TESTS + 1))
+TEMP_TEST_DIR=$(mktemp -d)
+cd "$TEMP_TEST_DIR"
+
+# Answer 'n' to project root confirmation - should abort
+OUTPUT=$(echo "n" | "$OLDPWD/bin/promptstash" link claude 2>&1 || true)
+
+if echo "$OUTPUT" | grep -q "Aborted"; then
+  echo -e "${GREEN}✓ Functional test: link aborts when user declines confirmation${NC}"
+else
+  echo -e "${RED}✗ Functional test: link doesn't abort on declined confirmation${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Verify no files were created when aborted
+if [ ! -d ".claude" ] && [ ! -f ".claude/CLAUDE.md" ]; then
+  # Files correctly not created - this is expected
+  :
+else
+  echo -e "${RED}✗ Functional test: files created despite abort${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+cd "$OLDPWD"
+rm -rf "$TEMP_TEST_DIR"
+
+# Test 17: Functional test - verify --yes flag skips prompts
+TESTS=$((TESTS + 1))
+TEMP_TEST_DIR=$(mktemp -d)
+cd "$TEMP_TEST_DIR"
+
+# Create a .gitignore to verify it's not modified with --yes
+echo "# existing content" > .gitignore
+
+# Use --yes flag - should not prompt for anything
+OUTPUT=$("$OLDPWD/bin/promptstash" link claude --yes 2>&1 || true)
+
+if [ -f ".claude/CLAUDE.md" ] && grep -q "@" ".claude/CLAUDE.md"; then
+  echo -e "${GREEN}✓ Functional test: link --yes creates file without prompts${NC}"
+else
+  echo -e "${RED}✗ Functional test: link --yes failed to create file${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# Verify .gitignore wasn't modified (only has original content)
+if grep -q "# existing content" .gitignore && ! grep -q ".claude" .gitignore; then
+  echo -e "${GREEN}✓ Functional test: link --yes skips .gitignore modification${NC}"
+else
+  echo -e "${RED}✗ Functional test: link --yes modified .gitignore${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+cd "$OLDPWD"
+rm -rf "$TEMP_TEST_DIR"
+
+# Test 18: Functional test - verify -y flag works the same as --yes
+TESTS=$((TESTS + 1))
+TEMP_TEST_DIR=$(mktemp -d)
+cd "$TEMP_TEST_DIR"
+
+# Use -y flag (short form)
+OUTPUT=$("$OLDPWD/bin/promptstash" link copilot -y 2>&1 || true)
+
+if [ -f ".copilot/copilot-instructions.md" ] && grep -q "@" ".copilot/copilot-instructions.md"; then
+  echo -e "${GREEN}✓ Functional test: link -y works as short form${NC}"
+else
+  echo -e "${RED}✗ Functional test: link -y failed${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+cd "$OLDPWD"
+rm -rf "$TEMP_TEST_DIR"
+
 # Summary
 echo ""
 echo "Tests: $TESTS"
