@@ -1062,6 +1062,14 @@ search_prompts() {
 link_llm() {
     local llm_type="$1"
 
+    # Validate PROMPTSTASH_DIR is set
+    if [ -z "$PROMPTSTASH_DIR" ]; then
+        echo -e "${RED}✗ Error: PROMPTSTASH_DIR is not set${NC}"
+        echo ""
+        echo "Please configure PromptStash first. See installation documentation."
+        exit 1
+    fi
+
     if [ -z "$llm_type" ]; then
         echo -e "${RED}✗ Error: link command requires an LLM type${NC}"
         echo ""
@@ -1069,6 +1077,8 @@ link_llm() {
         echo ""
         echo "  claude   - Link to Claude Code (creates .claude/CLAUDE.md)"
         echo "  copilot  - Link to GitHub Copilot (creates .copilot/copilot-instructions.md)"
+        echo ""
+        echo "Note: Requires PROMPTSTASH_DIR to be configured."
         exit 1
     fi
 
@@ -1110,7 +1120,10 @@ link_llm() {
     # Create config directory if it doesn't exist
     if [ ! -d "$config_dir" ]; then
         echo "Creating $config_dir directory..."
-        mkdir -p "$config_dir"
+        if ! mkdir -p "$config_dir"; then
+            echo -e "${RED}✗ Error: Failed to create $config_dir${NC}"
+            exit 1
+        fi
         echo -e "${GREEN}✓ Created $config_dir${NC}"
     fi
 
@@ -1134,13 +1147,18 @@ ${marker}"
 
         # File exists but no promptstash entry - append
         echo "Updating existing $config_file..."
-        echo "" >> "$config_file"
-        echo "$content" >> "$config_file"
+        if ! { echo "" >> "$config_file" && echo "$content" >> "$config_file"; }; then
+            echo -e "${RED}✗ Error: Failed to update $config_file${NC}"
+            exit 1
+        fi
         echo -e "${GREEN}✓ Updated $config_file${NC}"
     else
         # Create new file
         echo "Creating new $config_file..."
-        echo "$content" > "$config_file"
+        if ! echo "$content" > "$config_file"; then
+            echo -e "${RED}✗ Error: Failed to create $config_file${NC}"
+            exit 1
+        fi
         echo -e "${GREEN}✓ Created $config_file${NC}"
     fi
 
@@ -1151,7 +1169,10 @@ ${marker}"
             read -p "Add $config_dir to .gitignore? (y/n): " add_gitignore
 
             if [ "$add_gitignore" = "y" ] || [ "$add_gitignore" = "Y" ]; then
-                echo "$config_dir" >> ".gitignore"
+                if ! echo "$config_dir" >> ".gitignore"; then
+                    echo -e "${RED}✗ Error: Failed to update .gitignore${NC}"
+                    exit 1
+                fi
                 echo -e "${GREEN}✓ Added $config_dir to .gitignore${NC}"
             fi
         fi
@@ -1160,7 +1181,10 @@ ${marker}"
         read -p "Create .gitignore with $config_dir? (y/n): " create_gitignore
 
         if [ "$create_gitignore" = "y" ] || [ "$create_gitignore" = "Y" ]; then
-            echo "$config_dir" > ".gitignore"
+            if ! echo "$config_dir" > ".gitignore"; then
+                echo -e "${RED}✗ Error: Failed to create .gitignore${NC}"
+                exit 1
+            fi
             echo -e "${GREEN}✓ Created .gitignore with $config_dir${NC}"
         fi
     fi
