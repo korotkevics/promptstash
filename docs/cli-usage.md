@@ -279,7 +279,7 @@ File configured:
 
 ### `promptstash link copilot [--yes|-y]`
 
-Links PromptStash to GitHub Copilot in the current project directory. Creates a local `.copilot/copilot-instructions.md` file that references your PromptStash workflows.
+Links PromptStash to GitHub Copilot in the current project directory. Creates a local `.github/copilot-instructions.md` file that references your PromptStash workflows.
 
 ```bash
 promptstash link copilot
@@ -290,28 +290,28 @@ promptstash link copilot --yes
 promptstash link copilot -y
 ```
 
-**Example:**
+Example:
 ```bash
 Link PromptStash to copilot in current directory:
   /Users/username/my-project
 
 Is this the project root directory? (y/n): y
-Creating .copilot directory...
-✓ Created .copilot
-Creating new .copilot/copilot-instructions.md...
-✓ Created .copilot/copilot-instructions.md
+Creating .github directory...
+✓ Created .github
+Creating new .github/copilot-instructions.md...
+✓ Created .github/copilot-instructions.md
 
-Add .copilot to .gitignore? (y/n): y
-✓ Added .copilot to .gitignore
+Add .github to .gitignore? (y/n): y
+✓ Added .github to .gitignore
 
 ✓ Successfully linked PromptStash to copilot!
 
 File configured:
-  • .copilot/copilot-instructions.md
+  • .github/copilot-instructions.md
 ```
 
 **Behavior:**
-- Same as `link claude` but creates `.copilot/copilot-instructions.md`
+- Same as `link claude` but creates `.github/copilot-instructions.md`
 - Content format is identical to Claude, referencing PromptStash workflows
 
 ---
