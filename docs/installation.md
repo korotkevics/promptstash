@@ -115,7 +115,7 @@ cd /path/to/your/project
 promptstash link copilot
 ```
 
-This creates a local `.copilot/copilot-instructions.md` file with the same content structure as Claude.
+This creates a local `.github/copilot-instructions.md` file with the same content structure as Claude.
 
 ### Behavior Details
 

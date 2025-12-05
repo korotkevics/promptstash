@@ -40,7 +40,7 @@ fi
 
 # Test 4: Verify link command validates LLM type
 TESTS=$((TESTS + 1))
-if grep -q 'if \[ "$llm_type" != "claude" \] && \[ "$llm_type" != "copilot" \]' bin/promptstash; then
+if grep -q 'if \[ "$llm_type" != "claude" ] && \[ "$llm_type" != "copilot" ]' bin/promptstash; then
   echo -e "${GREEN}✓ link command validates LLM type${NC}"
 else
   echo -e "${RED}✗ link command doesn't validate LLM type${NC}"
@@ -58,7 +58,7 @@ fi
 
 # Test 6: Verify link command handles .copilot directory
 TESTS=$((TESTS + 1))
-if grep -q '\.copilot' bin/promptstash; then
+if grep -q '\.github' bin/promptstash; then
   echo -e "${GREEN}✓ link command handles .copilot directory${NC}"
 else
   echo -e "${RED}✗ link command doesn't handle .copilot directory${NC}"
@@ -126,8 +126,8 @@ cd "$TEMP_TEST_DIR"
 # Simulate user input: confirm directory (y), don't add to gitignore (n)
 echo -e "y\nn" | "$OLDPWD/bin/promptstash" link copilot > /dev/null 2>&1 || true
 
-if [ -f ".copilot/copilot-instructions.md" ] && grep -q "@" ".copilot/copilot-instructions.md"; then
-  echo -e "${GREEN}✓ Functional test: copilot link creates .copilot/copilot-instructions.md${NC}"
+if [ -f ".github/copilot-instructions.md" ] && grep -q "@" ".github/copilot-instructions.md"; then
+  echo -e "${GREEN}✓ Functional test: copilot link creates .github/copilot-instructions.md${NC}"
 else
   echo -e "${RED}✗ Functional test: copilot link failed to create file${NC}"
   ERRORS=$((ERRORS + 1))
@@ -278,7 +278,7 @@ cd "$TEMP_TEST_DIR"
 # Use -y flag (short form)
 OUTPUT=$("$OLDPWD/bin/promptstash" link copilot -y 2>&1 || true)
 
-if [ -f ".copilot/copilot-instructions.md" ] && grep -q "@" ".copilot/copilot-instructions.md"; then
+if [ -f ".github/copilot-instructions.md" ] && grep -q "@" ".github/copilot-instructions.md"; then
   echo -e "${GREEN}✓ Functional test: link -y works as short form${NC}"
 else
   echo -e "${RED}✗ Functional test: link -y failed${NC}"

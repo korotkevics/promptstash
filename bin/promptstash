@@ -1085,7 +1085,7 @@ link_llm() {
         echo "Usage: promptstash link [claude|copilot] [--yes|-y]"
         echo ""
         echo "  claude   - Link to Claude Code (creates .claude/CLAUDE.md)"
-        echo "  copilot  - Link to GitHub Copilot (creates .copilot/copilot-instructions.md)"
+        echo "  copilot  - Link to GitHub Copilot (creates .github/copilot-instructions.md)"
         echo ""
         echo "Options:"
         echo "  --yes, -y  Non-interactive mode (auto-confirm prompts, skip .gitignore)"
@@ -1126,7 +1126,7 @@ link_llm() {
             config_file="$config_dir/CLAUDE.md"
             ;;
         copilot)
-            config_dir=".copilot"
+            config_dir=".github"
             config_file="$config_dir/copilot-instructions.md"
             ;;
     esac
